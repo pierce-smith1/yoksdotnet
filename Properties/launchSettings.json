@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "yoksdotnet": {
+      "commandName": "Project",
+      "hotReloadEnabled": false
+    }
+  }
+}

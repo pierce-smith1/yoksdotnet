@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="resources\cvjoy.png" />
+    <None Remove="resources\cvyoy.png" />
+    <None Remove="resources\fn.png" />
+    <None Remove="resources\fnplead.png" />
+    <None Remove="resources\fnyoy.png" />
+    <None Remove="resources\lk.png" />
+    <None Remove="resources\lkconcern.png" />
+    <None Remove="resources\lkcool.png" />
+    <None Remove="resources\lkexhausted.png" />
+    <None Remove="resources\lkhusk.png" />
+    <None Remove="resources\lkjoy.png" />
+    <None Remove="resources\lkmoyai.png" />
+    <None Remove="resources\lksix.png" />
+    <None Remove="resources\lkthink.png" />
+    <None Remove="resources\lkthumbsup.png" />
+    <None Remove="resources\lkunamused.png" />
+    <None Remove="resources\lkxd.png" />
+    <None Remove="resources\lkyoy.png" />
+    <None Remove="resources\lkyoyapprove.png" />
+    <None Remove="resources\nx.png" />
+    <None Remove="resources\vx.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="2.88.8" />
+    <PackageReference Include="SkiaSharp.Views.WindowsForms" Version="2.88.8" />
+    <PackageReference Include="SkiaSharp.Views.WPF" Version="2.88.8" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Resource Include="resources\cvjoy.png" />
+    <Resource Include="resources\cvyoy.png" />
+    <Resource Include="resources\fn.png" />
+    <Resource Include="resources\fnplead.png" />
+    <Resource Include="resources\fnyoy.png" />
+    <Resource Include="resources\lk.png" />
+    <Resource Include="resources\lkconcern.png" />
+    <Resource Include="resources\lkcool.png" />
+    <Resource Include="resources\lkexhausted.png" />
+    <Resource Include="resources\lkhusk.png" />
+    <Resource Include="resources\lkjoy.png" />
+    <Resource Include="resources\lkmoyai.png" />
+    <Resource Include="resources\lksix.png" />
+    <Resource Include="resources\lkthink.png" />
+    <Resource Include="resources\lkthumbsup.png" />
+    <Resource Include="resources\lkunamused.png" />
+    <Resource Include="resources\lkxd.png" />
+    <Resource Include="resources\lkyoy.png" />
+    <Resource Include="resources\lkyoyapprove.png" />
+    <Resource Include="resources\nx.png" />
+    <Resource Include="resources\vx.png" />
+  </ItemGroup>
+
+</Project>
