@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using yoksdotnet.common;
 using yoksdotnet.drawing;
@@ -30,12 +31,26 @@ public class EntityGenerator
                 Width = 128,
                 Height = 128,
                 AngleRadians = 0.0,
-                Paint = Palettes.Paints[rng.SampleEnum<PaletteId>()],
+                Paint = Palettes.Paints[GetRandomPalette()],
             };
 
             entities.Add(newEntity);
         }
 
         return entities;
+    }
+
+    private PaletteId GetRandomPalette()
+    {
+        var possiblePalettes = Options.Palette switch
+        {
+            PaletteChoice.SingleGroup choice => Palettes.Definitions
+                .Where(pair => pair.Value.Group == choice.Group)
+                .Select(pair => pair.Key),
+
+            _ => throw new NotImplementedException(),
+        };
+
+        return RandomUtils.SharedRng.Sample(possiblePalettes);
     }
 }

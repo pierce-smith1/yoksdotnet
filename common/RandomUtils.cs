@@ -19,6 +19,11 @@ public static class RandomUtils
         return source.ElementAt(index);
     }
 
+    public static T Sample<T>(this IEnumerable<T> source, Random rng)
+    {
+        return rng.Sample(source);
+    }
+
     public static EnumType SampleEnum<EnumType>(this Random rng) where EnumType : Enum
     {
         var enumValues = Enum.GetValues(typeof(EnumType)).Cast<EnumType>();

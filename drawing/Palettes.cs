@@ -10,11 +10,21 @@ public enum PaletteId
 {
     Autumn,
     Ascent,
+    Aemil,
+    Loxxe,
 }
 
 public enum PaletteGroup
 {
     XpInspired,
+    Fractalthorns,
+}
+
+public record PaletteChoice
+{
+    public record SingleGroup(PaletteGroup? Group) : PaletteChoice();
+    public record UserDefined() : PaletteChoice();
+    public record ImFeelingLucky() : PaletteChoice();
 }
 
 public enum PaletteIndex
@@ -88,6 +98,16 @@ public static class Palettes
 
     public static readonly Dictionary<PaletteId, PaletteDefinition> Definitions = new()
     {
+        { PaletteId.Ascent, new(
+            PaletteGroup.XpInspired,
+            "#1963c4",
+            "#1963c4",
+            "#0b407d",
+            "#8c96dd",
+            "#8c96dd",
+            "#ffffff",
+            "#506bbc"
+        )},
         { PaletteId.Autumn, new(
             PaletteGroup.XpInspired,
             "#db8313",
@@ -98,16 +118,26 @@ public static class Palettes
             "#f3e6e9",
             "#000000"
         )},
-        { PaletteId.Ascent, new(
-            PaletteGroup.XpInspired,
-            "#1963c4",
-            "#1963c4",
-            "#0b407d",
-            "#8c96dd",
-            "#8c96dd",
-            "#ffffff",
-            "#506bbc"
-        )}
+        { PaletteId.Aemil, new(
+            PaletteGroup.Fractalthorns,
+            "#56eb8e",
+            "#84f5c3",
+            "#1d9550",
+            "#e29a56",
+            "#e16a72",
+            "#dff9eb",
+            "#966336"
+        )},
+        { PaletteId.Loxxe, new(
+            PaletteGroup.Fractalthorns,
+            "#243966",
+            "#31487a",
+            "#16274d",
+            "#122240",
+            "#546e78",
+            "#a4b2b6",
+            "#0b162c"
+        )},
     };
 
     private static SKPaint DefinitionToPaint(PaletteDefinition palette)
