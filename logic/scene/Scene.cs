@@ -69,9 +69,4 @@ public class Scene
     {
         _choreographer.HandleFrame();
     }
-
-    public IEnumerable<SceneEntity> GetEntities()
-    {
-        return Entities;
-    }
 }
