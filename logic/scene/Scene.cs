@@ -25,7 +25,7 @@ public class Scene
         SetSize(width, height);
 
         _entityGenerator = new()
-        { 
+        {
             Options = options,
         };
 
