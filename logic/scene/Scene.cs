@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
+using yoksdotnet.common;
+
 namespace yoksdotnet.logic.scene;
 
 public class Scene
@@ -17,7 +19,7 @@ public class Scene
     private List<SceneEntity> _entities = [];
     private DateTimeOffset? _lastTick;
     private EntityGenerator _entityGenerator;
-    private List<MoveFunction> _movers = [];
+    private PatternId _currentPattern;
 
     public Scene(ScrOptions options, int width, int height)
     {
@@ -36,11 +38,7 @@ public class Scene
         );
         _entities.AddRange(initialEntities);
 
-        _movers =
-        [
-            Patterns.Functions[PatternId.Roamers],
-            EntityMovers.OffscreenMover,
-        ];
+        _currentPattern = RandomUtils.SharedRng.Sample(options.AvailablePatterns);
     }
 
     public void SetSize(int width, int height)
@@ -70,10 +68,8 @@ public class Scene
     {
         foreach (var entity in _entities)
         {
-            foreach (var mover in _movers)
-            {
-                mover(this, entity, _entities);
-            }
+            Patterns.Functions[_currentPattern](this, entity, _entities);
+            EntityMovers.OffscreenMover(this, entity, _entities);
         }
     }
 
