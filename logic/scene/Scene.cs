@@ -16,10 +16,11 @@ public class Scene
 
     public ScrOptions Options { get; init; }
 
-    private List<SceneEntity> _entities = [];
+    public List<SceneEntity> Entities { get; private set; } = [];
+
     private DateTimeOffset? _lastTick;
     private EntityGenerator _entityGenerator;
-    private PatternId _currentPattern;
+    private Choreographer _choreographer;
 
     public Scene(ScrOptions options, int width, int height)
     {
@@ -31,14 +32,14 @@ public class Scene
             Options = options,
         };
 
+        _choreographer = new(options: options, scene: this);
+
         var initialEntities = _entityGenerator.Make
         (
             spreadX: width,
             spreadY: height
         );
-        _entities.AddRange(initialEntities);
-
-        _currentPattern = RandomUtils.SharedRng.Sample(options.AvailablePatterns);
+        Entities.AddRange(initialEntities);
     }
 
     public void SetSize(int width, int height)
@@ -66,15 +67,11 @@ public class Scene
 
     private void Simulate()
     {
-        foreach (var entity in _entities)
-        {
-            Patterns.Functions[_currentPattern](this, entity, _entities);
-            EntityMovers.OffscreenMover(this, entity, _entities);
-        }
+        _choreographer.HandleFrame();
     }
 
-    public IEnumerable<SceneEntity> GetEntityView()
+    public IEnumerable<SceneEntity> GetEntities()
     {
-        return _entities;
+        return Entities;
     }
 }

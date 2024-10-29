@@ -59,7 +59,7 @@ public partial class DisplayWindow : Window
     {
         e.Surface.Canvas.Clear(SKColors.BlueViolet);
 
-        foreach (var entity in Scene?.GetEntityView() ?? [])
+        foreach (var entity in Scene?.GetEntities() ?? [])
         {
             _drawer?.Draw(e.Surface.Canvas, entity);
         }
