@@ -56,6 +56,11 @@ public class Choreographer
         var possiblePatterns = Options.AvailablePatterns
             .Where(pattern => pattern != _currentPattern);
 
+        if (! possiblePatterns.Any())
+        {
+            return;
+        }
+
         _currentPattern = RandomUtils.SharedRng.Sample(possiblePatterns);
 
         _lastPatternChangeSeconds = Scene.Seconds;
