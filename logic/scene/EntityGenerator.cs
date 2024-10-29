@@ -19,7 +19,7 @@ public class EntityGenerator
 
         List<SceneEntity> entities = new(Options.EntityCount);
 
-        var selectedPalettes = SelectPalettes();
+        var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
         for (var i = 0; i < Options.EntityCount; i++)
         {
@@ -33,7 +33,7 @@ public class EntityGenerator
                 Width = 128,
                 Height = 128,
                 AngleRadians = 0.0,
-                Paint = Palettes.Paints[rng.SampleExponential(selectedPalettes)],
+                Paint = Palettes.Paints[rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count() / totalPossibleCount)],
             };
 
             entities.Add(newEntity);
@@ -42,7 +42,7 @@ public class EntityGenerator
         return entities;
     }
 
-    private List<PaletteId> SelectPalettes()
+    private (List<PaletteId> Palettes, int TotalPossibleCount) SelectPalettes()
     {
         var possiblePalettes = Options.Palette switch
         {
@@ -59,6 +59,6 @@ public class EntityGenerator
             .OrderBy(x => RandomUtils.SharedRng.Next())
             .Take(usableColorsCount);
 
-        return [..selectedPalettes];
+        return ([..selectedPalettes], possiblePalettes.Count());
     }
 }
