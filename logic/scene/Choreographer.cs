@@ -18,7 +18,7 @@ public class Choreographer
         Options = options;
         Scene = scene;
 
-        _currentPattern = RandomUtils.SharedRng.Sample(options.AvailablePatterns);
+        _currentPattern = options.StartingPattern ?? RandomUtils.SharedRng.Sample(options.AvailablePatterns);
     }
 
     public void HandleFrame()
