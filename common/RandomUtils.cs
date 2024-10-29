@@ -24,6 +24,27 @@ public static class RandomUtils
         return rng.Sample(source);
     }
 
+    public static T SampleExponential<T>(this Random rng, IEnumerable<T> source, double factor)
+    {
+        if (! source.Any())
+        {
+            throw new InvalidOperationException("Sample from empty list");
+        }
+
+        factor = Math.Clamp(factor, 0.1, 1.0);
+
+        while (true)
+        {
+            foreach (var item in source.OrderBy(x => rng.Next()))
+            {
+                if (rng.NextDouble() < factor)
+                {
+                    return item;
+                }
+            }
+        }
+    }
+
     public static EnumType SampleEnum<EnumType>(this Random rng) where EnumType : Enum
     {
         var enumValues = Enum.GetValues(typeof(EnumType)).Cast<EnumType>();

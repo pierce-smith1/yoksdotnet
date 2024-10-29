@@ -51,6 +51,8 @@ public class EntityGenerator
             _ => throw new NotImplementedException(),
         };
 
-        return RandomUtils.SharedRng.Sample(possiblePalettes);
+        var usableColorsCount = Math.Min(Options.ColorsCount, possiblePalettes.Count());
+
+        return RandomUtils.SharedRng.SampleExponential(possiblePalettes, factor: 1 - usableColorsCount / possiblePalettes.Count());
     }
 }
