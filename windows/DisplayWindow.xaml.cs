@@ -57,7 +57,7 @@ public partial class DisplayWindow : Window
 
     private void OnPaintSurface(object? sender, SKPaintGLSurfaceEventArgs e)
     {
-        e.Surface.Canvas.Clear(SKColors.BlueViolet);
+        e.Surface.Canvas.Clear(new SKColor(0x11, 0x11, 0x11));
 
         foreach (var entity in Scene?.Entities ?? [])
         {

@@ -10,6 +10,10 @@ public enum PaletteId
 {
     Autumn,
     Ascent,
+    Azul,
+    Bliss,
+    Crystal,
+
     Aemil,
     Loxxe,
 }
@@ -118,6 +122,37 @@ public static class Palettes
             "#f3e6e9",
             "#000000"
         )},
+        { PaletteId.Azul, new(
+            PaletteGroup.XpInspired,
+            "#1aadd9",
+            "#a1d0e5",
+            "#296d9e",
+            "#4d8db9",
+            "#296d9e",
+            "#ffffff",
+            "#103050"
+        )},
+        { PaletteId.Bliss, new(
+            PaletteGroup.XpInspired,
+            "#73981e",
+            "#73981e",
+            "#3d5317",
+            "#6a96f2",
+            "#282438",
+            "#eaf2ff",
+            "#3b73ee"
+        )},
+        { PaletteId.Crystal, new(
+            PaletteGroup.XpInspired,
+            "#38399e",
+            "#51b7cf",
+            "#1c63d8",
+            "#434ad9",
+            "#0a1a4a",
+            "#eaf2ff",
+            "#0a1a4a"
+        )},
+
         { PaletteId.Aemil, new(
             PaletteGroup.Fractalthorns,
             "#56eb8e",

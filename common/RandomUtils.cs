@@ -24,20 +24,18 @@ public static class RandomUtils
         return rng.Sample(source);
     }
 
-    public static T SampleExponential<T>(this Random rng, IEnumerable<T> source, double factor)
+    public static T SampleExponential<T>(this Random rng, IEnumerable<T> source)
     {
         if (! source.Any())
         {
             throw new InvalidOperationException("Sample from empty list");
         }
 
-        factor = Math.Clamp(factor, 0.1, 1.0);
-
         while (true)
         {
-            foreach (var item in source.OrderBy(x => rng.Next()))
+            foreach (var item in source)
             {
-                if (rng.NextDouble() < factor)
+                if (rng.NextDouble() < 0.7)
                 {
                     return item;
                 }

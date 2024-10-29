@@ -12,10 +12,10 @@ public class ScrOptions
     public int EntityCount { get; init; } = 100;
     public double EntityScale { get; init; } = 0.5;
 
-    public PaletteChoice Palette { get; init; } = new PaletteChoice.SingleGroup(PaletteGroup.Fractalthorns);
-    public int ColorsCount { get; init; } = 2;
+    public PaletteChoice Palette { get; init; } = new PaletteChoice.SingleGroup(PaletteGroup.XpInspired);
+    public int ColorsCount { get; init; } = 5;
 
-    public List<PatternId> AvailablePatterns { get; init; } = Enum.GetValues<PatternId>().ToList();
+    public List<PatternId> AvailablePatterns { get; init; } = [.. Enum.GetValues<PatternId>()];
     public PatternId? StartingPattern { get; init; } = PatternId.Roamers;
     public double? PatternChangeSeconds { get; init; } = 10.0;
 }
