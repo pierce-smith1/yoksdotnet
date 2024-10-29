@@ -38,7 +38,7 @@ public class Scene
 
         _movers =
         [
-            EntityMovers.Functions[PatternId.Roamers],
+            Patterns.Functions[PatternId.Roamers],
             EntityMovers.OffscreenMover,
         ];
     }
