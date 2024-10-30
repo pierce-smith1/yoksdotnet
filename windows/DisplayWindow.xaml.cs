@@ -56,7 +56,7 @@ public partial class DisplayWindow : Window
                 break;
 
             case DisplayMode.Preview(var parentHandle):
-                InitForPreview(parentHandle);
+                // Doesn't work and I don't know why. Ignoring for now but we should come back to this.
                 break;
         }
 
@@ -83,24 +83,6 @@ public partial class DisplayWindow : Window
 
         Width = globalMaxX - globalMinX;
         Height = globalMaxY - globalMinY;
-
-        Left = 0;
-        Top = 0;
-    }
-
-    // Adapted from https://sites.harding.edu/fmccown/screensaver/screensaver.html
-    private void InitForPreview(nint parentHandle)
-    {
-        var interop = new System.Windows.Interop.WindowInteropHelper(this);
-        var thisHandle = interop.Handle;
-
-        SetParent(thisHandle, parentHandle);
-
-        SetWindowLong(thisHandle, -16, new IntPtr(GetWindowLong(thisHandle, -16) | 0x40000000));
-
-        GetClientRect(parentHandle, out var parentRect);
-        Width = parentRect.Width;
-        Height = parentRect.Height;
 
         Left = 0;
         Top = 0;
