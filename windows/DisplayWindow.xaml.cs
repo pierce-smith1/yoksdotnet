@@ -2,8 +2,9 @@
 using SkiaSharp.Views.Desktop;
 
 using System;
-using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
@@ -16,40 +17,47 @@ namespace yoksdotnet.windows;
 
 public partial class DisplayWindow : Window
 {
+    #region Win32 interop defs
+
+    [DllImport("user32.dll")]
+    static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+    [DllImport("user32.dll")]
+    static extern int SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll")]
+    static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
+
+    #endregion
+
     public Scene? Scene { get; private set; }
     public int DesiredFps { get; private set; } = 60;
 
     private EntityPainter _painter = new();
 
-    public enum DisplayMode
+    public record DisplayMode()
     {
-        Windowed,
-        Screensaver,
+        public record Debug() : DisplayMode();
+        public record Screensaver() : DisplayMode();
+        public record Preview(nint parentHandle) : DisplayMode();
     }
 
-    public DisplayWindow(DisplayMode mode = DisplayMode.Windowed, long? parentHandle = null)
+    public DisplayWindow(DisplayMode mode)
     {
         InitializeComponent();
 
-        if (mode == DisplayMode.Screensaver)
+        switch (mode)
         {
-            WindowStyle = WindowStyle.None;
-            ResizeMode = ResizeMode.NoResize;
+            case DisplayMode.Screensaver:
+                InitForScreensaver();
+                break;
 
-            var globalMinX = Screen.AllScreens.Select(screen => screen.Bounds.Left).Min();
-            var globalMaxX = Screen.AllScreens.Select(screen => screen.Bounds.Right).Max();
-
-            var globalMinY = Screen.AllScreens.Select(screen => screen.Bounds.Top).Min();
-            var globalMaxY = Screen.AllScreens.Select(screen => screen.Bounds.Bottom).Max();
-
-            var finalWidth = globalMaxX - globalMinX;
-            var finalHeight = globalMaxY - globalMinY;
-
-            Width = finalWidth;
-            Height = finalHeight;
-
-            Left = 0;
-            Top = 0;
+            case DisplayMode.Preview(var parentHandle):
+                InitForPreview(parentHandle);
+                break;
         }
 
         Scene = new
@@ -60,6 +68,42 @@ public partial class DisplayWindow : Window
         );
 
         StartLoop();
+    }
+
+    private void InitForScreensaver()
+    {
+        WindowStyle = WindowStyle.None;
+        ResizeMode = ResizeMode.NoResize;
+
+        var globalMinX = Screen.AllScreens.Select(screen => screen.Bounds.Left).Min();
+        var globalMaxX = Screen.AllScreens.Select(screen => screen.Bounds.Right).Max();
+
+        var globalMinY = Screen.AllScreens.Select(screen => screen.Bounds.Top).Min();
+        var globalMaxY = Screen.AllScreens.Select(screen => screen.Bounds.Bottom).Max();
+
+        Width = globalMaxX - globalMinX;
+        Height = globalMaxY - globalMinY;
+
+        Left = 0;
+        Top = 0;
+    }
+
+    // Adapted from https://sites.harding.edu/fmccown/screensaver/screensaver.html
+    private void InitForPreview(nint parentHandle)
+    {
+        var interop = new System.Windows.Interop.WindowInteropHelper(this);
+        var thisHandle = interop.Handle;
+
+        SetParent(thisHandle, parentHandle);
+
+        SetWindowLong(thisHandle, -16, new IntPtr(GetWindowLong(thisHandle, -16) | 0x40000000));
+
+        GetClientRect(parentHandle, out var parentRect);
+        Width = parentRect.Width;
+        Height = parentRect.Height;
+
+        Left = 0;
+        Top = 0;
     }
 
     private void StartLoop()
