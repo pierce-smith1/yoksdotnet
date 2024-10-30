@@ -2,6 +2,7 @@
 using SkiaSharp.Views.Desktop;
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -88,6 +89,21 @@ public partial class DisplayWindow : Window
         Top = 0;
 
         System.Windows.Forms.Cursor.Hide();
+
+        // Windows forms repeatedly fires MouseMove events even if you aren't doing shit.
+        // I'm forced to manually check that the position of the mouse hasn't changed.
+        (int X, int Y)? lastMouseLocation = null;
+        MainCanvas.Child.MouseMove += (s, e) =>
+        {
+            if (lastMouseLocation is not null && lastMouseLocation != (e.X, e.Y))
+            {
+                Shutdown();
+            }
+
+            lastMouseLocation = (e.X, e.Y);
+        };
+
+        KeyDown += (s, e) => Shutdown();
     }
 
     private void StartLoop()
@@ -126,5 +142,10 @@ public partial class DisplayWindow : Window
 
         var host = (WindowsFormsHost)sender!;
         host.Child = glControl;
+    }
+
+    private void Shutdown()
+    {
+        System.Windows.Application.Current.Shutdown();
     }
 }
