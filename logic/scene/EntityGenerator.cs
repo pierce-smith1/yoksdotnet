@@ -44,7 +44,7 @@ public class EntityGenerator
 
     private (List<PaletteId> Palettes, int TotalPossibleCount) SelectPalettes()
     {
-        var possiblePalettes = Options.Palette switch
+        var possiblePalettes = Options.PaletteChoice switch
         {
             PaletteChoice.SingleGroup choice => Palettes.Definitions
                 .Where(pair => pair.Value.Group == choice.Group)
