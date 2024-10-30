@@ -2,14 +2,13 @@
 using SkiaSharp.Views.Desktop;
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 
 using yoksdotnet.drawing;
-using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.windows;
@@ -19,13 +18,11 @@ public partial class DisplayWindow : Window
     public Scene? Scene { get; private set; }
     public int DesiredFps { get; private set; } = 60;
 
-    private EntityPainter _drawer = new();
+    private EntityPainter _painter = new();
 
     public DisplayWindow()
     {
         InitializeComponent();
-
-        WindowState = WindowState.Maximized;
 
         Scene = new
         (
@@ -61,7 +58,7 @@ public partial class DisplayWindow : Window
 
         foreach (var entity in Scene?.Entities ?? [])
         {
-            _drawer?.Draw(e.Surface.Canvas, entity);
+            _painter?.Draw(e.Surface.Canvas, entity);
         }
     }
 
