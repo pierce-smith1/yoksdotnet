@@ -86,6 +86,8 @@ public partial class DisplayWindow : Window
 
         Left = 0;
         Top = 0;
+
+        System.Windows.Forms.Cursor.Hide();
     }
 
     private void StartLoop()
