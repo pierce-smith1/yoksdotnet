@@ -30,23 +30,22 @@ public partial class App : Application
 
             case RunType.Show:
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Screensaver());
-                MainWindow.Show();
                 break;
 
             case RunType.Preview(var parentHandle):
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Preview(parentHandle));
-                MainWindow.Show();
                 break;
 
             case RunType.Debug:
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Debug());
-                MainWindow.Show();
                 break;
 
             case null:
                 Shutdown();
                 break;
         }
+
+        MainWindow.Show();
     }
 
     private RunType? DetermineRunType(StartupEventArgs e)

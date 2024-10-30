@@ -16,10 +16,10 @@ public class Scene
 
     public ScrOptions Options { get; init; }
 
-    public List<SceneEntity> Entities { get; private set; } = [];
+    public List<Sprite> Entities { get; private set; } = [];
 
     private DateTimeOffset? _lastTick;
-    private EntityGenerator _entityGenerator;
+    private SpriteGenerator _entityGenerator;
     private Choreographer _choreographer;
 
     public Scene(ScrOptions options, int width, int height)

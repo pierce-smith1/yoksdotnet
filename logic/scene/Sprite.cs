@@ -7,7 +7,7 @@ public record struct Vector(double X, double Y);
 
 public partial class MoverState {}
 
-public class SceneEntity
+public class Sprite
 {
     public required int Id;
     public required double Brand;
@@ -40,7 +40,7 @@ public class SceneEntity
     }
 }
 
-public class Yokin : SceneEntity
+public class Yokin : Sprite
 {
     public record struct EmotionVector(double Empathy, double Ambition, double Optimism);
 

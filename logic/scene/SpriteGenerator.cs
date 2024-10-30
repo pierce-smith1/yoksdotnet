@@ -7,23 +7,23 @@ using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
 
-public class EntityGenerator
+public class SpriteGenerator
 {
     public required ScrOptions Options { get; init; }
 
     private static int _runningId = 0;
 
-    public IEnumerable<SceneEntity> Make(double spreadX = 1.0, double spreadY = 1.0)
+    public IEnumerable<Sprite> Make(double spreadX = 1.0, double spreadY = 1.0)
     {
         var rng = RandomUtils.SharedRng;
 
-        List<SceneEntity> entities = new(Options.EntityCount);
+        List<Sprite> entities = new(Options.EntityCount);
 
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
         for (var i = 0; i < Options.EntityCount; i++)
         {
-            var newEntity = new SceneEntity
+            var newEntity = new Sprite
             {
                 Id = _runningId++,
                 Brand = rng.NextDouble(),

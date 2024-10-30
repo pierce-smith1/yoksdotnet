@@ -31,7 +31,7 @@ public class Choreographer
         foreach (var entity in Scene.Entities)
         {
             Patterns.Functions[_currentPattern](Scene, entity, Scene.Entities);
-            EntityMovers.OffscreenMover(Scene, entity, Scene.Entities);
+            SpriteMovers.OffscreenMover(Scene, entity, Scene.Entities);
         }
     }
 

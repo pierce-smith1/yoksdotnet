@@ -6,7 +6,7 @@ namespace yoksdotnet.drawing;
 
 public class EntityPainter
 {
-    public void Draw(SKCanvas canvas, SceneEntity entity)
+    public void Draw(SKCanvas canvas, Sprite entity)
     {
         var (TopLeft, BotRight) = entity.GetBounds();
 

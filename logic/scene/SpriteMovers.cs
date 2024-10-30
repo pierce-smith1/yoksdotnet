@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace yoksdotnet.logic.scene;
 
-public delegate void MoveFunction(Scene scene, SceneEntity entity, IEnumerable<SceneEntity> allEntities);
+public delegate void MoveFunction(Scene scene, Sprite entity, IEnumerable<Sprite> allEntities);
 
 public partial class MoverState
 {
@@ -16,9 +16,9 @@ public partial class MoverState
     public OffscreenBehaviors OffscreenBehavior { get; set; } = OffscreenBehaviors.Wrap;
 }
 
-public static class EntityMovers
+public static class SpriteMovers
 {
-    public static void OffscreenMover(Scene scene, SceneEntity entity, IEnumerable<SceneEntity> allEntities)
+    public static void OffscreenMover(Scene scene, Sprite entity, IEnumerable<Sprite> allEntities)
     {
         var bounds = entity.GetBounds();
 
