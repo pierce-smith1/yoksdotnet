@@ -34,7 +34,9 @@ public partial class App : Application
                 break;
 
             case RunType.Preview(var parentHandle):
-                throw new NotImplementedException();
+                MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Preview(parentHandle));
+                MainWindow.Show();
+                break;
 
             case RunType.Debug:
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Debug());
