@@ -29,23 +29,21 @@ public partial class App : Application
                 throw new NotImplementedException();
 
             case RunType.Show:
-                MainWindow = new DisplayWindow();
+                MainWindow = new DisplayWindow(DisplayWindow.DisplayMode.Screensaver);
                 MainWindow.Show();
                 break;
 
-            case RunType.Preview:
+            case RunType.Preview(var parentHandle):
                 throw new NotImplementedException();
 
             case RunType.Debug:
-                throw new NotImplementedException();
+                MainWindow = new DisplayWindow(DisplayWindow.DisplayMode.Windowed);
+                MainWindow.Show();
+                break;
 
             case null:
                 Shutdown();
                 break;
-        }
-
-        if (runType is null)
-        {
         }
     }
 

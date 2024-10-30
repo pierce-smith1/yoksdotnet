@@ -3,6 +3,7 @@ using SkiaSharp.Views.Desktop;
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
@@ -20,9 +21,33 @@ public partial class DisplayWindow : Window
 
     private EntityPainter _painter = new();
 
-    public DisplayWindow()
+    public enum DisplayMode
+    {
+        Windowed,
+        Screensaver,
+    }
+
+    public DisplayWindow(DisplayMode mode = DisplayMode.Windowed, long? parentHandle = null)
     {
         InitializeComponent();
+
+        if (mode == DisplayMode.Screensaver)
+        {
+            WindowStyle = WindowStyle.None;
+            ResizeMode = ResizeMode.NoResize;
+
+            var globalMinX = Screen.AllScreens.Select(screen => screen.Bounds.Left).Min();
+            var globalMaxX = Screen.AllScreens.Select(screen => screen.Bounds.Right).Max();
+
+            var globalMinY = Screen.AllScreens.Select(screen => screen.Bounds.Top).Min();
+            var globalMaxY = Screen.AllScreens.Select(screen => screen.Bounds.Bottom).Max();
+
+            var finalWidth = globalMaxX - globalMinX;
+            var finalHeight = globalMaxY - globalMinY;
+
+            Width = finalWidth;
+            Height = finalHeight;
+        }
 
         Scene = new
         (
