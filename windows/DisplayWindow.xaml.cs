@@ -47,6 +47,9 @@ public partial class DisplayWindow : Window
 
             Width = finalWidth;
             Height = finalHeight;
+
+            Left = 0;
+            Top = 0;
         }
 
         Scene = new
