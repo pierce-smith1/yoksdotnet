@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Forms;
 
 namespace yoksdotnet.logic;
 
@@ -85,6 +86,15 @@ public static class PerlinNoise
     private static readonly FastRandom _rng = new();
     private static readonly uint _baseSeed = (uint)DateTimeOffset.Now.Millisecond;
 
+    public static double Get(double x, double y, double z)
+    {
+        NoiseVector v = new() { X = x, Y = y, Z = z };
+
+        var dots = GetCellDots(v);
+        var result = CellInterpolate(ref dots, v);
+        return result;
+    }
+
     private static NoiseVector GetGradVector(double x, double y, double z)
     {
         double seed = _baseSeed;
@@ -118,7 +128,7 @@ public static class PerlinNoise
         double y = Math.Floor(v.Y);
         double z = Math.Floor(v.Z);
 
-        return new()
+        CellVectors corners = new()
         {
             A = new() { X = x,       Y = y,       Z = z       },
             B = new() { X = x + 1.0, Y = y,       Z = z       },
@@ -129,13 +139,14 @@ public static class PerlinNoise
             G = new() { X = x,       Y = y + 1.0, Z = z + 1.0 },
             H = new() { X = x + 1.0, Y = y + 1.0, Z = z + 1.0 },
         };
+        return corners;
     }
 
     private static CellVectors GetOffsetVectors(NoiseVector v)
     {
         var corners = GetCellCorners(v);
 
-        return new()
+        CellVectors offsets = new()
         {
             A = v.Subtract(corners.A),
             B = v.Subtract(corners.B),
@@ -146,6 +157,26 @@ public static class PerlinNoise
             G = v.Subtract(corners.G),
             H = v.Subtract(corners.H)
         };
+        return offsets;
+    }
+
+    private static CellDots GetCellDots(NoiseVector v)
+    {
+        var offsets = GetOffsetVectors(v);
+        var corners = GetCellCorners(v);
+
+        CellDots dots = new()
+        {
+            A = offsets.A.Dot(GetGradVectorFromCorner(corners.A)),
+            B = offsets.B.Dot(GetGradVectorFromCorner(corners.B)),
+            C = offsets.C.Dot(GetGradVectorFromCorner(corners.C)),
+            D = offsets.D.Dot(GetGradVectorFromCorner(corners.D)),
+            E = offsets.E.Dot(GetGradVectorFromCorner(corners.E)),
+            F = offsets.F.Dot(GetGradVectorFromCorner(corners.F)),
+            G = offsets.G.Dot(GetGradVectorFromCorner(corners.G)),
+            H = offsets.H.Dot(GetGradVectorFromCorner(corners.H)),
+        };
+        return dots;
     }
 
     private static double CellInterpolate(ref readonly CellDots dots, NoiseVector v)
