@@ -128,7 +128,7 @@ public partial class DisplayWindow : Window
     {
         e.Surface.Canvas.Clear(new SKColor(0x11, 0x11, 0x11));
 
-        foreach (var entity in Scene?.Entities ?? [])
+        foreach (var entity in Scene?.Sprites ?? [])
         {
             _painter?.Draw(e.Surface.Canvas, entity);
         }

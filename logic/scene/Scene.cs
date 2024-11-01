@@ -11,9 +11,7 @@ public class Scene
     public int Width { get; private set; }
     public int Height { get; private set; }
 
-    public ScrOptions Options { get; init; }
-
-    public List<Sprite> Entities { get; private set; } = [];
+    public List<Sprite> Sprites { get; private set; } = [];
 
     private DateTimeOffset? _lastTick;
     private SpriteGenerator _entityGenerator;
@@ -21,7 +19,6 @@ public class Scene
 
     public Scene(ScrOptions options, int width, int height)
     {
-        Options = options;
         SetSize(width, height);
 
         _entityGenerator = new()
@@ -36,7 +33,7 @@ public class Scene
             spreadX: width,
             spreadY: height
         );
-        Entities.AddRange(initialEntities);
+        Sprites.AddRange(initialEntities);
     }
 
     public void SetSize(int width, int height)

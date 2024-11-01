@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 using yoksdotnet.common;
@@ -10,6 +9,7 @@ public class Choreographer
     public Scene Scene { get; init; }
     public ScrOptions Options { get; init; }
 
+    private EmotionHandler _emotionHandler;
     private double? _lastPatternChangeSeconds = null;
     private PatternId _currentPattern;
 
@@ -18,6 +18,11 @@ public class Choreographer
         Options = options;
         Scene = scene;
 
+        _emotionHandler = new()
+        {
+            Scene = scene,
+            Options = options,
+        };
         _currentPattern = options.StartingPattern ?? RandomUtils.SharedRng.Sample(options.AvailablePatterns);
     }
 
@@ -28,10 +33,12 @@ public class Choreographer
             ChangePattern();
         }
 
-        foreach (var entity in Scene.Entities)
+        foreach (var sprite in Scene.Sprites)
         {
-            Patterns.Functions[_currentPattern](Scene, entity, Scene.Entities);
-            SpriteMovers.OffscreenMover(Scene, entity, Scene.Entities);
+            Patterns.Functions[_currentPattern](Scene, sprite, Scene.Sprites);
+            SpriteMovers.OffscreenMover(Scene, sprite, Scene.Sprites);
+
+            _emotionHandler.UpdateEmotions(sprite);
         }
     }
 

@@ -1,5 +1,6 @@
 using System;
-using System.Windows.Forms;
+
+using yoksdotnet.common;
 
 namespace yoksdotnet.logic;
 
@@ -53,37 +54,7 @@ public static class PerlinNoise
         public required double H { get; init; }
     }
 
-    // Our RNG has to be REALLY fast here because it will be called
-    // for every sprite multiple times a frame.
-    // C# also does not provide a way to seed its standard Random class
-    // without creating a new one, which is unacceptable for this use case.
-    // So after an extremely minimal amount of research, I've decided to roll an xorshift.
-    // Adapted from https://en.wikipedia.org/wiki/Xorshift
-    private class FastRandom
-    {
-        private uint _state;
-
-        public void SetSeed(uint seed)
-        {
-            _state = seed;
-        }
-
-        public uint NextInt()
-        {
-            _state ^= _state << 13;
-            _state ^= _state >> 17;
-            _state ^= _state << 5;
-            return _state;
-        }
-
-        public double NextDouble()
-        {
-            var x = NextInt();
-            return (double)x / uint.MaxValue;
-        }
-    }
-
-    private static readonly FastRandom _rng = new();
+    private static readonly RandomUtils.FastRandom _rng = new();
     private static readonly uint _baseSeed = (uint)DateTimeOffset.Now.Millisecond;
 
     public static double Get(double x, double y, double z)
