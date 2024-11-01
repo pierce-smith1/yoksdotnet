@@ -39,8 +39,7 @@ public partial class DisplayWindow : Window
     public int DesiredFps { get; private set; } = 60;
 
     private DisplayMode _displayMode;
-    private EntityPainter _painter = new();
-    private DebugPainter _debugPainter = new();
+    private ScenePainter _scenePainter;
 
     public record DisplayMode()
     {
@@ -62,6 +61,10 @@ public partial class DisplayWindow : Window
             case DisplayMode.Preview(var parentHandle):
                 // Doesn't work and I don't know why. Ignoring for now but we should come back to this.
                 break;
+
+            case DisplayMode.Debug:
+                InitForDebug();
+                break;
         }
 
         Scene = new
@@ -72,6 +75,11 @@ public partial class DisplayWindow : Window
         );
 
         _displayMode = mode;
+        _scenePainter = new()
+        {
+            Scene = Scene,
+            DisplayMode = mode,
+        };
 
         StartLoop();
     }
@@ -111,6 +119,24 @@ public partial class DisplayWindow : Window
         KeyDown += (s, e) => Shutdown();
     }
 
+    private void InitForDebug()
+    {
+        MainCanvas.Child.MouseUp += (s, e) =>
+        {
+            var clickedSprite = Scene?.Sprites?.FirstOrDefault(sprite =>
+            {
+                var bounds = sprite.GetBounds();
+
+                var mouseXIntersects = e.X > bounds.TopLeft.X && e.X < bounds.BotRight.X;
+                var mouseYIntersects = e.Y > bounds.TopLeft.Y && e.Y < bounds.BotRight.Y;
+
+                return mouseXIntersects && mouseYIntersects;
+            });
+
+            _scenePainter.DebuggedSprite = clickedSprite;
+        };
+    }
+
     private void StartLoop()
     {
         var loopTimer = new System.Timers.Timer(1000 / DesiredFps);
@@ -131,17 +157,7 @@ public partial class DisplayWindow : Window
 
     private void OnPaintSurface(object? sender, SKPaintGLSurfaceEventArgs e)
     {
-        e.Surface.Canvas.Clear(new SKColor(0x11, 0x11, 0x11));
-
-        foreach (var entity in Scene?.Sprites ?? [])
-        {
-            _painter?.Draw(e.Surface.Canvas, entity);
-
-            if (_displayMode is DisplayMode.Debug) 
-            {
-                _debugPainter?.DrawDebugInfo(e.Surface.Canvas, entity);
-            }
-        }
+        _scenePainter.Draw(e.Surface.Canvas);
     }
 
     private void CreateGlContext(object? sender, EventArgs e)
