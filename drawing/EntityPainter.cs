@@ -6,15 +6,8 @@ namespace yoksdotnet.drawing;
 
 public class EntityPainter
 {
-    public void Draw(SKCanvas canvas, Sprite entity)
+    public void Draw(SKCanvas canvas, Sprite sprite)
     {
-        var (TopLeft, BotRight) = entity.GetBounds();
-
-        canvas.DrawBitmap
-        (
-            Images.lk,
-            new SKRect((float)TopLeft.X, (float)TopLeft.Y, (float)BotRight.X, (float)BotRight.Y),
-            entity.Paint
-        );
+        canvas.DrawBitmap(Images.lk, sprite.GetRect(), sprite.Paint);
     }
 }

@@ -10,6 +10,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
+using System.Windows.Input;
 
 using yoksdotnet.drawing;
 using yoksdotnet.logic.scene;
@@ -37,7 +38,9 @@ public partial class DisplayWindow : Window
     public Scene? Scene { get; private set; }
     public int DesiredFps { get; private set; } = 60;
 
+    private DisplayMode _displayMode;
     private EntityPainter _painter = new();
+    private DebugPainter _debugPainter = new();
 
     public record DisplayMode()
     {
@@ -67,6 +70,8 @@ public partial class DisplayWindow : Window
             width: (int)Width,
             height: (int)Height
         );
+
+        _displayMode = mode;
 
         StartLoop();
     }
@@ -131,6 +136,7 @@ public partial class DisplayWindow : Window
         foreach (var entity in Scene?.Sprites ?? [])
         {
             _painter?.Draw(e.Surface.Canvas, entity);
+            _debugPainter?.DrawDebugInfo(e.Surface.Canvas, entity);
         }
     }
 
