@@ -136,7 +136,11 @@ public partial class DisplayWindow : Window
         foreach (var entity in Scene?.Sprites ?? [])
         {
             _painter?.Draw(e.Surface.Canvas, entity);
-            _debugPainter?.DrawDebugInfo(e.Surface.Canvas, entity);
+
+            if (_displayMode is DisplayMode.Debug) 
+            {
+                _debugPainter?.DrawDebugInfo(e.Surface.Canvas, entity);
+            }
         }
     }
 

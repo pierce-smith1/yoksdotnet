@@ -23,7 +23,7 @@ public class SpriteGenerator
 
         for (var i = 0; i < Options.EntityCount; i++)
         {
-            var newEntity = new Sprite
+            var newEntity = new Yokin
             {
                 Id = _runningId++,
                 Brand = rng.NextDouble(),
@@ -34,6 +34,7 @@ public class SpriteGenerator
                 Height = 128,
                 AngleRadians = 0.0,
                 Paint = Palettes.Paints[rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count() / totalPossibleCount)],
+                Emotion = new(),
             };
 
             entities.Add(newEntity);
