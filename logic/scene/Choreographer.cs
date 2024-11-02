@@ -1,6 +1,7 @@
 using System.Linq;
 
 using yoksdotnet.common;
+using yoksdotnet.logic.scene.patterns;
 
 namespace yoksdotnet.logic.scene;
 
@@ -35,7 +36,8 @@ public class Choreographer
 
         foreach (var sprite in Scene.Sprites)
         {
-            Patterns.Functions[_currentPattern](Scene, sprite, Scene.Sprites);
+            Patterns.GetFunction(_currentPattern)(Scene, sprite, Scene.Sprites);
+
             SpriteMovers.OffscreenMover(Scene, sprite, Scene.Sprites);
             SpriteMovers.YokinShakeMover(Scene, sprite, Scene.Sprites);
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using yoksdotnet.drawing;
-using yoksdotnet.logic.scene;
+using yoksdotnet.logic.scene.patterns;
 
 namespace yoksdotnet.logic;
 
@@ -16,5 +16,5 @@ public class ScrOptions
 
     public List<PatternId> AvailablePatterns { get; init; } = [.. Enum.GetValues<PatternId>()];
     public PatternId? StartingPattern { get; init; } = PatternId.Roamers;
-    public double? PatternChangeSeconds { get; init; } = null;
+    public double? PatternChangeSeconds { get; init; } = 10.0;
 }
