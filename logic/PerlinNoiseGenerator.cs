@@ -20,8 +20,8 @@ public class PerlinNoiseGenerator
     public double Get(double x, double y, double z)
     {
         int cubeX = (int)Math.Floor(x) & 255;
-        int cubeY = (int)Math.Floor(x) & 255;
-        int cubeZ = (int)Math.Floor(x) & 255;
+        int cubeY = (int)Math.Floor(y) & 255;
+        int cubeZ = (int)Math.Floor(z) & 255;
 
         double relativeX = x - Math.Floor(x);
         double relativeY = y - Math.Floor(y);

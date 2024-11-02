@@ -15,13 +15,13 @@ public class EmotionHandler
         }
 
         yokin.Emotion.Ambition = GetNoiseForSprite(sprite, 0.0);
-        yokin.Emotion.Empathy = GetNoiseForSprite(sprite, 100.0);
-        yokin.Emotion.Optimism = GetNoiseForSprite(sprite, 200.0);
+        yokin.Emotion.Empathy = GetNoiseForSprite(sprite, 1000.0);
+        yokin.Emotion.Optimism = GetNoiseForSprite(sprite, 2000.0);
     }
 
     private double GetNoiseForSprite(Sprite sprite, double zOffset)
     {
-        var noise = _perlinNoiseGenerator.Get(sprite.Home.X / 100.0, sprite.Home.Y / 100.0, Scene.Seconds + zOffset);
+        var noise = _perlinNoiseGenerator.Get(sprite.Home.X / 1000.0, sprite.Home.Y / 1000.0, Scene.Seconds + zOffset / 50.0);
         return noise;
     }
 }
