@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using yoksdotnet.common;
+
 namespace yoksdotnet.logic.scene;
 
-public delegate void MoveFunction(Scene scene, Sprite entity, IEnumerable<Sprite> allEntities);
+public delegate void MoveFunction(Scene scene, Sprite sprite, IEnumerable<Sprite> allSprites);
 
 public partial class MoverState
 {
@@ -18,9 +20,9 @@ public partial class MoverState
 
 public static class SpriteMovers
 {
-    public static void OffscreenMover(Scene scene, Sprite entity, IEnumerable<Sprite> allEntities)
+    public static void OffscreenMover(Scene scene, Sprite sprite, IEnumerable<Sprite> allSprites)
     {
-        var bounds = entity.GetBounds();
+        var bounds = sprite.GetBounds();
 
         var xInBounds = bounds.BotRight.X >= 0 && bounds.TopLeft.X <= scene.Width;
         var yInBounds = bounds.BotRight.Y >= 0 && bounds.TopLeft.Y <= scene.Height;
@@ -31,7 +33,7 @@ public static class SpriteMovers
             return;
         }
 
-        switch (entity.MoverState.OffscreenBehavior)
+        switch (sprite.MoverState.OffscreenBehavior)
         {
             case MoverState.OffscreenBehaviors.Wrap:
                 var boundsWidth = bounds.BotRight.X - bounds.TopLeft.X;
@@ -39,21 +41,38 @@ public static class SpriteMovers
 
                 if (!xInBounds)
                 {
-                    entity.Home.X += (scene.Width + boundsWidth) * (entity.Home.X < 0 ? 1 : -1);
+                    sprite.Home.X += (scene.Width + boundsWidth) * (sprite.Home.X < 0 ? 1 : -1);
                 } 
 
                 if (!yInBounds)
                 {
-                    entity.Home.Y += (scene.Height + boundsHeight) * (entity.Home.Y < 0 ? 1 : -1);
+                    sprite.Home.Y += (scene.Height + boundsHeight) * (sprite.Home.Y < 0 ? 1 : -1);
                 }
 
                 break;
 
             case MoverState.OffscreenBehaviors.Clamp:
-                entity.Home.X = Math.Clamp(entity.Home.X, entity.Offset.X, scene.Width + entity.Offset.X);
-                entity.Home.Y = Math.Clamp(entity.Home.Y, entity.Offset.Y, scene.Width + entity.Offset.Y);
+                sprite.Home.X = Math.Clamp(sprite.Home.X, sprite.Offset.X, scene.Width + sprite.Offset.X);
+                sprite.Home.Y = Math.Clamp(sprite.Home.Y, sprite.Offset.Y, scene.Width + sprite.Offset.Y);
 
                 break;
         }
+    }
+
+    public static void YokinShakeMover(Scene scene, Sprite sprite, IEnumerable<Sprite> allSprites)
+    {
+        if (sprite is not Yokin yokin)
+        {
+            return;
+        }
+
+        var emotionMagnitude = yokin.GetEmotionStrength();
+        var rng = RandomUtils.SharedRng;
+
+        sprite.Offset.X += (rng.NextDouble() * 2 - 1) * Math.Sqrt(emotionMagnitude);
+        sprite.Offset.Y += (rng.NextDouble() * 2 - 1) * Math.Sqrt(emotionMagnitude);
+
+        sprite.Offset.X = Math.Clamp(sprite.Offset.X, -20, 20);
+        sprite.Offset.Y = Math.Clamp(sprite.Offset.Y, -20, 20);
     }
 }

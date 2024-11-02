@@ -12,9 +12,8 @@ public class DebugPainter
     {
         return 
         [
-            sprite is Yokin yokin1 ? $"A: {yokin1.Emotion.Ambition:0.##}" : "",
-            sprite is Yokin yokin2 ? $"E: {yokin2.Emotion.Empathy:0.##}" : "",
-            sprite is Yokin yokin3 ? $"O: {yokin3.Emotion.Optimism:0.##}" : "",
+            $"offX: {sprite.Offset.X}",
+            $"offY: {sprite.Offset.Y}",
         ];
     }
 
@@ -41,7 +40,7 @@ public class DebugPainter
                 Color = SKColors.White,
             };
 
-            var yOffset = (i + 1) * 20;
+            var yOffset = (i + 1) * 15;
             var textPos = new SKPoint
             {
                 X = spriteRect.Location.X,

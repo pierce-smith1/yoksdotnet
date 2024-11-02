@@ -37,6 +37,7 @@ public class Choreographer
         {
             Patterns.Functions[_currentPattern](Scene, sprite, Scene.Sprites);
             SpriteMovers.OffscreenMover(Scene, sprite, Scene.Sprites);
+            SpriteMovers.YokinShakeMover(Scene, sprite, Scene.Sprites);
 
             _emotionHandler.UpdateEmotions(sprite);
         }
