@@ -21,7 +21,12 @@ public class EmotionHandler
 
     private double GetNoiseForSprite(Sprite sprite, double zOffset)
     {
-        var noise = _perlinNoiseGenerator.Get(sprite.Home.X / 1000.0, sprite.Home.Y / 1000.0, Scene.Seconds + zOffset / 50.0);
+        var noise = _perlinNoiseGenerator.Get
+        (
+            sprite.Home.X / 1000.0, 
+            sprite.Home.Y / 1000.0, 
+            (Scene.Seconds + zOffset) / 50.0
+        );
         return noise;
     }
 }

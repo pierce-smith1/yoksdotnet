@@ -19,33 +19,33 @@ public class PerlinNoiseGenerator
     // Adapted from https://mrl.cs.nyu.edu/~perlin/noise/
     public double Get(double x, double y, double z)
     {
-        int cubeX = (int)Math.Floor(x) & 255;
-        int cubeY = (int)Math.Floor(y) & 255;
-        int cubeZ = (int)Math.Floor(z) & 255;
+        var cubeX = (int)Math.Floor(x) & 255;
+        var cubeY = (int)Math.Floor(y) & 255;
+        var cubeZ = (int)Math.Floor(z) & 255;
 
-        double relativeX = x - Math.Floor(x);
-        double relativeY = y - Math.Floor(y);
-        double relativeZ = z - Math.Floor(z);
+        var relativeX = x - Math.Floor(x);
+        var relativeY = y - Math.Floor(y);
+        var relativeZ = z - Math.Floor(z);
 
-        double u = Fade(relativeX);
-        double v = Fade(relativeY);
-        double w = Fade(relativeZ);
+        var u = Fade(relativeX);
+        var v = Fade(relativeY);
+        var w = Fade(relativeZ);
 
-        int cornerHashA = _permutation[cubeX] + cubeY;
-        int cornerHashAA = _permutation[cornerHashA] + cubeZ;
-        int cornerHashAB = _permutation[cornerHashA + 1] + cubeZ;
-        int cornerHashB = _permutation[cubeX + 1] + cubeY;
-        int cornerHashBA = _permutation[cornerHashB] + cubeZ;
-        int cornerHashBB = _permutation[cornerHashB + 1] + cubeZ;
+        var cornerHashA = _permutation[cubeX] + cubeY;
+        var cornerHashAA = _permutation[cornerHashA] + cubeZ;
+        var cornerHashAB = _permutation[cornerHashA + 1] + cubeZ;
+        var cornerHashB = _permutation[cubeX + 1] + cubeY;
+        var cornerHashBA = _permutation[cornerHashB] + cubeZ;
+        var cornerHashBB = _permutation[cornerHashB + 1] + cubeZ;
 
         var cornerGradAA  = Grad(_permutation[cornerHashAA], relativeX,     relativeY,     relativeZ    );
         var cornerGradBA  = Grad(_permutation[cornerHashBA], relativeX - 1, relativeY,     relativeZ    );
         var cornerGradAB  = Grad(_permutation[cornerHashAB], relativeX,     relativeY - 1, relativeZ    );
         var cornerGradBB  = Grad(_permutation[cornerHashBB], relativeX - 1, relativeY - 1, relativeZ    );
-        var cornerGradAAZ = Grad(_permutation[cornerHashAA], relativeX,     relativeY,     relativeZ - 1);
-        var cornerGradBAZ = Grad(_permutation[cornerHashBA], relativeX - 1, relativeY,     relativeZ - 1);
-        var cornerGradABZ = Grad(_permutation[cornerHashAB], relativeX,     relativeY - 1, relativeZ - 1);
-        var cornerGradBBZ = Grad(_permutation[cornerHashBB], relativeX - 1, relativeY - 1, relativeZ - 1);
+        var cornerGradAAZ = Grad(_permutation[cornerHashAA + 1], relativeX,     relativeY,     relativeZ - 1);
+        var cornerGradBAZ = Grad(_permutation[cornerHashBA + 1], relativeX - 1, relativeY,     relativeZ - 1);
+        var cornerGradABZ = Grad(_permutation[cornerHashAB + 1], relativeX,     relativeY - 1, relativeZ - 1);
+        var cornerGradBBZ = Grad(_permutation[cornerHashBB + 1], relativeX - 1, relativeY - 1, relativeZ - 1);
 
         var lerpXA = Lerp(u, cornerGradAA, cornerGradAB);
         var lerpXB = Lerp(u, cornerGradAB, cornerGradBB);
