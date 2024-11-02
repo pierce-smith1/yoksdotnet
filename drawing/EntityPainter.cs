@@ -8,6 +8,6 @@ public class EntityPainter
 {
     public void Draw(SKCanvas canvas, Sprite sprite)
     {
-        canvas.DrawBitmap(Images.lk, sprite.GetRect(), sprite.Paint);
+        canvas.DrawBitmap(Bitmaps.Lk, sprite.GetRect(), sprite.Paint);
     }
 }
