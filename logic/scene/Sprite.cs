@@ -1,5 +1,7 @@
 ﻿using SkiaSharp;
 
+using System;
+
 namespace yoksdotnet.logic.scene;
 
 public record struct Point(double X, double Y);
@@ -48,6 +50,9 @@ public class Yokin : Sprite
 
     public double GetEmotionStrength()
     {
-        return (Emotion.Empathy + Emotion.Ambition + Emotion.Optimism) / 3.0;
+        var (e, a, o) = Emotion;
+
+        var result =  Math.Sqrt(e * e + a * a + o * o);
+        return result;
     }
 }

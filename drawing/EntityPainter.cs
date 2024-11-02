@@ -54,7 +54,7 @@ public class EntityPainter
 
         static int getEmotionRanking(double emotion)
         {
-            if (emotion < 0.33) return -1;
+            if (emotion < -0.66) return -1;
             if (emotion < 0.66) return 0;
             return 1;
         }

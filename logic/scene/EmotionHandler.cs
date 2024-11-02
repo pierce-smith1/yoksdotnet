@@ -27,6 +27,7 @@ public class EmotionHandler
             sprite.Home.Y / 1000.0, 
             (Scene.Seconds + zOffset) / 50.0
         );
-        return noise;
+        var result = (noise * 2) - 1;
+        return result;
     }
 }

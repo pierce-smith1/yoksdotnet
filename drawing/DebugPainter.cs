@@ -10,11 +10,12 @@ public class DebugPainter
 {
     private List<string> InfoToReport(Sprite sprite)
     {
-        return 
+        return sprite is Yokin yokin ?
         [
-            $"offX: {sprite.Offset.X}",
-            $"offY: {sprite.Offset.Y}",
-        ];
+            $"E: {yokin.Emotion.Empathy}",
+            $"A: {yokin.Emotion.Ambition}",
+            $"O: {yokin.Emotion.Optimism}",
+        ] : [];
     }
 
     public void DrawDebugInfo(SKCanvas canvas, Sprite sprite)

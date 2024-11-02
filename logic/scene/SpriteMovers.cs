@@ -69,8 +69,8 @@ public static class SpriteMovers
         var emotionMagnitude = yokin.GetEmotionStrength();
         var rng = RandomUtils.SharedRng;
 
-        sprite.Offset.X += (rng.NextDouble() * 2 - 1) * Math.Sqrt(emotionMagnitude);
-        sprite.Offset.Y += (rng.NextDouble() * 2 - 1) * Math.Sqrt(emotionMagnitude);
+        sprite.Offset.X += (rng.NextDouble() * 2 - 1) * emotionMagnitude * emotionMagnitude;
+        sprite.Offset.Y += (rng.NextDouble() * 2 - 1) * emotionMagnitude * emotionMagnitude;
 
         sprite.Offset.X = Math.Clamp(sprite.Offset.X, -20, 20);
         sprite.Offset.Y = Math.Clamp(sprite.Offset.Y, -20, 20);
