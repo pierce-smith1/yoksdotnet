@@ -5,6 +5,8 @@ public class EmotionHandler
     public required Scene Scene { get; init; }
     public required ScrOptions Options { get; init; }
 
+    private readonly PerlinNoiseGenerator _perlinNoiseGenerator = new();
+
     public void UpdateEmotions(Sprite sprite)
     {
         if (sprite is not Yokin yokin)
@@ -19,7 +21,7 @@ public class EmotionHandler
 
     private double GetNoiseForSprite(Sprite sprite, double zOffset)
     {
-        var noise = PerlinNoise.Get(sprite.Home.X / 100.0, sprite.Home.Y / 100.0, Scene.Seconds + zOffset);
+        var noise = _perlinNoiseGenerator.Get(sprite.Home.X / 100.0, sprite.Home.Y / 100.0, Scene.Seconds + zOffset);
         return noise;
     }
 }

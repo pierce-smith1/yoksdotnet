@@ -27,9 +27,9 @@ public class PerlinNoiseGenerator
         double relativeY = y - Math.Floor(y);
         double relativeZ = z - Math.Floor(z);
 
-        double u = Fade(x);
-        double v = Fade(y);
-        double w = Fade(z);
+        double u = Fade(relativeX);
+        double v = Fade(relativeY);
+        double w = Fade(relativeZ);
 
         int cornerHashA = _permutation[cubeX] + cubeY;
         int cornerHashAA = _permutation[cornerHashA] + cubeZ;
@@ -56,8 +56,9 @@ public class PerlinNoiseGenerator
         var lerpYB = Lerp(v, lerpXC, lerpXD);
 
         var lerpZ = Lerp(w, lerpYA, lerpYB);
-
-        return lerpZ;
+        
+        var result = (lerpZ + 1) / 2;
+        return result;
     }
 
     private double Fade(double t)
@@ -79,7 +80,7 @@ public class PerlinNoiseGenerator
         double u = direction < 8 ? x : y;
         double v = direction < 4 ? y : direction == 12 || direction == 14 ? x : z;
 
-        var result = ((direction & 1) == 0 ? u : -u) + ((direction & 2) == 0 ? v : -v));
+        var result = ((direction & 1) == 0 ? u : -u) + ((direction & 2) == 0 ? v : -v);
         return result;
     }
 };
