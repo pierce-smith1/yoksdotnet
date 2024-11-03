@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace yoksdotnet.drawing;
 
@@ -24,6 +25,9 @@ public enum PaletteGroup
     Fractalthorns,
 }
 
+[JsonDerivedType(typeof(SingleGroup), nameof(SingleGroup))]
+[JsonDerivedType(typeof(UserDefined), nameof(UserDefined))]
+[JsonDerivedType(typeof(ImFeelingLucky), nameof(ImFeelingLucky))]
 public record PaletteChoice
 {
     public record SingleGroup(PaletteGroup? Group) : PaletteChoice();
