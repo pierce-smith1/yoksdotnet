@@ -13,6 +13,7 @@ using System.Windows.Forms.Integration;
 using System.Windows.Input;
 
 using yoksdotnet.drawing;
+using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.windows;
@@ -82,6 +83,8 @@ public partial class DisplayWindow : Window
         };
 
         StartLoop();
+
+        new OptionsSaver().Save(new());
     }
 
     private void InitForScreensaver()
