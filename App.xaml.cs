@@ -25,7 +25,8 @@ public partial class App : Application
         switch (runType)
         {
             case RunType.Configure: 
-                throw new NotImplementedException();
+                MainWindow = new OptionsWindow();
+                break;
 
             case RunType.Show:
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Screensaver());
