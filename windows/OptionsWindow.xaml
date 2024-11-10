@@ -4,12 +4,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:yoksdotnet.windows"
+    xmlns:local="clr-namespace:yoksdotnet.windows" 
+    xmlns:c="clr-namespace:yoksdotnet.logic"
     mc:Ignorable="d"
     Title="OptionsWindow" 
     Height="450" 
     Width="540"
 >
+    <Window.Resources>
+        <c:ScrOptions x:Key="currentOptions" />
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding Source="{StaticResource currentOptions}" />
+    </Window.DataContext>
     <Grid>
         <ComboBox 
             x:Name="PatternSelector"
@@ -18,6 +25,15 @@
             VerticalAlignment="Top" 
             Width="120"
             IsReadOnly="true" 
+            ItemsSource="{Binding Path=AvailablePatterns}"
+            SelectedItem="{Binding Path=StartingPattern}"
+        />
+        <Button 
+            Content="Save" 
+            HorizontalAlignment="Left" 
+            Margin="415,384,0,0" 
+            VerticalAlignment="Top"
+            Click="OnSave"
         />
     </Grid>
 </Window>

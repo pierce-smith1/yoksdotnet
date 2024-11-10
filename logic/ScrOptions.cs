@@ -15,6 +15,6 @@ public class ScrOptions
     public int ColorsCount { get; init; } = 4;
 
     public List<PatternId> AvailablePatterns { get; init; } = [.. Enum.GetValues<PatternId>()];
-    public PatternId? StartingPattern { get; init; } = PatternId.Roamers;
+    public PatternId? StartingPattern { get; init; } = null;
     public double? PatternChangeSeconds { get; init; } = 10.0;
 }
