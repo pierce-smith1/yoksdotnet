@@ -17,11 +17,11 @@ public class SpriteGenerator
     {
         var rng = RandomUtils.SharedRng;
 
-        List<Sprite> entities = new(Options.EntityCount);
+        List<Sprite> entities = new(Options.SpriteCount);
 
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
-        for (var i = 0; i < Options.EntityCount; i++)
+        for (var i = 0; i < Options.SpriteCount; i++)
         {
             var newEntity = new Yokin
             {
@@ -29,7 +29,7 @@ public class SpriteGenerator
                 Brand = rng.NextDouble(),
                 Home = new(rng.NextDouble() * spreadX, rng.NextDouble() * spreadY),
                 Offset = new(0, 0),
-                Scale = Options.EntityScale,
+                Scale = Options.SpriteScale,
                 Width = 128,
                 Height = 128,
                 AngleRadians = 0.0,

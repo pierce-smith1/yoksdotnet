@@ -9,7 +9,7 @@ public record struct Vector(double X, double Y);
 
 public partial class MoverState {}
 
-public class Sprite
+public abstract class Sprite
 {
     public required int Id;
     public required double Brand;

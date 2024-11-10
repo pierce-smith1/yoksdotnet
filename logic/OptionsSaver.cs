@@ -11,6 +11,7 @@ public class OptionsSaver
     public readonly static string OptionsFileName = "ydn-options.json";
 
     private readonly string _appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private readonly string _optionsDirPath;
     private readonly string _optionsPath;
 
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -24,11 +25,17 @@ public class OptionsSaver
 
     public OptionsSaver()
     {
-        _optionsPath = Path.Combine(_appDataPath, OptionsDirName, OptionsFileName);
+        _optionsDirPath = Path.Combine(_appDataPath, OptionsDirName);
+        _optionsPath = Path.Combine(_optionsDirPath, OptionsFileName);
     }
 
     public void Save(ScrOptions options)
     {
+        if (! Directory.Exists(_optionsPath))
+        {
+            Directory.CreateDirectory(_optionsDirPath);
+        }
+
         var serialized = JsonSerializer.Serialize(options, _jsonOptions);
 
         File.WriteAllText(_optionsPath, serialized);
@@ -36,9 +43,20 @@ public class OptionsSaver
 
     public ScrOptions? Load()
     {
-        var json = File.ReadAllText(_optionsPath);
+        try 
+        {
+            var json = File.ReadAllText(_optionsPath);
 
-        var deserialized = JsonSerializer.Deserialize<ScrOptions>(json, _jsonOptions);
-        return deserialized;
+            var deserialized = JsonSerializer.Deserialize<ScrOptions>(json, _jsonOptions);
+            return deserialized;
+        } 
+        catch (Exception ex) when 
+        (
+            ex is FileNotFoundException ||
+            ex is DirectoryNotFoundException
+        )
+        {
+            return null;
+        }
     }
 }
