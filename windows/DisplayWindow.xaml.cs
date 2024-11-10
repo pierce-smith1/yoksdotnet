@@ -41,6 +41,7 @@ public partial class DisplayWindow : Window
 
     private DisplayMode _displayMode;
     private ScenePainter _scenePainter;
+    private OptionsSaver _optionsSaver = new();
 
     public record DisplayMode()
     {
@@ -70,7 +71,7 @@ public partial class DisplayWindow : Window
 
         Scene = new
         (
-            options: new(),
+            options: GetOptions(),
             width: (int)Width,
             height: (int)Height
         );
@@ -83,8 +84,6 @@ public partial class DisplayWindow : Window
         };
 
         StartLoop();
-
-        new OptionsSaver().Save(new());
     }
 
     private void InitForScreensaver()
@@ -138,6 +137,21 @@ public partial class DisplayWindow : Window
 
             _scenePainter.DebuggedSprite = clickedSprite;
         };
+    }
+
+    private ScrOptions GetOptions()
+    {
+        var savedOptions = _optionsSaver.Load();
+
+        if (savedOptions is null)
+        {
+            var defaultOptions = new ScrOptions();
+            _optionsSaver.Save(defaultOptions);
+            
+            return defaultOptions;
+        }
+
+        return savedOptions;
     }
 
     private void StartLoop()

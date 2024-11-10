@@ -31,10 +31,7 @@ public class OptionsSaver
 
     public void Save(ScrOptions options)
     {
-        if (! Directory.Exists(_optionsPath))
-        {
-            Directory.CreateDirectory(_optionsDirPath);
-        }
+        Directory.CreateDirectory(_optionsDirPath);
 
         var serialized = JsonSerializer.Serialize(options, _jsonOptions);
 
