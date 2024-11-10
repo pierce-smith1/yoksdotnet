@@ -50,7 +50,8 @@ public class OptionsSaver
         catch (Exception ex) when 
         (
             ex is FileNotFoundException ||
-            ex is DirectoryNotFoundException
+            ex is DirectoryNotFoundException ||
+            ex is JsonException
         )
         {
             return null;
