@@ -11,12 +11,6 @@
     Height="450" 
     Width="540"
 >
-    <Window.Resources>
-        <c:ScrOptions x:Key="currentOptions" />
-    </Window.Resources>
-    <Window.DataContext>
-        <Binding Source="{StaticResource currentOptions}" />
-    </Window.DataContext>
     <Grid>
         <ComboBox 
             x:Name="PatternSelector"

@@ -12,6 +12,8 @@ public partial class OptionsWindow : Window
 {
     public List<string> PatternChoices { get; init; } = [..Enum.GetNames<PatternId>()];
 
+    public ScrOptions CurrentOptions { get; private set; }
+
     private readonly OptionsSaver _optionsSaver = new();
     private readonly OptionsMapper _optionsMapper = new();
 
@@ -19,13 +21,12 @@ public partial class OptionsWindow : Window
     {
         InitializeComponent();
 
-        Resources["currentOptions"] = _optionsSaver.Load() ?? new();
+        CurrentOptions = _optionsSaver.Load() ?? new();
+        DataContext = CurrentOptions;
     }
 
     private void OnSave(object? sender, RoutedEventArgs e)
     {
-        var options = Resources["currentOptions"];
-
-        Debug.Print("Saving!!!");
+        _optionsSaver.Save(CurrentOptions);
     }
 }
