@@ -6,28 +6,50 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:yoksdotnet.windows" 
     xmlns:c="clr-namespace:yoksdotnet.logic"
+    xmlns:uc="clr-namespace:yoksdotnet.windows.controls"
     mc:Ignorable="d"
-    Title="OptionsWindow" 
-    Height="450" 
-    Width="540"
+    Title="OptionsWindow" ResizeMode="NoResize"
 >
-    <Grid>
-        <ComboBox 
-            x:Name="PatternSelector"
-            HorizontalAlignment="Left" 
-            Margin="110,157,0,0" 
-            VerticalAlignment="Top" 
-            Width="120"
-            IsReadOnly="true" 
-            ItemsSource="{Binding Path=AvailablePatterns}"
-            SelectedItem="{Binding Path=StartingPattern}"
-        />
-        <Button 
-            Content="Save" 
-            HorizontalAlignment="Left" 
-            Margin="415,384,0,0" 
-            VerticalAlignment="Top"
-            Click="OnSave"
-        />
-    </Grid>
+    <Window.Resources>
+        <Style TargetType="GroupBox">
+            <Setter Property="BorderThickness" Value="0,0,0,0"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+        </Style>
+        
+        <Style TargetType="GroupBox" x:Key="OptionSetContainer">
+            <Setter Property="BorderThickness" Value="1,1,1,1"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="16,16,16,16">
+        <GroupBox Header="Family" Style="{StaticResource OptionSetContainer}">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <GroupBox Header="Diversity:"> 
+                        <uc:LabeledSlider 
+                            x:Name="SpriteCountSlider"
+                            LeftLabel="Kindred"
+                            RightLabel="Vibrant"
+                            Value="{Binding Path=SpriteCount, Mode=TwoWay}"
+                            Minimum="10"
+                            Maximum="200"
+                        />
+                    </GroupBox>
+                    
+                    <GroupBox Header="Impostors:">
+                        <uc:LabeledSlider LeftLabel="None" RightLabel="All"/>
+                    </GroupBox>
+                </StackPanel>
+                
+                <StackPanel>
+                    <GroupBox Header="Amount:">
+                        <uc:LabeledSlider LeftLabel="Few" RightLabel="Many"/>
+                    </GroupBox>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        
+        <Button Content="Save" Click="OnSave"/>
+    </StackPanel>
 </Window>

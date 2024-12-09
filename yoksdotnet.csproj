@@ -59,5 +59,9 @@
     <Resource Include="resources\nx.png" />
     <Resource Include="resources\vx.png" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="windows\controls\" />
+  </ItemGroup>
 
 </Project>

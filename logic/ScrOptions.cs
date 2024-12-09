@@ -6,6 +6,14 @@ using yoksdotnet.logic.scene.patterns;
 
 namespace yoksdotnet.logic;
 
+public class OptionDefinition<T>
+{
+    public required T Default { get; init; }
+    public required string Name { get; init; }
+
+    public (T, T)? Range { get; init; }
+}
+
 public class ScrOptions
 {
     public int SpriteCount { get; init; } = 100;
