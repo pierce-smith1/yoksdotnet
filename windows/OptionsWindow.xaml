@@ -35,8 +35,8 @@
                 <Slider 
                     Grid.Column="1" 
                     Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content.Value}"
-                    Minimum="{Binding Path=Minimum}"
-                    Maximum="{Binding Path=Maximum}"
+                    Minimum="0.0"
+                    Maximum="1.0"
                 />
                 <Label Content="{Binding Path=RightLabel}" Grid.Column="2"/>
             </Grid>
@@ -48,14 +48,12 @@
             <StackPanel Orientation="Horizontal">
                 <StackPanel>
                     <GroupBox Header="Diversity:">
-                        <ContentControl x:Name="SpriteCountControl" ContentTemplate="{StaticResource LabeledSlider}">
+                        <ContentControl ContentTemplate="{StaticResource LabeledSlider}">
                             <ContentControl.Content>
                                 <local:LabeledSliderElement
                                     LeftLabel="Kindred"
                                     RightLabel="Vibrant"
-                                    Value="{Binding Path=SpriteCount, Mode=TwoWay}"
-                                    Minimum="10"
-                                    Maximum="200"
+                                    Value="{Binding Path=SpriteDensity, Mode=TwoWay}"
                                 />
                             </ContentControl.Content>
                         </ContentControl>

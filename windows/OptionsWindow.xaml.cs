@@ -14,7 +14,6 @@ public partial class OptionsWindow : Window
     public ScrOptions CurrentOptions { get; private set; }
 
     private readonly OptionsSaver _optionsSaver = new();
-    private readonly OptionsMapper _optionsMapper = new();
 
     public OptionsWindow()
     {
@@ -34,8 +33,6 @@ public class LabeledSliderElement : FrameworkElement
 {
     public required string LeftLabel { get; init; }
     public required string RightLabel { get; init; }
-    public required double Minimum { get; init; }
-    public required double Maximum { get; init; }
 
     // I tried so hard
     // and got so far

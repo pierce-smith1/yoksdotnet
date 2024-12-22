@@ -16,14 +16,12 @@ public class SpriteGenerator
     public IEnumerable<Sprite> Make(double spreadX = 1.0, double spreadY = 1.0)
     {
         var rng = RandomUtils.SharedRng;
-
-        List<Sprite> entities = new(Options.SpriteCount);
-
+        var sprites = new List<Sprite>();
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
-        for (var i = 0; i < Options.SpriteCount; i++)
+        for (var i = 0; i < Options.GetSpriteCount(); i++)
         {
-            var newEntity = new Yokin
+            var newSprite = new Yokin
             {
                 Id = _runningId++,
                 Brand = rng.NextDouble(),
@@ -37,10 +35,10 @@ public class SpriteGenerator
                 Emotion = new(),
             };
 
-            entities.Add(newEntity);
+            sprites.Add(newSprite);
         }
 
-        return entities;
+        return sprites;
     }
 
     private (List<PaletteId> Palettes, int TotalPossibleCount) SelectPalettes()
@@ -54,7 +52,7 @@ public class SpriteGenerator
             _ => throw new NotImplementedException(),
         };
 
-        var usableColorsCount = Math.Min(Options.ColorsCount, possiblePalettes.Count());
+        var usableColorsCount = Math.Min(Options.GetColorCount(), possiblePalettes.Count());
 
         var selectedPalettes = possiblePalettes
             .OrderBy(x => RandomUtils.SharedRng.Next())
@@ -63,3 +61,4 @@ public class SpriteGenerator
         return ([..selectedPalettes], possiblePalettes.Count());
     }
 }
+
