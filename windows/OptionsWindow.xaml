@@ -6,7 +6,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:yoksdotnet.windows" 
     xmlns:c="clr-namespace:yoksdotnet.logic"
-    xmlns:uc="clr-namespace:yoksdotnet.windows.controls"
     mc:Ignorable="d"
     Title="OptionsWindow" ResizeMode="NoResize"
 >
@@ -20,31 +19,54 @@
             <Setter Property="BorderThickness" Value="1,1,1,1"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
+
+        <DataTemplate x:Key="LabeledSlider">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Content="{Binding Path=LeftLabel}" Grid.Column="0" HorizontalContentAlignment="Right" Padding="5,5,10,5"/>
+                <Slider 
+                    Grid.Column="1" 
+                    Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content.Value}"
+                    Minimum="{Binding Path=Minimum}"
+                    Maximum="{Binding Path=Maximum}"
+                />
+                <Label Content="{Binding Path=RightLabel}" Grid.Column="2"/>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
 
     <StackPanel Margin="16,16,16,16">
         <GroupBox Header="Family" Style="{StaticResource OptionSetContainer}">
             <StackPanel Orientation="Horizontal">
                 <StackPanel>
-                    <GroupBox Header="Diversity:"> 
-                        <uc:LabeledSlider 
-                            x:Name="SpriteCountSlider"
-                            LeftLabel="Kindred"
-                            RightLabel="Vibrant"
-                            Value="{Binding Path=SpriteCount, Mode=TwoWay}"
-                            Minimum="10"
-                            Maximum="200"
-                        />
+                    <GroupBox Header="Diversity:">
+                        <ContentControl x:Name="SpriteCountControl" ContentTemplate="{StaticResource LabeledSlider}">
+                            <ContentControl.Content>
+                                <local:LabeledSliderElement
+                                    LeftLabel="Kindred"
+                                    RightLabel="Vibrant"
+                                    Value="{Binding Path=SpriteCount, Mode=TwoWay}"
+                                    Minimum="10"
+                                    Maximum="200"
+                                />
+                            </ContentControl.Content>
+                        </ContentControl>
                     </GroupBox>
                     
                     <GroupBox Header="Impostors:">
-                        <uc:LabeledSlider LeftLabel="None" RightLabel="All"/>
                     </GroupBox>
                 </StackPanel>
                 
                 <StackPanel>
                     <GroupBox Header="Amount:">
-                        <uc:LabeledSlider LeftLabel="Few" RightLabel="Many"/>
                     </GroupBox>
                 </StackPanel>
             </StackPanel>
