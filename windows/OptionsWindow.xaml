@@ -4,72 +4,195 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:yoksdotnet.windows" 
-    xmlns:c="clr-namespace:yoksdotnet.logic"
+    xmlns:ydnwindows="clr-namespace:yoksdotnet.windows"
     mc:Ignorable="d"
-    Title="OptionsWindow" ResizeMode="NoResize"
+    Title="YoksDotNet Options" 
+    Height="700"
+    Width="500"
+    ResizeMode="NoResize"
 >
     <Window.Resources>
         <Style TargetType="GroupBox">
-            <Setter Property="BorderThickness" Value="0,0,0,0"/>
-            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="BorderThickness" Value="0,0,0,0" />
+            <Setter Property="FontWeight" Value="Normal" />
         </Style>
         
         <Style TargetType="GroupBox" x:Key="OptionSetContainer">
-            <Setter Property="BorderThickness" Value="1,1,1,1"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="1,1,1,1" />
+        </Style>
+        
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="5,2" />
+            <Setter Property="Margin" Value="5,2" />
         </Style>
 
-        <DataTemplate x:Key="LabeledSlider">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="80"/>
-                </Grid.ColumnDefinitions>
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="0,3" />
+        </Style>
 
-                <Label Content="{Binding Path=LeftLabel}" Grid.Column="0" HorizontalContentAlignment="Right" Padding="5,5,10,5"/>
-                <Slider 
-                    Grid.Column="1" 
-                    Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content.Value}"
-                    Minimum="0.0"
-                    Maximum="1.0"
-                />
-                <Label Content="{Binding Path=RightLabel}" Grid.Column="2"/>
-            </Grid>
-        </DataTemplate>
+        <Style TargetType="Slider">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
     </Window.Resources>
 
-    <StackPanel Margin="16,16,16,16">
-        <GroupBox Header="Family" Style="{StaticResource OptionSetContainer}">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel>
-                    <GroupBox Header="Diversity:">
-                        <ContentControl ContentTemplate="{StaticResource LabeledSlider}">
-                            <ContentControl.Content>
-                                <local:LabeledSliderElement
-                                    LeftLabel="Kindred"
-                                    RightLabel="Vibrant"
-                                    Value="{Binding Path=SpriteDensity, Mode=TwoWay}"
-                                />
-                            </ContentControl.Content>
-                        </ContentControl>
-                    </GroupBox>
-                    
-                    <GroupBox Header="Impostors:">
-                    </GroupBox>
-                </StackPanel>
+    <Window.DataContext>
+        <ydnwindows:OptionsViewModel x:Name="ViewModel" />
+    </Window.DataContext>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <GroupBox Header="Family" Style="{StaticResource OptionSetContainer}" Grid.Row="0">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Diversity -->
+                <Label Grid.Row="0" Grid.Column="0" FontWeight="SemiBold">Diversity:</Label>
+                <Label Grid.Row="0" Grid.Column="1" FontWeight="Normal">Kindred</Label>
+                <Slider Grid.Row="0" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding FamilyDiversity}" />
+                <Label Grid.Row="0" Grid.Column="3" FontWeight="Normal">Vibrant</Label>
                 
-                <StackPanel>
-                    <GroupBox Header="Amount:">
-                    </GroupBox>
-                </StackPanel>
-            </StackPanel>
+                <!-- Population Size -->
+                <Label Grid.Row="1" Grid.Column="0" FontWeight="SemiBold">Population:</Label>
+                <Label Grid.Row="1" Grid.Column="1" FontWeight="Normal">Few</Label>
+                <Slider Grid.Row="1" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding FamilySize}" />
+                <Label Grid.Row="1" Grid.Column="3" FontWeight="Normal">Many</Label>
+                
+                <!-- Impostors -->
+                <Label Grid.Row="2" Grid.Column="0" FontWeight="SemiBold">Impostors:</Label>
+                <Label Grid.Row="2" Grid.Column="1" FontWeight="Normal">None</Label>
+                <Slider Grid.Row="2" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding FamilyImpostorDensity}" />
+                <Label Grid.Row="2" Grid.Column="3" FontWeight="Normal">All</Label>
+
+                <!-- Palette -->
+                <Label Grid.Row="3" Grid.Column="0" FontWeight="SemiBold">Palette:</Label>
+                <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" 
+                    ItemsSource="{Binding PaletteChoices}"
+                    SelectedValue="{Binding FamilyPaletteChoice}"
+                    Height="25"
+                >
+                </ComboBox>
+
+                <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Visibility="{Binding PaletteCustomizeVisibility}">
+                    Customize
+                </Button>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Individuals" Style="{StaticResource OptionSetContainer}" Grid.Row="1">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <!-- Size -->
+                <Label Grid.Row="0" Grid.Column="0" FontWeight="SemiBold">Size:</Label>
+                <Label Grid.Row="0" Grid.Column="1" FontWeight="Normal">Little</Label>
+                <Slider Grid.Row="0" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding IndividualScale}" />
+                <Label Grid.Row="0" Grid.Column="3" FontWeight="Normal">Big</Label>
+                
+                <!-- Shakiness -->
+                <Label Grid.Row="1" Grid.Column="0" FontWeight="SemiBold">Shakiness:</Label>
+                <Label Grid.Row="1" Grid.Column="1" FontWeight="Normal">Calm</Label>
+                <Slider Grid.Row="1" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding IndividualShakiness}" />
+                <Label Grid.Row="1" Grid.Column="3" FontWeight="Normal">Excited</Label>
+                
+                <!-- Trail Length -->
+                <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" 
+                    Margin="0,10,0,0" 
+                    IsChecked="{Binding IndividualTrailsEnabled}"
+                >
+                    Enable trails
+                </CheckBox>
+                
+                <Label Grid.Row="3" Grid.Column="0" FontWeight="SemiBold" IsEnabled="{Binding IndividualTrailsEnabled}">Trail Length:</Label>
+                <Label Grid.Row="3" Grid.Column="1" FontWeight="Normal" IsEnabled="{Binding IndividualTrailsEnabled}">Stubby</Label>
+                <Slider Grid.Row="3" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding IndividualTrailLength}" IsEnabled="{Binding IndividualTrailsEnabled}" />
+                <Label Grid.Row="3" Grid.Column="3" FontWeight="Normal" IsEnabled="{Binding IndividualTrailsEnabled}">Long</Label>
+            </Grid>
         </GroupBox>
         
-        <Button Content="Save" Click="OnSave"/>
-    </StackPanel>
+        <GroupBox Header="Animation" Style="{StaticResource OptionSetContainer}" Grid.Row="2">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <!-- Patterns -->
+                <Label Grid.Row="0" Grid.Column="0" FontWeight="SemiBold">Starting Pattern:</Label>
+                <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" 
+                    ItemsSource="{Binding PatternChoices}"
+                    SelectedValue="{Binding AnimationStartingPattern}"
+                    Height="25"
+                >
+                </ComboBox>
+                <Button Grid.Row="0" Grid.Column="3">Customize</Button>
+
+                <!-- Speed -->
+                <Label Grid.Row="1" Grid.Column="0" FontWeight="SemiBold">Speed:</Label>
+                <Label Grid.Row="1" Grid.Column="1" FontWeight="Normal">Slow</Label>
+                <Slider Grid.Row="1" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding AnimationSpeed}" />
+                <Label Grid.Row="1" Grid.Column="3" FontWeight="Normal">Fast</Label>
+                
+                <!-- Change Frequency -->
+                <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" 
+                    Margin="0,10,0,0" 
+                    IsChecked="{Binding AnimationPatternDoesChange}"
+                >
+                    Pattern changes
+                </CheckBox>
+                
+                <!-- Change Frequency -->
+                <Label Grid.Row="3" Grid.Column="0" FontWeight="SemiBold" IsEnabled="{Binding AnimationPatternDoesChange}">Change Pattern:</Label>
+                <Label Grid.Row="3" Grid.Column="1" FontWeight="Normal" IsEnabled="{Binding AnimationPatternDoesChange}">Rarely</Label>
+                <Slider Grid.Row="3" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding AnimationPatternChangeFrequency}" IsEnabled="{Binding AnimationPatternDoesChange}" />
+                <Label Grid.Row="3" Grid.Column="3" FontWeight="Normal" IsEnabled="{Binding AnimationPatternDoesChange}">Often</Label>
+            </Grid>
+        </GroupBox>
+
+        <DockPanel Grid.Row="3" LastChildFill="False">
+            <Button DockPanel.Dock="Right" Click="OnSave">Save</Button>
+            <Button DockPanel.Dock="Right" Click="OnDefaults">Defaults</Button>
+            <Button DockPanel.Dock="Right" Click="OnCancel">Cancel</Button>
+        </DockPanel>
+    </Grid>
+    
 </Window>

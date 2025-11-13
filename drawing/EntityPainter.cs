@@ -21,7 +21,7 @@ public class EntityPainter
             return GetBitmapForYokin(yokin);
         }
 
-        return Bitmaps.Vx;
+        return Bitmap.Vx.Resource;
     }
 
     private SKBitmap GetBitmapForYokin(Yokin yokin)
@@ -30,27 +30,27 @@ public class EntityPainter
         var empathyRanking = getEmotionRanking(yokin.Emotion.Empathy) + 1;
         var optimismRanking = getEmotionRanking(yokin.Emotion.Optimism) + 1;
 
-        SKBitmap[][][] emotionMap =
+        Bitmap[][][] emotionMap =
         [
             [
-                [Bitmaps.LkSix, Bitmaps.LkHusk, Bitmaps.LkHusk],
-                [Bitmaps.LkUnamused, Bitmaps.LkUnamused, Bitmaps.LkSix],
-                [Bitmaps.LkXd, Bitmaps.LkXd, Bitmaps.LkSix],
+                [Bitmap.LkSix, Bitmap.LkHusk, Bitmap.LkHusk],
+                [Bitmap.LkUnamused, Bitmap.LkUnamused, Bitmap.LkSix],
+                [Bitmap.LkXd, Bitmap.LkXd, Bitmap.LkSix],
             ],
             [
-                [Bitmaps.LkUnamused, Bitmaps.LkUnamused, Bitmaps.Lk],
-                [Bitmaps.LkConcern, Bitmaps.Lk, Bitmaps.Lk],
-                [Bitmaps.LkConcern, Bitmaps.LkThumbsup, Bitmaps.LkThumbsup],
+                [Bitmap.LkUnamused, Bitmap.LkUnamused, Bitmap.Lk],
+                [Bitmap.LkConcern, Bitmap.Lk, Bitmap.Lk],
+                [Bitmap.LkConcern, Bitmap.LkThumbsup, Bitmap.LkThumbsup],
             ],
             [
-                [Bitmaps.LkExhausted, Bitmaps.LkExhausted, Bitmaps.LkExhausted],
-                [Bitmaps.LkThink, Bitmaps.LkThink, Bitmaps.LkJoy],
-                [Bitmaps.LkJoy, Bitmaps.LkCool, Bitmaps.LkSix],
+                [Bitmap.LkExhausted, Bitmap.LkExhausted, Bitmap.LkExhausted],
+                [Bitmap.LkThink, Bitmap.LkThink, Bitmap.LkJoy],
+                [Bitmap.LkJoy, Bitmap.LkCool, Bitmap.LkSix],
             ],
         ];
 
         var result = emotionMap[empathyRanking][optimismRanking][ambitionRanking];
-        return result;
+        return result.Resource;
 
         static int getEmotionRanking(double emotion)
         {

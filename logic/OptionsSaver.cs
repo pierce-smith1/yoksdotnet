@@ -3,6 +3,8 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using yoksdotnet.common;
+
 namespace yoksdotnet.logic;
 
 public class OptionsSaver
@@ -20,6 +22,7 @@ public class OptionsSaver
         Converters =
         {
             new JsonStringEnumConverter(),
+            new JsonSfeConverterFactory(),
         },
     };
 

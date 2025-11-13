@@ -1,44 +1,66 @@
 ﻿using System;
+using System.Text.Json.Serialization;
+
+using yoksdotnet.common;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public enum PatternId
+public class Pattern : IStaticFieldEnumeration
 {
-    Lattice,
-    Roamers,
-    Waves,
+    public readonly static Pattern Lattice = new(
+        "Lattice",
+        MoverState.OffscreenBehaviors.Wrap,
+        (scene, sprite, allSprites) => {}
+    );
+
+    public readonly static Pattern Roamers = new(
+        "Roamers",
+        MoverState.OffscreenBehaviors.Wrap,
+        (scene, sprite, allSprites) =>
+        {
+            sprite.Home.X += sprite.Brand + 0.2;
+            sprite.Home.Y += Math.Sin(scene.Seconds * sprite.Brand);
+        }
+    );
+
+    public readonly static Pattern Waves = new(
+        "Waves",
+        MoverState.OffscreenBehaviors.Wrap,
+        (scene, sprite, allSprites) =>
+        {
+            sprite.Home.X += Math.Sin(scene.Seconds * sprite.Brand);
+            sprite.Home.Y += Math.Cos(scene.Seconds * sprite.Brand);
+        }
+    );
+
+    public string Name { get; init; }
+    public MoverState.OffscreenBehaviors OffscreenBehavior { get; init; }
+    public MoveFunction Move { get; init; }
+
+    private Pattern(
+        string displayName, 
+        MoverState.OffscreenBehaviors offScreenBehavior, 
+        MoveFunction moveFn
+    ) {
+        Name = displayName;
+        OffscreenBehavior = offScreenBehavior;
+        Move = moveFn;
+    }
+
+    public override string ToString() => Name;
 }
 
-public static class Patterns
+[JsonDerivedType(typeof(Random), nameof(Random))]
+[JsonDerivedType(typeof(SinglePattern), nameof(SinglePattern))]
+public record PatternChoice
 {
-    public readonly static LatticePattern Lattice = new();
-    public readonly static RoamersPattern Roamers = new();
-    public readonly static WavesPattern Waves = new();
-
-    public static MoveFunction GetFunction(PatternId patternId)
+    public record Random() : PatternChoice()
     {
-        PatternDefinition patternDefinition = patternId switch
-        {
-            PatternId.Lattice => Lattice,
-            PatternId.Roamers => Roamers,
-            PatternId.Waves => Waves,
+        public override string ToString() => "Random";
+    }
 
-            _ => throw new NotImplementedException(),
-        };
-
-        return patternDefinition.GetMoveFunction();
+    public record SinglePattern(Pattern Pattern) : PatternChoice()
+    {
+        public override string ToString() => Pattern.Name;
     }
 }
-
-public abstract class PatternDefinition
-{
-    abstract public MoverState.OffscreenBehaviors GetOffscreenBehavior();
-    abstract protected MoveFunction GetBaseMoveFunction();
-
-    public MoveFunction GetMoveFunction() => (scene, sprite, allSprites) =>
-    {
-        sprite.MoverState.OffscreenBehavior = GetOffscreenBehavior();
-        GetBaseMoveFunction()(scene, sprite, allSprites);
-    };
-}
-

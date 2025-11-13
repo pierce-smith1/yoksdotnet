@@ -27,11 +27,11 @@ public class SpriteGenerator
                 Brand = rng.NextDouble(),
                 Home = new(rng.NextDouble() * spreadX, rng.NextDouble() * spreadY),
                 Offset = new(0, 0),
-                Scale = Options.SpriteScale,
+                Scale = Options.IndividualScale,
                 Width = 128,
                 Height = 128,
                 AngleRadians = 0.0,
-                Paint = Palettes.Paints[rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count() / totalPossibleCount)],
+                Paint = rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count() / totalPossibleCount).Paint,
                 Emotion = new(),
             };
 
@@ -41,13 +41,11 @@ public class SpriteGenerator
         return sprites;
     }
 
-    private (List<PaletteId> Palettes, int TotalPossibleCount) SelectPalettes()
+    private (List<Palette> Palettes, int TotalPossibleCount) SelectPalettes()
     {
-        var possiblePalettes = Options.PaletteChoice switch
+        var possiblePalettes = Options.FamilyPaletteChoice switch
         {
-            PaletteChoice.SingleGroup choice => Palettes.Definitions
-                .Where(pair => pair.Value.Group == choice.Group)
-                .Select(pair => pair.Key),
+            PaletteChoice.SingleGroup choice => StaticFieldEnumeration.GetAll<Palette>().Where(pair => pair.Group == choice.Group),
 
             _ => throw new NotImplementedException(),
         };

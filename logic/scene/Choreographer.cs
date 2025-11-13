@@ -12,7 +12,7 @@ public class Choreographer
 
     private EmotionHandler _emotionHandler;
     private double? _lastPatternChangeSeconds = null;
-    private PatternId _currentPattern;
+    private Pattern _currentPattern;
 
     public Choreographer(ScrOptions options, Scene scene)
     {
@@ -24,7 +24,14 @@ public class Choreographer
             Scene = scene,
             Options = options,
         };
-        _currentPattern = options.StartingPattern ?? RandomUtils.SharedRng.Sample(options.AvailablePatterns);
+
+        _currentPattern = options.AnimationStartingPattern switch
+        {
+            PatternChoice.Random => RandomUtils.SharedRng.Sample(options.AnimationPossiblePatterns),
+            PatternChoice.SinglePattern(Pattern p) => p,
+
+            _ => throw new System.NotImplementedException(),
+        };
     }
 
     public void HandleFrame()
@@ -36,7 +43,7 @@ public class Choreographer
 
         foreach (var sprite in Scene.Sprites)
         {
-            Patterns.GetFunction(_currentPattern)(Scene, sprite, Scene.Sprites);
+            _currentPattern.Move(Scene, sprite, Scene.Sprites);
 
             SpriteMovers.OffscreenMover(Scene, sprite, Scene.Sprites);
             SpriteMovers.YokinShakeMover(Scene, sprite, Scene.Sprites);
@@ -47,7 +54,7 @@ public class Choreographer
 
     public bool ShouldChangePattern()
     {
-        if (Options.PatternChangeSeconds is null)
+        if (!Options.AnimationPatternDoesChange)
         {
             return false;
         }
@@ -57,13 +64,13 @@ public class Choreographer
             _lastPatternChangeSeconds = Scene.Seconds;
         }
 
-        var shouldChange = Scene.Seconds > _lastPatternChangeSeconds + Options.PatternChangeSeconds;
+        var shouldChange = Scene.Seconds > _lastPatternChangeSeconds + Options.AnimationPatternChangeFrequency;
         return shouldChange;
     }
 
     public void ChangePattern()
     {
-        var possiblePatterns = Options.AvailablePatterns
+        var possiblePatterns = Options.AnimationPossiblePatterns
             .Where(pattern => pattern != _currentPattern);
 
         if (! possiblePatterns.Any())

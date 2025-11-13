@@ -1,8 +1,6 @@
-﻿using SkiaSharp;
-using SkiaSharp.Views.Desktop;
+﻿using SkiaSharp.Views.Desktop;
 
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -10,7 +8,6 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
-using System.Windows.Input;
 
 using yoksdotnet.drawing;
 using yoksdotnet.logic;

@@ -7,13 +7,13 @@ public static class OptionsExtensions
     // TODO: These functions need more nuance.
     public static int GetSpriteCount(this ScrOptions options)
     {
-        var spriteCount = (int) Math.Round(options.SpriteDensity * 50);
+        var spriteCount = (int) Math.Round(options.FamilySize * 50);
         return spriteCount;
     }
 
     public static int GetColorCount(this ScrOptions options)
     {
-        var colorCount = (int) Math.Round(options.ColorsDensity * 8);
+        var colorCount = (int) Math.Round(options.FamilyDiversity * 8);
         return colorCount;
     }
 }
