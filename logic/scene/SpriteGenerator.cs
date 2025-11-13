@@ -45,7 +45,7 @@ public class SpriteGenerator
     {
         var possiblePalettes = Options.FamilyPaletteChoice switch
         {
-            PaletteChoice.SingleGroup choice => StaticFieldEnumeration.GetAll<Palette>().Where(pair => pair.Group == choice.Group),
+            PaletteChoice.SingleGroup choice => StaticFieldEnumerations.GetAll<Palette>().Where(pair => pair.Group == choice.Group),
 
             _ => throw new NotImplementedException(),
         };

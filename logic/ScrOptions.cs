@@ -24,7 +24,7 @@ public class ScrOptions
     public double IndividualTrailLength { get; set; } = 0.1;
 
     public double AnimationSpeed { get; set; } = 0.5;
-    public List<Pattern> AnimationPossiblePatterns { get; set; } = [..StaticFieldEnumeration.GetAll<Pattern>()];
+    public List<Pattern> AnimationPossiblePatterns { get; set; } = [..StaticFieldEnumerations.GetAll<Pattern>()];
     public PatternChoice AnimationStartingPattern { get; set; } = new PatternChoice.Random();
     public bool AnimationPatternDoesChange { get; set; } = true;
     public double AnimationPatternChangeFrequency { get; set; } = 10.0;

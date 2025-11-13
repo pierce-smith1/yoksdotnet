@@ -191,7 +191,7 @@ public class OptionsViewModel : INotifyPropertyChanged
         : Visibility.Hidden;
 
     public List<PaletteChoice> PaletteChoices { get; init; } = [
-        ..StaticFieldEnumeration.GetAll<PaletteGroup>().Select(g => new PaletteChoice.SingleGroup(g)),
+        ..StaticFieldEnumerations.GetAll<PaletteGroup>().Select(g => new PaletteChoice.SingleGroup(g)),
         new PaletteChoice.AllGroups(),
         new PaletteChoice.ImFeelingLucky(),
         new PaletteChoice.UserDefined(),
