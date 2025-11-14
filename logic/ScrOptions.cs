@@ -28,4 +28,14 @@ public class ScrOptions
     public PatternChoice AnimationStartingPattern { get; set; } = new PatternChoice.Random();
     public bool AnimationPatternDoesChange { get; set; } = true;
     public double AnimationPatternChangeFrequency { get; set; } = 10.0;
+
+    public int GetActualSpriteCount(double width, double height)
+    {
+        return 50;
+    }
+
+    public int GetActualColorCount()
+    {
+        return 4;
+    }
 }

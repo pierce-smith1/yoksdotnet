@@ -19,7 +19,7 @@ public class SpriteGenerator
         var sprites = new List<Sprite>();
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
-        for (var i = 0; i < Options.GetSpriteCount(); i++)
+        for (var i = 0; i < Options.GetActualSpriteCount(spreadX, spreadY); i++)
         {
             var newSprite = new Yokin
             {
@@ -45,12 +45,12 @@ public class SpriteGenerator
     {
         var possiblePalettes = Options.FamilyPaletteChoice switch
         {
-            PaletteChoice.SingleGroup choice => StaticFieldEnumerations.GetAll<Palette>().Where(pair => pair.Group == choice.Group),
+            PaletteChoice.SingleGroup choice => StaticFieldEnumerations.GetAll<PredefinedPalette>().Where(pair => pair.Group == choice.Group),
 
             _ => throw new NotImplementedException(),
         };
 
-        var usableColorsCount = Math.Min(Options.GetColorCount(), possiblePalettes.Count());
+        var usableColorsCount = Math.Min(Options.GetActualColorCount(), possiblePalettes.Count());
 
         var selectedPalettes = possiblePalettes
             .OrderBy(x => RandomUtils.SharedRng.Next())
