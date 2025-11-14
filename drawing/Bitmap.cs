@@ -10,7 +10,7 @@ namespace yoksdotnet.drawing;
 public class Bitmap : IStaticFieldEnumeration
 {
     public readonly static Bitmap Lk = new("lk");
-    public readonly static Bitmap LkConcern = new ("lkconcern");
+    public readonly static Bitmap LkConcern = new("lkconcern");
     public readonly static Bitmap LkCool = new("lkcool");
     public readonly static Bitmap LkExhausted = new("lkexhausted");
     public readonly static Bitmap LkHusk = new("lkhusk");
@@ -33,7 +33,7 @@ public class Bitmap : IStaticFieldEnumeration
     private Bitmap(string name)
     {
         Name = name;
-        Resource = LoadResource($"/resources/${name}.png");
+        Resource = LoadResource($"/resources/{name}.png");
     }
 
     private static SKBitmap LoadResource(string path)

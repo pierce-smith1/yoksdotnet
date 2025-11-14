@@ -36,7 +36,7 @@ public static class RandomUtils
 
     public static T Sample<T>(this Random rng, IEnumerable<T> source)
     {
-        if (! source.Any())
+        if (!source.Any())
         {
             throw new InvalidOperationException("Sample from empty list");
         }
@@ -52,7 +52,7 @@ public static class RandomUtils
 
     public static T SampleExponential<T>(this Random rng, IEnumerable<T> source, double factor)
     {
-        if (! source.Any())
+        if (!source.Any())
         {
             throw new InvalidOperationException("Sample from empty list");
         }

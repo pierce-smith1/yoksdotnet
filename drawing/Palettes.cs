@@ -154,7 +154,7 @@ public class Palette : IStaticFieldEnumeration
         return new(red, green, blue);
     }
 
-    private static readonly Dictionary<PaletteIndex, byte> IndexLuminances = new()
+    private static Dictionary<PaletteIndex, byte> IndexLuminances => new()
     {
         { PaletteIndex.ScalesShadow, 0 },
         { PaletteIndex.HornsShadow, 40 },
