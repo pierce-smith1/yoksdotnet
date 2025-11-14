@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using yoksdotnet.common;
+
 namespace yoksdotnet.logic.scene;
 
 public class Scene
@@ -14,25 +16,34 @@ public class Scene
     public List<Sprite> Sprites { get; private set; } = [];
 
     private DateTimeOffset? _lastTick;
-    private SpriteGenerator _entityGenerator;
-    private Choreographer _choreographer;
+    private SpriteGenerator? _spriteGenerator;
+    private Choreographer? _choreographer;
 
     public Scene(ScrOptions options, int width, int height)
     {
+        Refresh(options, width, height, Guid.NewGuid().GetHashCode());
+    }
+
+    public void Refresh(ScrOptions options, int width, int height, int rngSeed)
+    {
         SetSize(width, height);
 
-        _entityGenerator = new()
+        RandomUtils.SeedSharedRng(rngSeed);
+
+        _spriteGenerator = new()
         {
             Options = options,
         };
 
         _choreographer = new(options: options, scene: this);
 
-        var initialEntities = _entityGenerator.Make
+        var initialEntities = _spriteGenerator.Make
         (
             spreadX: width,
             spreadY: height
         );
+        
+        Sprites.Clear();
         Sprites.AddRange(initialEntities);
     }
 
@@ -61,6 +72,6 @@ public class Scene
 
     private void Simulate()
     {
-        _choreographer.HandleFrame();
+        _choreographer?.HandleFrame();
     }
 }

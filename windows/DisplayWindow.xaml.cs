@@ -42,7 +42,7 @@ public partial class DisplayWindow : Window
 
     public record DisplayMode()
     {
-        public record Debug() : DisplayMode();
+        public record Debug(OptionsWindow? DebugOptionsWindow) : DisplayMode();
         public record Screensaver() : DisplayMode();
         public record Preview(nint parentHandle) : DisplayMode();
     }
@@ -61,8 +61,8 @@ public partial class DisplayWindow : Window
                 // Doesn't work and I don't know why. Ignoring for now but we should come back to this.
                 break;
 
-            case DisplayMode.Debug:
-                InitForDebug();
+            case DisplayMode.Debug(OptionsWindow optionsWindow):
+                InitForDebug(optionsWindow);
                 break;
         }
 
@@ -118,7 +118,7 @@ public partial class DisplayWindow : Window
         KeyDown += (s, e) => Shutdown();
     }
 
-    private void InitForDebug()
+    private void InitForDebug(OptionsWindow? debugOptionsWindow)
     {
         MainCanvas.Child.MouseUp += (s, e) =>
         {
@@ -134,6 +134,22 @@ public partial class DisplayWindow : Window
 
             _scenePainter.DebuggedSprite = clickedSprite;
         };
+
+        if (debugOptionsWindow is not null)
+        {
+            var rngSeed = Guid.NewGuid().GetHashCode();
+
+            var viewModel = debugOptionsWindow.ViewModel;
+            var debugOptions = viewModel.BackingOptions;
+
+            viewModel.PropertyChanged += (s, e) =>
+            {
+                if (Scene is not null && ScrOptions.PropertyRequiresSceneRefresh(e.PropertyName ?? ""))
+                {
+                    Scene.Refresh(debugOptions, (int)Width, (int)Height, rngSeed);
+                }
+            };
+        }
     }
 
     private ScrOptions GetOptions()

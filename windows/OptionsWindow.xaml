@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ydnwindows="clr-namespace:yoksdotnet.windows"
     mc:Ignorable="d"
-    Title="YoksDotNet Options" 
+    Title="Yoksdotnet Settings" 
     Height="700"
     Width="500"
     ResizeMode="NoResize"
@@ -191,7 +191,7 @@
         <DockPanel Grid.Row="3" LastChildFill="False">
             <Button DockPanel.Dock="Right" Click="OnSave">Save</Button>
             <Button DockPanel.Dock="Right" Click="OnDefaults">Defaults</Button>
-            <Button DockPanel.Dock="Right" Click="OnCancel">Cancel</Button>
+            <Button DockPanel.Dock="Right" Click="OnCancel" IsEnabled="{Binding IsNotDebugWindow}">Cancel</Button>
         </DockPanel>
     </Grid>
     

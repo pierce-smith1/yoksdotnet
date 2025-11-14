@@ -43,14 +43,14 @@ public class OptionsSaver
 
     public ScrOptions? Load()
     {
-        try 
+        try
         {
             var json = File.ReadAllText(_optionsPath);
 
             var deserialized = JsonSerializer.Deserialize<ScrOptions>(json, _jsonOptions);
             return deserialized;
-        } 
-        catch (Exception ex) when 
+        }
+        catch (Exception ex) when
         (
             ex is FileNotFoundException ||
             ex is DirectoryNotFoundException ||

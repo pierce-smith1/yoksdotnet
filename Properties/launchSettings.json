@@ -2,7 +2,7 @@
   "profiles": {
     "yoksdotnet": {
       "commandName": "Project",
-      "commandLineArgs": "/d",
+      "commandLineArgs": "/dd",
       "hotReloadEnabled": false
     }
   }

@@ -213,6 +213,11 @@ public class PredefinedPalette : Palette, IStaticFieldEnumeration
         Name = displayName;
     }
 
+    public static IEnumerable<PredefinedPalette> AllForGroup(PaletteGroup group)
+    {
+        return StaticFieldEnumerations.GetAll<PredefinedPalette>().Where(p => p.Group == group);
+    }
+
     public override string ToString() => Name;
 }
 

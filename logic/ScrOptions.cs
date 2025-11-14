@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using yoksdotnet.common;
 using yoksdotnet.drawing;
@@ -31,11 +32,49 @@ public class ScrOptions
 
     public int GetActualSpriteCount(double width, double height)
     {
-        return 50;
+        var scalingFactor = Interpolation.InterpLinear(FamilySize, 0.0, 1.0, 0.2, 1.0);
+        var count = (width / 64) * (height / 64) * scalingFactor;
+        return (int)count;
+    }
+
+    public int GetActualMaxColorCount()
+    {
+        var maxColorCount = FamilyPaletteChoice switch
+        {
+            PaletteChoice.SingleGroup(PaletteGroup g) => PredefinedPalette.AllForGroup(g).Count(),
+            PaletteChoice.AllGroups => StaticFieldEnumerations.GetAll<PredefinedPalette>().Count(),
+            PaletteChoice.ImFeelingLucky => 30,
+
+            _ => throw new NotImplementedException(),
+        };
+
+        return maxColorCount;
     }
 
     public int GetActualColorCount()
     {
-        return 4;
+        var maxCount = GetActualMaxColorCount();
+        var scalingFactor = Interpolation.InterpLinear(FamilySize, 0.0, 1.0, 0.2, 1.0);
+
+        var count = Math.Max(2, (int)Math.Round(FamilyDiversity * maxCount));
+        return count;
     }
+
+    // This is used by the runtime debug options window to know whether or not to
+    // refresh the entire animation when the option changes.
+    // This is necessary for options that affect initial starting conditions such as
+    // the amount or color of sprites.
+    public static bool PropertyRequiresSceneRefresh(string propertyName)
+    {
+        List<string> propertiesRequiringRefresh = [
+            nameof(FamilyDiversity),
+            nameof(FamilySize),
+            nameof(FamilyImpostorDensity),
+            nameof(FamilyPaletteChoice),
+            nameof(IndividualScale),
+        ];
+
+        return propertiesRequiringRefresh.Contains(propertyName);
+    }
+
 }

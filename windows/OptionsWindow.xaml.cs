@@ -23,23 +23,32 @@ public partial class OptionsWindow : Window
 {
     private readonly OptionsSaver _optionsSaver = new();
 
-    public OptionsWindow()
+    public OptionsWindow(ScrOptions? debugOptions = null)
     {
         InitializeComponent();
-        InitializeModel(_optionsSaver.Load() ?? new());
+
+        if (debugOptions is not null)
+        {
+            ViewModel.IsDebugWindow = true;
+        }
+
+        var options = debugOptions ?? _optionsSaver.Load() ?? new();
+
+        ViewModel.BackingOptions = options;
+        InitializeModel(options);
     }
 
-    private void OnSave(object? _sender, RoutedEventArgs _e)
+    protected void OnSave(object? _sender, RoutedEventArgs _e)
     {
         _optionsSaver.Save(ViewModel.BackingOptions);
     }
 
-    private void OnDefaults(object? _sender, RoutedEventArgs _e)
+    protected void OnDefaults(object? _sender, RoutedEventArgs _e)
     {
         InitializeModel(new());
     }
 
-    private void InitializeModel(ScrOptions options)
+    protected void InitializeModel(ScrOptions options)
     {
         ViewModel.FamilyDiversity = options.FamilyDiversity;
         ViewModel.FamilySize = options.FamilySize;
@@ -55,8 +64,6 @@ public partial class OptionsWindow : Window
         ViewModel.AnimationPossiblePatterns = options.AnimationPossiblePatterns;
         ViewModel.AnimationStartingPattern = options.AnimationStartingPattern;
         ViewModel.AnimationPatternChangeFrequency = options.AnimationPatternChangeFrequency;
-
-        ViewModel.BackingOptions = options;
     }
 
     private void OnCancel(object? _sender, RoutedEventArgs _e)
@@ -67,6 +74,9 @@ public partial class OptionsWindow : Window
 
 public class OptionsViewModel : INotifyPropertyChanged
 {
+    public bool IsDebugWindow { get; set; } = false;
+    public bool IsNotDebugWindow => !IsDebugWindow;
+
     public double FamilyDiversity 
     {
         get => BackingOptions.FamilyDiversity;

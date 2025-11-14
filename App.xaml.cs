@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 
+using yoksdotnet.logic;
 using yoksdotnet.windows;
 
 namespace yoksdotnet;
@@ -11,12 +12,14 @@ internal record RunType()
     internal record Configure() : RunType();
     internal record Show() : RunType();
     internal record Preview(nint WindowHandle) : RunType();
-    internal record Debug() : RunType();
+    internal record Debug(bool WithOptions) : RunType();
 }
 
 public partial class App : Application
 {
     public App() {}
+
+    private OptionsWindow? _debugOptionsWindow;
 
     public void OnStartup(object? sender, StartupEventArgs e)
     {
@@ -24,25 +27,42 @@ public partial class App : Application
 
         switch (runType)
         {
-            case RunType.Configure: 
+            case RunType.Configure:
+            {
                 MainWindow = new OptionsWindow();
                 break;
+            }
 
             case RunType.Show:
+            {
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Screensaver());
                 break;
+            }
 
             case RunType.Preview(var parentHandle):
+            {
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Preview(parentHandle));
                 break;
+            }
 
-            case RunType.Debug:
-                MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Debug());
+            case RunType.Debug(bool withOptions):
+            {
+                if (withOptions)
+                {
+                    _debugOptionsWindow = new OptionsWindow(new OptionsSaver().Load());
+                    _debugOptionsWindow.Show();
+                }
+
+                MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Debug(_debugOptionsWindow));
+
                 break;
+            }
 
             case null:
+            {
                 Shutdown();
                 break;
+            }
         }
 
         MainWindow.Show();
@@ -59,7 +79,8 @@ public partial class App : Application
         {
             [] => new RunType.Configure(),
             ["/c"] => new RunType.Configure(),
-            ["/d"] => new RunType.Debug(),
+            ["/d"] => new RunType.Debug(WithOptions: false),
+            ["/dd"] => new RunType.Debug(WithOptions: true),
             ["/s"] => new RunType.Show(),
             ["/s", var handle] => new RunType.Show(),
             ["/p", var handle] => new RunType.Preview(nint.Parse(handle)),
