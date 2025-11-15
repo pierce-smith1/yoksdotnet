@@ -9,25 +9,18 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.drawing;
 
-public enum PaletteIndex
-{
-    ScalesShadow,
-    HornsShadow,
-    Eye,
-    Horns,
-    Scales,
-    ScalesHighlight,
-    Whites
-}
-
 public record Color(byte R, byte G, byte B);
-
-public class Palette
-{
-    public Dictionary<PaletteIndex, Color> Colors { get; init; } = [];
-    public SKPaint Paint { get; init; }
-
-    public Palette
+public record PaletteColors
+(
+    Color Scales,
+    Color ScalesHighlight,
+    Color ScalesShadow,
+    Color Horns,
+    Color Eyes,
+    Color Whites,
+    Color HornsShadow
+) {
+    public PaletteColors
     (
         string scales,
         string scalesHighlight,
@@ -36,23 +29,15 @@ public class Palette
         string eye,
         string whites,
         string hornsShadow
-    ) {
-        Colors[PaletteIndex.ScalesShadow] = HexStringToColor(scalesShadow);
-        Colors[PaletteIndex.HornsShadow] = HexStringToColor(hornsShadow);
-        Colors[PaletteIndex.Eye] = HexStringToColor(eye);
-        Colors[PaletteIndex.Horns] = HexStringToColor(horns);
-        Colors[PaletteIndex.Scales] = HexStringToColor(scales);
-        Colors[PaletteIndex.ScalesHighlight] = HexStringToColor(scalesHighlight);
-        Colors[PaletteIndex.Whites] = HexStringToColor(whites);
-
-        Paint = GetPaint();
-    }
-    
-    public Palette(Dictionary<PaletteIndex, Color> colors)
-    {
-        Colors = colors;
-        Paint = GetPaint();
-    }
+    ) : this(
+        ScalesShadow: HexStringToColor(scalesShadow),
+        HornsShadow: HexStringToColor(hornsShadow),
+        Eyes: HexStringToColor(eye),
+        Horns: HexStringToColor(horns),
+        Scales: HexStringToColor(scales),
+        ScalesHighlight: HexStringToColor(scalesHighlight),
+        Whites: HexStringToColor(whites)
+    ) { }
 
     private static Color HexStringToColor(string hex)
     {
@@ -67,17 +52,18 @@ public class Palette
 
         return new(red, green, blue);
     }
+};
 
-    private static Dictionary<PaletteIndex, byte> IndexLuminances => new()
+public class Palette
+{
+    public PaletteColors Colors { get; init; }
+    public SKPaint Paint { get; init; }
+    
+    public Palette(PaletteColors colors)
     {
-        { PaletteIndex.ScalesShadow, 0 },
-        { PaletteIndex.HornsShadow, 40 },
-        { PaletteIndex.Eye, 80 },
-        { PaletteIndex.Horns, 120 },
-        { PaletteIndex.Scales, 160 },
-        { PaletteIndex.ScalesHighlight, 200 },
-        { PaletteIndex.Whites, 240 },
-    };
+        Colors = colors;
+        Paint = GetPaint();
+    }
 
     private SKPaint GetPaint()
     {
@@ -89,12 +75,33 @@ public class Palette
         var greenTable = identityTable.ToArray();
         var blueTable = identityTable.ToArray();
 
-        foreach (var (index, color) in IndexLuminances)
-        {
-            redTable[IndexLuminances[index]] = Colors[index].R;
-            greenTable[IndexLuminances[index]] = Colors[index].G;
-            blueTable[IndexLuminances[index]] = Colors[index].B;
-        }
+        redTable[0] = Colors.ScalesShadow.R;
+        greenTable[0] = Colors.ScalesShadow.G;
+        blueTable[0] = Colors.ScalesShadow.B;
+
+        redTable[40] = Colors.HornsShadow.R;
+        greenTable[40] = Colors.HornsShadow.G;
+        blueTable[40] = Colors.HornsShadow.B;
+
+        redTable[80] = Colors.Eyes.R;
+        greenTable[80] = Colors.Eyes.G;
+        blueTable[80] = Colors.Eyes.B;
+
+        redTable[120] = Colors.Horns.R;
+        greenTable[120] = Colors.Horns.G;
+        blueTable[120] = Colors.Horns.B;
+
+        redTable[160] = Colors.Scales.R;
+        greenTable[160] = Colors.Scales.G;
+        blueTable[160] = Colors.Scales.B;
+
+        redTable[200] = Colors.ScalesHighlight.R;
+        greenTable[200] = Colors.ScalesHighlight.G;
+        blueTable[200] = Colors.ScalesHighlight.B;
+        
+        redTable[240] = Colors.Whites.R;
+        greenTable[240] = Colors.Whites.G;
+        blueTable[240] = Colors.Whites.B;
 
         var filter = SKColorFilter.CreateTable(alphaTable, redTable, greenTable, blueTable);
         var paint = new SKPaint()
@@ -207,7 +214,17 @@ public class PredefinedPalette : Palette, IStaticFieldEnumeration
         string whites,
         string hornsShadow
     )
-        : base(scales, scalesHighlight, scalesShadow, horns, eye, whites, hornsShadow)
+        : base(new PaletteColors
+        (
+            scales: scales,
+            scalesHighlight: scalesHighlight,
+            scalesShadow:
+            scalesShadow,
+            horns: horns,
+            eye: eye,
+            whites: whites,
+            hornsShadow: hornsShadow
+        ))
     {
         Group = group;
         Name = displayName;

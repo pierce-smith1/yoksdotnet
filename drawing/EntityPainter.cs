@@ -1,6 +1,7 @@
 ﻿using SkiaSharp;
 
 using yoksdotnet.logic.scene;
+using yoksdotnet.windows;
 
 namespace yoksdotnet.drawing;
 
@@ -19,6 +20,11 @@ public class EntityPainter
         if (sprite is Yokin yokin)
         {
             return GetBitmapForYokin(yokin);
+        }
+
+        if (sprite is PreviewSprite previewSprite)
+        {
+            return previewSprite.Bitmap.Resource;
         }
 
         return Bitmap.Vx.Resource;

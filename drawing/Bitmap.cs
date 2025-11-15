@@ -9,6 +9,8 @@ namespace yoksdotnet.drawing;
 
 public class Bitmap : IStaticFieldEnumeration
 {
+    public static int BitmapSize() => 128;
+
     public readonly static Bitmap Lk = new("lk");
     public readonly static Bitmap LkConcern = new("lkconcern");
     public readonly static Bitmap LkCool = new("lkcool");
