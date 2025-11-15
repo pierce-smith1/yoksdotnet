@@ -59,7 +59,7 @@ public static class SpriteMovers
         }
     }
 
-    public static void YokinShakeMover(Scene scene, Sprite sprite, IEnumerable<Sprite> allSprites)
+    public static void YokinShakeMover(ScrOptions options, Scene scene, Sprite sprite, IEnumerable<Sprite> allSprites)
     {
         if (sprite is not Yokin yokin)
         {

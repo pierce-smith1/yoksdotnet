@@ -26,9 +26,9 @@ public class EntityPainter
 
     private SKBitmap GetBitmapForYokin(Yokin yokin)
     {
-        var ambitionRanking = getEmotionRanking(yokin.Emotion.Ambition) + 1;
-        var empathyRanking = getEmotionRanking(yokin.Emotion.Empathy) + 1;
-        var optimismRanking = getEmotionRanking(yokin.Emotion.Optimism) + 1;
+        var ambitionRanking = getEmotionRanking(yokin.GetEmotionVector().Ambition) + 1;
+        var empathyRanking = getEmotionRanking(yokin.GetEmotionVector().Empathy) + 1;
+        var optimismRanking = getEmotionRanking(yokin.GetEmotionVector().Optimism) + 1;
 
         Bitmap[][][] emotionMap =
         [

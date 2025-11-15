@@ -12,9 +12,8 @@ public class DebugPainter
     {
         return sprite is Yokin yokin ?
         [
-            $"E: {yokin.Emotion.Empathy}",
-            $"A: {yokin.Emotion.Ambition}",
-            $"O: {yokin.Emotion.Optimism}",
+            $"X: {yokin.Home.X}",
+            $"Y: {yokin.Home.Y}",
         ] : [];
     }
 

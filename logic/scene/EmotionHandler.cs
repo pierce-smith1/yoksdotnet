@@ -14,9 +14,11 @@ public class EmotionHandler
             return;
         }
 
-        yokin.Emotion.Ambition = GetNoiseForSprite(sprite, 0.0);
-        yokin.Emotion.Empathy = GetNoiseForSprite(sprite, 1000.0);
-        yokin.Emotion.Optimism = GetNoiseForSprite(sprite, 2000.0);
+        yokin.SetEmotionVector(
+            ambition: GetNoiseForSprite(sprite, 0.0),
+            empathy: GetNoiseForSprite(sprite, 1000.0),
+            optimism: GetNoiseForSprite(sprite, 2000.0)
+        );
     }
 
     private double GetNoiseForSprite(Sprite sprite, double zOffset)

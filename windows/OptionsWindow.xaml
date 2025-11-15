@@ -122,7 +122,7 @@
                 <!-- Shakiness -->
                 <Label Grid.Row="1" Grid.Column="0" FontWeight="SemiBold">Shakiness:</Label>
                 <Label Grid.Row="1" Grid.Column="1" FontWeight="Normal">Calm</Label>
-                <Slider Grid.Row="1" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding IndividualShakiness}" />
+                <Slider Grid.Row="1" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding IndividualEmotionScale}" />
                 <Label Grid.Row="1" Grid.Column="3" FontWeight="Normal">Excited</Label>
                 
                 <!-- Trail Length -->

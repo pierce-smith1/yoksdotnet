@@ -46,13 +46,26 @@ public class Yokin : Sprite
 {
     public record struct EmotionVector(double Empathy, double Ambition, double Optimism);
 
-    public required EmotionVector Emotion;
+    public required double EmotionScale { get; set; }
+    private EmotionVector Emotion = new();
+
+    public EmotionVector GetEmotionVector()
+    {
+        return new(Emotion.Empathy * EmotionScale, Emotion.Ambition * EmotionScale, Emotion.Optimism * EmotionScale);
+    }
+
+    public void SetEmotionVector(double empathy, double ambition, double optimism)
+    {
+        Emotion.Empathy = empathy;
+        Emotion.Ambition = ambition;
+        Emotion.Optimism = optimism;
+    }
 
     public double GetEmotionStrength()
     {
-        var (e, a, o) = Emotion;
+        var (e, a, o) = GetEmotionVector();
 
-        var result =  Math.Sqrt(e * e + a * a + o * o);
-        return result;
+        var strength =  Math.Sqrt(e * e + a * a + o * o);
+        return strength;
     }
 }

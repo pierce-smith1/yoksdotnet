@@ -32,7 +32,7 @@ public class SpriteGenerator
                 Height = 128,
                 AngleRadians = 0.0,
                 Paint = rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count() / totalPossibleCount).Paint,
-                Emotion = new(),
+                EmotionScale = Options.GetActualEmotionScale(),
             };
 
             sprites.Add(newSprite);
@@ -46,6 +46,7 @@ public class SpriteGenerator
         var possiblePalettes = Options.FamilyPaletteChoice switch
         {
             PaletteChoice.SingleGroup choice => StaticFieldEnumerations.GetAll<PredefinedPalette>().Where(pair => pair.Group == choice.Group),
+            PaletteChoice.AllGroups => StaticFieldEnumerations.GetAll<PredefinedPalette>(),
 
             _ => throw new NotImplementedException(),
         };

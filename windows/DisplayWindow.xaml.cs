@@ -51,7 +51,8 @@ public partial class DisplayWindow : Window
     {
         InitializeComponent();
 
-        switch (mode)
+        _displayMode = mode;
+        switch (_displayMode)
         {
             case DisplayMode.Screensaver:
                 InitForScreensaver();
@@ -73,7 +74,6 @@ public partial class DisplayWindow : Window
             height: (int)Height
         );
 
-        _displayMode = mode;
         _scenePainter = new()
         {
             Scene = Scene,
@@ -153,7 +153,12 @@ public partial class DisplayWindow : Window
     }
 
     private ScrOptions GetOptions()
-    {
+    { 
+        if (_displayMode is DisplayMode.Debug debugMode && debugMode.DebugOptionsWindow is not null)
+        {
+            return debugMode.DebugOptionsWindow.ViewModel.BackingOptions;
+        }
+
         var savedOptions = _optionsSaver.Load();
 
         if (savedOptions is null)

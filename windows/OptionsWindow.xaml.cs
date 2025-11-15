@@ -56,7 +56,7 @@ public partial class OptionsWindow : Window
         ViewModel.FamilyPaletteChoice = options.FamilyPaletteChoice;
 
         ViewModel.IndividualScale = options.IndividualScale;
-        ViewModel.IndividualShakiness = options.IndividualShakiness;
+        ViewModel.IndividualEmotionScale = options.IndividualEmotionScale;
         ViewModel.IndividualTrailsEnabled = options.IndividualTrailsEnabled;
         ViewModel.IndividualTrailLength = options.IndividualTrailLength;
 
@@ -64,6 +64,7 @@ public partial class OptionsWindow : Window
         ViewModel.AnimationPossiblePatterns = options.AnimationPossiblePatterns;
         ViewModel.AnimationStartingPattern = options.AnimationStartingPattern;
         ViewModel.AnimationPatternChangeFrequency = options.AnimationPatternChangeFrequency;
+        ViewModel.AnimationPatternDoesChange = options.AnimationPatternDoesChange;
     }
 
     private void OnCancel(object? _sender, RoutedEventArgs _e)
@@ -123,12 +124,12 @@ public class OptionsViewModel : INotifyPropertyChanged
         }
     }
 
-    public double IndividualShakiness
+    public double IndividualEmotionScale
     {
-        get => BackingOptions.IndividualShakiness;
+        get => BackingOptions.IndividualEmotionScale;
         set {
-            BackingOptions.IndividualShakiness = value;
-            OnPropertyChanged(nameof(IndividualShakiness));
+            BackingOptions.IndividualEmotionScale = value;
+            OnPropertyChanged(nameof(IndividualEmotionScale));
         }
     }
 
