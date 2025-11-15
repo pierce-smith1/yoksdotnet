@@ -19,15 +19,14 @@ public class ScrOptions
 
     public double IndividualScale { get; set; } = 0.5;
     public double IndividualEmotionScale { get; set; } = 0.5;
-
     public bool IndividualTrailsEnabled { get; set; } = false;
     public double IndividualTrailLength { get; set; } = 0.1;
 
-    public double AnimationSpeed { get; set; } = 0.5;
+    public double AnimationSpeed { get; set; } = 0.2;
     public List<Pattern> AnimationPossiblePatterns { get; set; } = [..StaticFieldEnumerations.GetAll<Pattern>()];
     public PatternChoice AnimationStartingPattern { get; set; } = new PatternChoice.Random();
     public bool AnimationPatternDoesChange { get; set; } = true;
-    public double AnimationPatternChangeFrequency { get; set; } = 10.0;
+    public double AnimationPatternChangeFrequency { get; set; } = 0.5;
 
     public int GetActualSpriteCount(double width, double height)
     {
@@ -61,7 +60,19 @@ public class ScrOptions
     
     public double GetActualEmotionScale()
     {
-        var scale = Interpolation.InterpLinear(IndividualEmotionScale, 0.0, 1.0, 0.0, 2.5);
+        var scale = Interpolation.InterpSqrt(IndividualEmotionScale, 0.0, 1.0, 0.0, 2.5);
+        return scale;
+    }
+
+    public double GetActualPatternChangeFrequencySeconds()
+    {
+        var seconds = Interpolation.InterpLinear(AnimationPatternChangeFrequency, 0.0, 1.0, 90.0, 5.0);
+        return seconds;
+    }
+
+    public double GetActualAnimationSpeedScale()
+    {
+        var scale = Interpolation.InterpSquare(AnimationSpeed, 0.0, 1.0, 0.05, 0.5);
         return scale;
     }
 

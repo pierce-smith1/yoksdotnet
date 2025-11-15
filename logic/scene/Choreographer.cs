@@ -64,7 +64,7 @@ public class Choreographer
             _lastPatternChangeSeconds = Scene.Seconds;
         }
 
-        var shouldChange = Scene.Seconds > _lastPatternChangeSeconds + Options.AnimationPatternChangeFrequency;
+        var shouldChange = Scene.Seconds > _lastPatternChangeSeconds + Options.GetActualPatternChangeFrequencySeconds();
         return shouldChange;
     }
 

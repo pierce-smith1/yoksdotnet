@@ -18,8 +18,8 @@ public class Pattern : IStaticFieldEnumeration
         MoverState.OffscreenBehaviors.Wrap,
         (scene, sprite, allSprites) =>
         {
-            sprite.Home.X += sprite.Brand + 0.2;
-            sprite.Home.Y += Math.Sin(scene.Seconds * sprite.Brand);
+            sprite.Home.X += sprite.Brand * scene.LastDtMs;
+            sprite.Home.Y += Math.Sin(scene.Seconds * sprite.Brand) * scene.LastDtMs;
         }
     );
 
@@ -28,8 +28,8 @@ public class Pattern : IStaticFieldEnumeration
         MoverState.OffscreenBehaviors.Wrap,
         (scene, sprite, allSprites) =>
         {
-            sprite.Home.X += Math.Sin(scene.Seconds * sprite.Brand);
-            sprite.Home.Y += Math.Cos(scene.Seconds * sprite.Brand);
+            sprite.Home.X += Math.Sin(scene.Seconds * sprite.Brand) * scene.LastDtMs;
+            sprite.Home.Y += Math.Cos(scene.Seconds * sprite.Brand) * scene.LastDtMs;
         }
     );
 

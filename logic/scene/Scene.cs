@@ -9,6 +9,9 @@ public class Scene
 {
     public int Frame { get; private set; }
     public double Seconds { get; private set; } = 0.0;
+    public double LastDtMs { get; private set; } = 0.0;
+
+    public ScrOptions Options { get; set; }
 
     public int Width { get; private set; }
     public int Height { get; private set; }
@@ -21,11 +24,14 @@ public class Scene
 
     public Scene(ScrOptions options, int width, int height)
     {
+        Options = options;
         Refresh(options, width, height, Guid.NewGuid().GetHashCode());
     }
 
     public void Refresh(ScrOptions options, int width, int height, int rngSeed)
     {
+        Options = options;
+
         SetSize(width, height);
 
         RandomUtils.SeedSharedRng(rngSeed);
@@ -62,7 +68,9 @@ public class Scene
         if (_lastTick is not null)
         {
             var deltaTime = now - _lastTick;
-            Seconds += deltaTime.Value.TotalSeconds;
+
+            LastDtMs = deltaTime.Value.TotalMilliseconds * Options.GetActualAnimationSpeedScale();
+            Seconds += deltaTime.Value.TotalSeconds * Options.GetActualAnimationSpeedScale();
         }
 
         _lastTick = now;

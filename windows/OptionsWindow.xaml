@@ -119,9 +119,9 @@
                 <Slider Grid.Row="0" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding IndividualScale}" />
                 <Label Grid.Row="0" Grid.Column="3" FontWeight="Normal">Big</Label>
                 
-                <!-- Shakiness -->
-                <Label Grid.Row="1" Grid.Column="0" FontWeight="SemiBold">Shakiness:</Label>
-                <Label Grid.Row="1" Grid.Column="1" FontWeight="Normal">Calm</Label>
+                <!-- Emotiveness -->
+                <Label Grid.Row="1" Grid.Column="0" FontWeight="SemiBold">Emotiveness:</Label>
+                <Label Grid.Row="1" Grid.Column="1" FontWeight="Normal">Stoic</Label>
                 <Slider Grid.Row="1" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding IndividualEmotionScale}" />
                 <Label Grid.Row="1" Grid.Column="3" FontWeight="Normal">Excited</Label>
                 

@@ -43,6 +43,6 @@ public static class Interpolation
 
     public static double InterpSqrt(double n, double inMin, double inMax, double outMin, double outMax)
     {
-        return InterpPower(n, 1 / 2 , inMin, inMax, outMin, outMax);
+        return InterpPower(n, 1.0 / 2.0 , inMin, inMax, outMin, outMax);
     }
 }
