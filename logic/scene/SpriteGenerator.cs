@@ -31,7 +31,7 @@ public class SpriteGenerator
                 Width = Bitmap.BitmapSize(),
                 Height = Bitmap.BitmapSize(),
                 AngleRadians = 0.0,
-                Paint = rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count() / totalPossibleCount).Paint,
+                Palette = rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count() / totalPossibleCount),
                 EmotionScale = Options.GetActualEmotionScale(),
             };
 

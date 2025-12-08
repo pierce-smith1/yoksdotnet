@@ -9,6 +9,26 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.drawing;
 
+public class PaletteIndex : IStaticFieldEnumeration
+{
+    public readonly static PaletteIndex Scales = new("Scales base", 160);
+    public readonly static PaletteIndex ScalesHighlight = new("Scale highlights", 200);
+    public readonly static PaletteIndex ScalesShadow = new("Scale shadows", 0);
+    public readonly static PaletteIndex Horns = new("Horns base", 120);
+    public readonly static PaletteIndex Eyes = new("Pupil color", 80);
+    public readonly static PaletteIndex Whites = new("Teeth and eyes", 240);
+    public readonly static PaletteIndex HornsShadow = new("Horns shadow", 40);
+
+    public string Name { get; init; }
+    public int Luminance { get; init; }
+
+    private PaletteIndex(string name, int luminance)
+    {
+        Name = name;
+        Luminance = luminance;
+    }
+};
+
 public record Color(byte R, byte G, byte B);
 public record PaletteColors
 (
@@ -52,6 +72,22 @@ public record PaletteColors
 
         return new(red, green, blue);
     }
+
+    public Color this[PaletteIndex index]
+    {
+        get
+        {
+            if (index == PaletteIndex.Scales) return Scales;
+            if (index == PaletteIndex.ScalesHighlight) return ScalesHighlight;
+            if (index == PaletteIndex.ScalesShadow) return ScalesShadow;
+            if (index == PaletteIndex.Horns) return Horns;
+            if (index == PaletteIndex.HornsShadow) return HornsShadow;
+            if (index == PaletteIndex.Eyes) return Eyes;
+            if (index == PaletteIndex.Whites) return Whites;
+
+            throw new InvalidOperationException();
+        }
+    }
 };
 
 public class Palette
@@ -75,33 +111,12 @@ public class Palette
         var greenTable = identityTable.ToArray();
         var blueTable = identityTable.ToArray();
 
-        redTable[0] = Colors.ScalesShadow.R;
-        greenTable[0] = Colors.ScalesShadow.G;
-        blueTable[0] = Colors.ScalesShadow.B;
-
-        redTable[40] = Colors.HornsShadow.R;
-        greenTable[40] = Colors.HornsShadow.G;
-        blueTable[40] = Colors.HornsShadow.B;
-
-        redTable[80] = Colors.Eyes.R;
-        greenTable[80] = Colors.Eyes.G;
-        blueTable[80] = Colors.Eyes.B;
-
-        redTable[120] = Colors.Horns.R;
-        greenTable[120] = Colors.Horns.G;
-        blueTable[120] = Colors.Horns.B;
-
-        redTable[160] = Colors.Scales.R;
-        greenTable[160] = Colors.Scales.G;
-        blueTable[160] = Colors.Scales.B;
-
-        redTable[200] = Colors.ScalesHighlight.R;
-        greenTable[200] = Colors.ScalesHighlight.G;
-        blueTable[200] = Colors.ScalesHighlight.B;
-        
-        redTable[240] = Colors.Whites.R;
-        greenTable[240] = Colors.Whites.G;
-        blueTable[240] = Colors.Whites.B;
+        foreach (var index in StaticFieldEnumerations.GetAll<PaletteIndex>())
+        {
+            redTable[index.Luminance] = Colors[index].R;
+            greenTable[index.Luminance] = Colors[index].G;
+            blueTable[index.Luminance] = Colors[index].B;
+        }
 
         var filter = SKColorFilter.CreateTable(alphaTable, redTable, greenTable, blueTable);
         var paint = new SKPaint()
