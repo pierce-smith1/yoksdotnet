@@ -14,6 +14,6 @@ public class EntityPainter
         canvas.DrawBitmap(bitmap, sprite.GetRect(), paint);
     }
 
-    private SKBitmap GetBitmap(Sprite sprite) => sprite.GetBitmap().Resource;
-    private SKPaint GetPaint(Sprite sprite) => sprite.GetPalette().Paint;
+    private static SKBitmap GetBitmap(Sprite sprite) => sprite.GetBitmap().Resource;
+    private static SKPaint GetPaint(Sprite sprite) => sprite.GetPaint();
 }

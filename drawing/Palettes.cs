@@ -1,15 +1,15 @@
-﻿using SkiaSharp;
+﻿using OpenTK.Graphics.OpenGL;
+using SkiaSharp;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-
 using yoksdotnet.common;
 
 namespace yoksdotnet.drawing;
 
-public class PaletteIndex : IStaticFieldEnumeration
+public record PaletteIndex(string Name, int Luminance) : IStaticFieldEnumeration
 {
     public readonly static PaletteIndex Scales = new("Scales base", 160);
     public readonly static PaletteIndex ScalesHighlight = new("Scale highlights", 200);
@@ -19,89 +19,116 @@ public class PaletteIndex : IStaticFieldEnumeration
     public readonly static PaletteIndex Whites = new("Teeth and eyes", 240);
     public readonly static PaletteIndex HornsShadow = new("Horns shadow", 40);
 
-    public string Name { get; init; }
-    public int Luminance { get; init; }
-
-    private PaletteIndex(string name, int luminance)
-    {
-        Name = name;
-        Luminance = luminance;
-    }
+    public override string ToString() => Name;
 };
 
-public record Color(byte R, byte G, byte B);
-public record PaletteColors
-(
-    Color Scales,
-    Color ScalesHighlight,
-    Color ScalesShadow,
-    Color Horns,
-    Color Eyes,
-    Color Whites,
-    Color HornsShadow
-) {
-    public PaletteColors
-    (
-        string scales,
-        string scalesHighlight,
-        string scalesShadow,
-        string horns,
-        string eye,
-        string whites,
-        string hornsShadow
-    ) : this(
-        ScalesShadow: HexStringToColor(scalesShadow),
-        HornsShadow: HexStringToColor(hornsShadow),
-        Eyes: HexStringToColor(eye),
-        Horns: HexStringToColor(horns),
-        Scales: HexStringToColor(scales),
-        ScalesHighlight: HexStringToColor(scalesHighlight),
-        Whites: HexStringToColor(whites)
-    ) { }
-
-    private static Color HexStringToColor(string hex)
+public record Color(byte R, byte G, byte B)
+{
+    public static Color FromHexString(string hex)
     {
         if (hex.StartsWith('#'))
         {
-            hex = hex.Substring(1);
+            hex = hex[1..];
         }
 
-        var red = Convert.ToByte(hex.Substring(0, 2), 16);
-        var green = Convert.ToByte(hex.Substring(2, 2), 16);
-        var blue = Convert.ToByte(hex.Substring(4, 2), 16);
+        var red = Convert.ToByte(hex[..2], 16);
+        var green = Convert.ToByte(hex[2..4], 16);
+        var blue = Convert.ToByte(hex[4..6], 16);
 
         return new(red, green, blue);
     }
 
-    public Color this[PaletteIndex index]
+    public (double H, double S, double L) ToHsl()
     {
-        get
-        {
-            if (index == PaletteIndex.Scales) return Scales;
-            if (index == PaletteIndex.ScalesHighlight) return ScalesHighlight;
-            if (index == PaletteIndex.ScalesShadow) return ScalesShadow;
-            if (index == PaletteIndex.Horns) return Horns;
-            if (index == PaletteIndex.HornsShadow) return HornsShadow;
-            if (index == PaletteIndex.Eyes) return Eyes;
-            if (index == PaletteIndex.Whites) return Whites;
+        var rp = R / 255.0;
+        var gp = G / 255.0;
+        var bp = B / 255.0;
 
-            throw new InvalidOperationException();
-        }
+        var cmax = new[] { rp, gp, bp }.Max();
+        var cmin = new[] { rp, gp, bp }.Min();
+        var delta = cmax - cmin;
+
+        var h = (delta == 0) ? 0
+            : (cmax == rp) ? 60 * (((gp - bp) / delta) % 6)
+            : (cmax == gp) ? 60 * (((bp - rp) / delta) + 2)
+            : (cmax == bp) ? 60 * (((rp - gp) / delta) + 4)
+            : 0
+            ;
+
+        var l = (cmax + cmin) / 2;
+
+        var s = (delta == 0) ? 0
+            : delta / (1 - Math.Abs(2 * l - 1))
+            ;
+
+        return (h, s * 100, l * 100);
+    }
+
+    public static Color FromHsl(double h, double s, double l)
+    {
+        s /= 100;
+        l /= 100;
+
+        var c = (1 - Math.Abs(2 * l - 1)) * s;
+        var x = c * (1 - Math.Abs((h / 60 % 2) - 1));
+        var m = l - c / 2;
+
+        var (rp, gp, bp) = h switch
+        {
+            < 60 => (c, x, 0),
+            >= 60 and < 120 => (x, c, 0),
+            >= 120 and < 180 => (0, c, x),
+            >= 180 and < 240 => (0, x, c),
+            >= 240 and < 300 => (x, 0, c),
+            >= 300 => (c, 0, x),
+            _ => (0.0, 0.0, 0.0)
+        };
+
+        var r = rp + m;
+        var g = gp + m;
+        var b = bp + m;
+
+        return new((byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
     }
 };
 
 public class Palette
 {
-    public PaletteColors Colors { get; init; }
-    public SKPaint Paint { get; init; }
-    
-    public Palette(PaletteColors colors)
+    public Dictionary<PaletteIndex, Color> Colors = [];
+
+    public Palette(Color s, Color sh, Color ss, Color h, Color e, Color w, Color hs)
     {
-        Colors = colors;
-        Paint = GetPaint();
+        Colors[PaletteIndex.Scales] = s;
+        Colors[PaletteIndex.ScalesHighlight] = sh;
+        Colors[PaletteIndex.ScalesShadow] = ss;
+        Colors[PaletteIndex.Horns] = h;
+        Colors[PaletteIndex.Eyes] = e;
+        Colors[PaletteIndex.Whites] = w;
+        Colors[PaletteIndex.HornsShadow] = hs;
+    }
+    public Palette(string s, string sh, string ss, string h, string e, string w, string hs)
+    {
+        Colors[PaletteIndex.Scales] = Color.FromHexString(s);
+        Colors[PaletteIndex.ScalesHighlight] = Color.FromHexString(sh);
+        Colors[PaletteIndex.ScalesShadow] = Color.FromHexString(ss);
+        Colors[PaletteIndex.Horns] = Color.FromHexString(h);
+        Colors[PaletteIndex.Eyes] = Color.FromHexString(e);
+        Colors[PaletteIndex.Whites] = Color.FromHexString(w);
+        Colors[PaletteIndex.HornsShadow] = Color.FromHexString(hs);
     }
 
-    private SKPaint GetPaint()
+    public Palette(Palette other)
+    {
+        Colors = new(other.Colors);
+    }
+
+    public Color this[PaletteIndex index]
+    {
+        get => Colors[index];
+        set => Colors[index] = value;
+    }
+
+    public SKPaint GetPaint()
     {
         var identityTable = Enumerable.Range(0, 256).Select(i => (byte)i);
 
@@ -217,29 +244,8 @@ public class PredefinedPalette : Palette, IStaticFieldEnumeration
     public PaletteGroup Group { get; init; }
     public string Name { get; init; }
 
-    private PredefinedPalette
-    (
-        string displayName,
-        PaletteGroup group,
-        string scales,
-        string scalesHighlight,
-        string scalesShadow,
-        string horns,
-        string eye,
-        string whites,
-        string hornsShadow
-    )
-        : base(new PaletteColors
-        (
-            scales: scales,
-            scalesHighlight: scalesHighlight,
-            scalesShadow:
-            scalesShadow,
-            horns: horns,
-            eye: eye,
-            whites: whites,
-            hornsShadow: hornsShadow
-        ))
+    private PredefinedPalette(string displayName, PaletteGroup group, string s, string sh, string ss, string h, string e, string w, string hs)
+        : base(s, sh, ss, h, e, w, hs)
     {
         Group = group;
         Name = displayName;

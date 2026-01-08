@@ -42,7 +42,10 @@
 
         <DockPanel Grid.Row="1" Grid.Column="1">
             <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom">
-                <Label>Currently editing:</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Currently editing:</Label>
+                    <Label Content="{Binding SelectedPaletteIndexName}"></Label>
+                </StackPanel>
                 <Slider Value="{Binding Hue}" Minimum="0" Maximum="360" />
             </StackPanel>
 

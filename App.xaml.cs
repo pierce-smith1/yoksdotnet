@@ -33,19 +33,16 @@ public partial class App : Application
                 MainWindow = new OptionsWindow();
                 break;
             }
-
             case RunType.Show:
             {
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Screensaver());
                 break;
             }
-
             case RunType.Preview(var parentHandle):
             {
                 MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Preview(parentHandle));
                 break;
             }
-
             case RunType.Debug(bool withOptions):
             {
                 if (withOptions)
@@ -58,14 +55,12 @@ public partial class App : Application
 
                 break;
             }
-
             case RunType.DebugPaletteCustomizer:
             {
                 MainWindow = new PaletteCustomizer();
 
                 break;
             }
-
             case null:
             {
                 Shutdown();

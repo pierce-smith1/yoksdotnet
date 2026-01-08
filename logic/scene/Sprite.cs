@@ -1,31 +1,31 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
 
 public record struct Point(double X, double Y);
-public record struct Vector(double X, double Y);
 
 public partial class MoverState {}
 
 public abstract class Sprite
 {
-    public required int Id;
-    public required double Brand;
+    public required int Id { get; init; }
+    public required double Brand { get; init; }
 
-    public required Point Home;
-    public required Vector Offset;
+    public Point Home = new(0, 0);
+    public Point Offset = new(0, 0);
 
     public required double Scale;
     public required double Width;
     public required double Height;
     public required double AngleRadians;
 
-    public MoverState MoverState = new();
+    public MoverState MoverState { get; init; } = new();
 
     public abstract Bitmap GetBitmap();
-    public abstract Palette GetPalette();
+    public abstract SKPaint GetPaint();
 
     public Point GetFinalPos()
     {
@@ -43,16 +43,17 @@ public abstract class Sprite
     }
 }
 
-public class Yokin : Sprite
+public class Yokin(Palette palette) : Sprite
 {
     public record struct EmotionVector(double Empathy, double Ambition, double Optimism);
 
     public required double EmotionScale { get; set; }
     private EmotionVector Emotion = new();
 
-    public required Palette Palette { get; set; }
+    public Palette Palette { get; init; } = palette;
+    private SKPaint Paint { get; init; } = palette.GetPaint();
 
-    public override Palette GetPalette() => Palette;
+    public override SKPaint GetPaint() => Paint;
 
     public override Bitmap GetBitmap()
     {

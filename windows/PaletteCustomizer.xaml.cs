@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 
@@ -24,25 +25,17 @@ public class PreviewSprite : Sprite
     public PaletteIndex? HoveredIndex { get; set; }
 
     public override Bitmap GetBitmap() => Bitmap;
-    public override Palette GetPalette()
+    public override SKPaint GetPaint() 
     {
         if (HoveredIndex is null)
         {
-            return Palette;
+            return Palette.GetPaint();
         }
 
-        var newColors = HoveredIndex switch
-        {
-            _ when HoveredIndex == PaletteIndex.Scales => Palette.Colors with { Scales = ToHoveredColor(Palette.Colors.Scales) },
-            _ when HoveredIndex == PaletteIndex.ScalesHighlight => Palette.Colors with { ScalesHighlight = ToHoveredColor(Palette.Colors.ScalesHighlight)},
-            _ when HoveredIndex == PaletteIndex.ScalesShadow => Palette.Colors with { ScalesShadow = ToHoveredColor(Palette.Colors.ScalesShadow) },
-            _ when HoveredIndex == PaletteIndex.Horns => Palette.Colors with { Horns = ToHoveredColor(Palette.Colors.Horns)},
-            _ when HoveredIndex == PaletteIndex.HornsShadow => Palette.Colors with { HornsShadow = ToHoveredColor(Palette.Colors.HornsShadow)},
-            _ when HoveredIndex == PaletteIndex.Eyes => Palette.Colors with { Eyes = ToHoveredColor(Palette.Colors.Eyes) },
-            _ when HoveredIndex == PaletteIndex.Whites => Palette.Colors with { Whites = ToHoveredColor(Palette.Colors.Whites) },
-            _ => throw new Exception(),
-        };
-        return new Palette(newColors);
+        var hoveredPalette = new Palette(Palette);
+        hoveredPalette[HoveredIndex] = ToHoveredColor(Palette[HoveredIndex]);
+
+        return hoveredPalette.GetPaint();
     }
 
     private Color ToHoveredColor(Color c)
@@ -51,7 +44,7 @@ public class PreviewSprite : Sprite
 
         var newColor = new Color(
             (byte)Math.Clamp(c.R + lightenAmount, 0, 255),
-            (byte)Math.Clamp(c.G + lightenAmount * 2, 0, 255),
+            (byte)Math.Clamp(c.G + lightenAmount, 0, 255),
             (byte)Math.Clamp(c.B + lightenAmount, 0, 255)
         );
         
@@ -64,7 +57,7 @@ public partial class PaletteCustomizer : Window
     private readonly EntityPainter _spritePainter;
     private readonly PreviewSprite _currentSprite;
 
-    public readonly Palette GhostPalette = new(new(
+    public readonly Palette GhostPalette = new(
         "#aaaaaa",
         "#aaaaaa",
         "#aaaaaa",
@@ -72,7 +65,7 @@ public partial class PaletteCustomizer : Window
         "#aaaaaa",
         "#cccccc",
         "#aaaaaa"
-    ));
+    );
 
     private SKRuntimeEffect _colorSelectShader;
     private SKRuntimeEffectUniforms _colorSelectShaderUniforms;
@@ -87,13 +80,15 @@ public partial class PaletteCustomizer : Window
         {
             Id = 0,
             Brand = 0,
-            Home = new(),
-            Offset = new(),
+            Home = new(0, 0),
+            Offset = new(0, 0),
             Scale = 1,
             Width = Bitmap.BitmapSize(),
             Height = Bitmap.BitmapSize(),
             AngleRadians = 0.0,
-            Palette = ViewModel.SelectedPaletteEntry?.Value ?? GhostPalette,
+            Palette = ViewModel.SelectedPaletteName is { } paletteName 
+                ? ViewModel.Palettes[paletteName] 
+                : GhostPalette,
             Bitmap = Bitmap.LkThumbsup,
         };
 
@@ -101,14 +96,13 @@ public partial class PaletteCustomizer : Window
 
         ViewModel.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(ViewModel.SelectedPaletteEntry))
+            if (e.PropertyName == nameof(ViewModel.SelectedPaletteName))
             {
                 OnSelectedPaletteChanged();
             }
-            else if (e.PropertyName == nameof(ViewModel.Hue)
-                || e.PropertyName == nameof(ViewModel.Saturation)
-                || e.PropertyName == nameof(ViewModel.Lightness)
-            ) {
+
+            if (new[] { nameof(ViewModel.Hue), nameof(ViewModel.Saturation), nameof(ViewModel.Lightness) }.Contains(e.PropertyName))
+            {
                 RefreshSurfaces();
             }
         };
@@ -188,8 +182,16 @@ public partial class PaletteCustomizer : Window
 
     private void OnSelectedPaletteChanged()
     {
-        _currentSprite.Palette = ViewModel.SelectedPaletteEntry?.Value ?? GhostPalette;
+        if (ViewModel.SelectedPaletteName is { } paletteName)
+        {
+            _currentSprite.Palette = ViewModel.Palettes[paletteName];
+        }
+        else
+        {
+            _currentSprite.Palette = GhostPalette;
+        }
 
+        ViewModel.UpdateHsl();
         RefreshSurfaces();
     }
 
@@ -219,7 +221,11 @@ public partial class PaletteCustomizer : Window
         }
 
         ViewModel.SelectedPaletteIndex = _currentSprite.HoveredIndex;
+
+        ViewModel.UpdateHsl();
+        RefreshSurfaces();
     }
+
 
     private void OnPreviewMouseMove(object? sender, MouseEventArgs e)
     {
@@ -265,6 +271,12 @@ public partial class PaletteCustomizer : Window
     {
         var ctx = e.Surface.Canvas;
 
+        if (!IsAnyPaletteSelected())
+        {
+            ctx.Clear();
+            return;
+        }
+
         _colorSelectShaderUniforms["resolution"] = new float[] {e.Info.Width, e.Info.Height};
         _colorSelectShaderUniforms["hue"] = ViewModel.Hue;
         var selectPaint = new SKPaint()
@@ -273,11 +285,6 @@ public partial class PaletteCustomizer : Window
         };
 
         ctx.DrawRect(0, 0, e.Info.Width, e.Info.Height, selectPaint);
-
-        if (!IsAnyPaletteSelected())
-        {
-            return;
-        }
 
         const float selectedBoxSize = 30;
 
@@ -305,7 +312,7 @@ public partial class PaletteCustomizer : Window
         ctx.DrawRect(selectedBoxBounds, selectedBoxStroke);
     }
 
-    private void OnColorSelectMouseMove(object? sender, System.Windows.Forms.MouseEventArgs e)
+    private void OnColorSelectMouseMove(object? sender, MouseEventArgs e)
     {
         if (e.Button != MouseButtons.Left)
         {
@@ -318,6 +325,12 @@ public partial class PaletteCustomizer : Window
 
         ViewModel.Saturation = saturation;
         ViewModel.Lightness = lightness;
+
+        if (ViewModel.SelectedPaletteName is { } paletteName)
+        {
+            ViewModel.UpdatePalette();
+            RefreshSurfaces();
+        }
     }
 
     private SKGLControl InitCanvas(WindowsFormsHost host, EventHandler<SKPaintGLSurfaceEventArgs> handler)
@@ -337,6 +350,7 @@ public partial class PaletteCustomizer : Window
         {
             var glControl = InitCanvas(host, OnPaintPreview);
             glControl.MouseMove += OnPreviewMouseMove;
+            glControl.MouseUp += OnPaintPreviewMouseUp;
         }
         else throw new InvalidOperationException();
     }
@@ -353,14 +367,14 @@ public partial class PaletteCustomizer : Window
     
     private bool IsAnyPaletteSelected()
     {
-        return ViewModel.SelectedPaletteEntry is not null;
+        return ViewModel.SelectedPaletteName is not null;
     }
 }
 
 public class PaletteCustomizerViewModel : INotifyPropertyChanged
 {
     private Dictionary<string, Palette> _palettes = new() {
-        { "Chasnah", new(new(
+        { "Chasnah", new(
             "#6f31dd",
             "#932de3",
             "#3a12a2",
@@ -368,8 +382,8 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
             "#e227ff",
             "#f6f5f4",
             "#e959f5"
-        ))},
-        { "Ellai", new(new(
+        )},
+        { "Ellai", new(
             "#97cc72",
             "#caecb1",
             "#338527",
@@ -377,7 +391,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
             "#f04f2a",
             "#ffffff",
             "#45160e"
-        ))},
+        )},
     };
 
     public Dictionary<string, Palette> Palettes { 
@@ -397,8 +411,11 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         {
             _selectedPaletteEntry = value;
             OnPropertyChanged(nameof(SelectedPaletteEntry));
+            OnPropertyChanged(nameof(SelectedPaletteName));
         }
     }
+
+    public string? SelectedPaletteName => SelectedPaletteEntry?.Key;
 
     private PaletteIndex _selectedPaletteIndex = PaletteIndex.Scales;
     public PaletteIndex SelectedPaletteIndex
@@ -408,8 +425,11 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         {
             _selectedPaletteIndex = value;
             OnPropertyChanged(nameof(SelectedPaletteIndex));
+            OnPropertyChanged(nameof(SelectedPaletteIndexName));
         }
     }
+
+    public string SelectedPaletteIndexName => SelectedPaletteIndex.ToString();
 
     private float _hue = 0;
     public float Hue
@@ -441,6 +461,28 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         {
             _lightness = value;
             OnPropertyChanged(nameof(Lightness));
+        }
+    }
+    public void UpdateHsl()
+    {
+        if (SelectedPaletteName is null)
+        {
+            return;
+        }
+
+        var (h, s, l) = Palettes[SelectedPaletteName][SelectedPaletteIndex].ToHsl();
+
+        Hue = (float)h;
+        Saturation = (float)s;
+        Lightness = (float)l;
+    }
+
+    public void UpdatePalette()
+    {
+        if (SelectedPaletteName is { } paletteName)
+        {
+            Palettes[paletteName][SelectedPaletteIndex] = Color.FromHsl(Hue, Saturation, Lightness);
+            OnPropertyChanged(nameof(Palettes));
         }
     }
 
