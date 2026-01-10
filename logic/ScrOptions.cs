@@ -28,7 +28,26 @@ public class ScrOptions
     public bool AnimationPatternDoesChange { get; set; } = true;
     public double AnimationPatternChangeFrequency { get; set; } = 0.5;
 
-    public Dictionary<string, Palette> CustomPaletteColors = new();
+    public Dictionary<string, Palette> CustomPaletteColors { get; set; } = new() {
+        { "Chasnah", new(
+            "#6f31dd",
+            "#932de3",
+            "#3a12a2",
+            "#e30efe",
+            "#e227ff",
+            "#f6f5f4",
+            "#e959f5"
+        )},
+        { "Ellai", new(
+            "#97cc72",
+            "#caecb1",
+            "#338527",
+            "#72482d",
+            "#f04f2a",
+            "#ffffff",
+            "#45160e"
+        )},
+    };
 
     public int GetActualSpriteCount(double width, double height)
     {

@@ -31,6 +31,7 @@
     <None Remove="resources\lkunamused.png" />
     <None Remove="resources\lkxd.png" />
     <None Remove="resources\nx.png" />
+    <None Remove="resources\ui\hue-strip.png" />
     <None Remove="resources\vx.png" />
   </ItemGroup>
 
@@ -41,23 +42,24 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Resource Include="resources\cvjoy.png" />
-    <Resource Include="resources\fn.png" />
-    <Resource Include="resources\fnplead.png" />
-    <Resource Include="resources\lk.png" />
-    <Resource Include="resources\lkconcern.png" />
-    <Resource Include="resources\lkcool.png" />
-    <Resource Include="resources\lkexhausted.png" />
-    <Resource Include="resources\lkhusk.png" />
-    <Resource Include="resources\lkjoy.png" />
-    <Resource Include="resources\lkmoyai.png" />
-    <Resource Include="resources\lksix.png" />
-    <Resource Include="resources\lkthink.png" />
-    <Resource Include="resources\lkthumbsup.png" />
-    <Resource Include="resources\lkunamused.png" />
-    <Resource Include="resources\lkxd.png" />
-    <Resource Include="resources\nx.png" />
-    <Resource Include="resources\vx.png" />
+    <Resource Include="resources\sprites\cvjoy.png" />
+    <Resource Include="resources\sprites\fn.png" />
+    <Resource Include="resources\sprites\fnplead.png" />
+    <Resource Include="resources\sprites\lk.png" />
+    <Resource Include="resources\sprites\lkconcern.png" />
+    <Resource Include="resources\sprites\lkcool.png" />
+    <Resource Include="resources\sprites\lkexhausted.png" />
+    <Resource Include="resources\sprites\lkhusk.png" />
+    <Resource Include="resources\sprites\lkjoy.png" />
+    <Resource Include="resources\sprites\lkmoyai.png" />
+    <Resource Include="resources\sprites\lksix.png" />
+    <Resource Include="resources\sprites\lkthink.png" />
+    <Resource Include="resources\sprites\lkthumbsup.png" />
+    <Resource Include="resources\sprites\lkunamused.png" />
+    <Resource Include="resources\sprites\lkxd.png" />
+    <Resource Include="resources\sprites\nx.png" />
+    <Resource Include="resources\sprites\vx.png" />
+    <Resource Include="resources\ui\hue-strip.png" />
   </ItemGroup>
 
 </Project>

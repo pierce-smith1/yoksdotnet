@@ -21,7 +21,7 @@ public class SpriteGenerator
 
         for (var i = 0; i < Options.GetActualSpriteCount(spreadX, spreadY); i++)
         {
-            var palette = rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count() / totalPossibleCount);
+            var palette = rng.SampleExponential(selectedPalettes, 1 - (double)selectedPalettes.Count / totalPossibleCount);
             var newSprite = new Yokin(palette)
             {
                 Id = _runningId++,

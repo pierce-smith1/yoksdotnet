@@ -12,6 +12,13 @@
     <Window.DataContext>
         <ydnwindows:PaletteCustomizerViewModel x:Name="ViewModel" />
     </Window.DataContext>
+
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="5,2" />
+            <Setter Property="Margin" Value="5,2" />
+        </Style>
+    </Window.Resources>
     
     <Grid Margin="16">
         <Grid.ColumnDefinitions>
@@ -22,31 +29,56 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ListBox Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="3"
-            ItemsSource="{Binding Palettes}" 
+        <ListBox Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="2" 
+            HorizontalContentAlignment="Stretch" 
+            VerticalContentAlignment="Center"
+            ItemsSource="{Binding PaletteViews}" 
             SelectedItem="{Binding SelectedPaletteEntry}"
         >
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Key}" />
+                    <DockPanel>
+                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.ScalesHex}" />
+                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.HornsHex}" />
+                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.EyesHex}" Margin="0,0,5,0" />
+
+                        <Button DockPanel.Dock="Right" Click="OnDeletePalette" Tag="{Binding Key}">Delete</Button>
+                        
+                        <TextBox Text="{Binding Mode=OneWay, Path=Key}" />
+                    </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         
-        <WindowsFormsHost Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+        <Grid Grid.Row="3" Grid.Column="0"  Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <Button Grid.Column="0" DockPanel.Dock="Right" Click="OnAddPalette">New</Button>
+        </Grid>
+
+        <DockPanel Grid.Row="3" Grid.Column="1" LastChildFill="False" Margin="2">
+            <Button DockPanel.Dock="Right" Click="OnSave">Save</Button>
+            <Button DockPanel.Dock="Right" Click="OnCancel">Cancel</Button>
+        </DockPanel>
+
+        <WindowsFormsHost Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="2"
             x:Name="PreviewCanvas"
             Initialized="InitPreviewCanvas"
         />
 
-        <DockPanel Grid.Row="1" Grid.Column="1">
+        <DockPanel Grid.Row="1" Grid.Column="1" Margin="2">
             <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom">
                 <StackPanel Orientation="Horizontal">
-                    <Label>Currently editing:</Label>
-                    <Label Content="{Binding SelectedPaletteIndexName}"></Label>
+                    <Label FontWeight="Bold">Currently editing:</Label>
+                    <Label Content="{Binding SelectedPaletteIndexName}" />
                 </StackPanel>
-                <Slider Value="{Binding Hue}" Minimum="0" Maximum="360" />
+                <Slider IsEnabled="{Binding IsPaletteSelected}" Value="{Binding Hue}" Minimum="0" Maximum="360" Margin="0,4,0,4" />
+                <Image Source="/resources/ui/hue-strip.png" Stretch="Fill" Height="15" Margin="4,0,4,0" />
             </StackPanel>
 
             <WindowsFormsHost Grid.Row="1" Grid.Column="1"
@@ -54,6 +86,5 @@
                 Initialized="InitColorSelectCanvas"
             />
         </DockPanel>
-
     </Grid>
 </Window>

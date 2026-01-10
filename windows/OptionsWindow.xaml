@@ -91,7 +91,10 @@
                 >
                 </ComboBox>
 
-                <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Visibility="{Binding PaletteCustomizeVisibility}">
+                <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" 
+                    Visibility="{Binding PaletteCustomizeVisibility}"
+                    Click="OnCustomizePalettes"
+                >
                     Customize
                 </Button>
             </Grid>

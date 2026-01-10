@@ -57,7 +57,8 @@ public partial class App : Application
             }
             case RunType.DebugPaletteCustomizer:
             {
-                MainWindow = new PaletteCustomizer();
+                var options = new OptionsSaver().Load() ?? new();
+                MainWindow = new PaletteCustomizer(options.CustomPaletteColors);
 
                 break;
             }

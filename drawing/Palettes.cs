@@ -1,5 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL;
-using SkiaSharp;
+﻿using SkiaSharp;
 
 using System;
 using System.Collections.Generic;
@@ -9,22 +8,22 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.drawing;
 
-public record PaletteIndex(string Name, int Luminance) : IStaticFieldEnumeration
+public record PaletteIndex(string Name, string DisplayName, int Luminance) : IStaticFieldEnumeration
 {
-    public readonly static PaletteIndex Scales = new("Scales base", 160);
-    public readonly static PaletteIndex ScalesHighlight = new("Scale highlights", 200);
-    public readonly static PaletteIndex ScalesShadow = new("Scale shadows", 0);
-    public readonly static PaletteIndex Horns = new("Horns base", 120);
-    public readonly static PaletteIndex Eyes = new("Pupil color", 80);
-    public readonly static PaletteIndex Whites = new("Teeth and eyes", 240);
-    public readonly static PaletteIndex HornsShadow = new("Horns shadow", 40);
+    public readonly static PaletteIndex Scales = new(nameof(Scales), "Scales base", 160);
+    public readonly static PaletteIndex ScalesHighlight = new(nameof(ScalesHighlight), "Scale highlights", 200);
+    public readonly static PaletteIndex ScalesShadow = new(nameof(ScalesShadow), "Scale shadows", 0);
+    public readonly static PaletteIndex Horns = new(nameof(Horns), "Horns base", 120);
+    public readonly static PaletteIndex Eyes = new(nameof(Eyes), "Pupil color", 80);
+    public readonly static PaletteIndex Whites = new(nameof(Whites), "Teeth and eyes", 240);
+    public readonly static PaletteIndex HornsShadow = new(nameof(HornsShadow), "Horns shadow", 40);
 
-    public override string ToString() => Name;
+    public override string ToString() => DisplayName;
 };
 
 public record Color(byte R, byte G, byte B)
 {
-    public static Color FromHexString(string hex)
+    public static Color FromHex(string hex)
     {
         if (hex.StartsWith('#'))
         {
@@ -64,6 +63,12 @@ public record Color(byte R, byte G, byte B)
         return (h, s * 100, l * 100);
     }
 
+    public string AsHex()
+    {
+        var hex = $"#{R:x2}{G:x2}{B:x2}";
+        return hex;
+    }
+
     public static Color FromHsl(double h, double s, double l)
     {
         s /= 100;
@@ -96,6 +101,54 @@ public class Palette
 {
     public Dictionary<PaletteIndex, Color> Colors = [];
 
+    public Color Scales
+    {
+        get => this[PaletteIndex.Scales];
+        set => this[PaletteIndex.Scales] = value;
+    }
+    public Color ScalesHighlight
+    {
+        get => this[PaletteIndex.ScalesHighlight];
+        set => this[PaletteIndex.ScalesHighlight] = value;
+    }
+    public Color ScalesShadow
+    {
+        get => this[PaletteIndex.ScalesShadow];
+        set => this[PaletteIndex.ScalesShadow] = value;
+    }
+    public Color Horns
+    {
+        get => this[PaletteIndex.Horns];
+        set => this[PaletteIndex.Horns] = value;
+    }
+    public Color Eyes
+    {
+        get => this[PaletteIndex.Eyes];
+        set => this[PaletteIndex.Eyes] = value;
+    }
+    public Color Whites
+    {
+        get => this[PaletteIndex.Whites];
+        set => this[PaletteIndex.Whites] = value;
+    }
+    public Color HornsShadow
+    {
+        get => this[PaletteIndex.HornsShadow];
+        set => this[PaletteIndex.HornsShadow] = value;
+    }
+
+    public string ScalesHex => Scales.AsHex();
+    public string ScalesHighlightHex => ScalesHighlight.AsHex();
+    public string ScalesShadowHex => ScalesShadow.AsHex();
+    public string HornsHex => Horns.AsHex();
+    public string EyesHex => Eyes.AsHex();
+    public string WhitesHex => Whites.AsHex();
+    public string HornsShadowHex => HornsShadow.AsHex();
+
+    public Palette()
+        : this("#000000", "#ff00ff", "#ff00ff", "#000000", "#ff00ff", "#000000", "#ff00ff") 
+    { }
+
     public Palette(Color s, Color sh, Color ss, Color h, Color e, Color w, Color hs)
     {
         Colors[PaletteIndex.Scales] = s;
@@ -108,13 +161,13 @@ public class Palette
     }
     public Palette(string s, string sh, string ss, string h, string e, string w, string hs)
     {
-        Colors[PaletteIndex.Scales] = Color.FromHexString(s);
-        Colors[PaletteIndex.ScalesHighlight] = Color.FromHexString(sh);
-        Colors[PaletteIndex.ScalesShadow] = Color.FromHexString(ss);
-        Colors[PaletteIndex.Horns] = Color.FromHexString(h);
-        Colors[PaletteIndex.Eyes] = Color.FromHexString(e);
-        Colors[PaletteIndex.Whites] = Color.FromHexString(w);
-        Colors[PaletteIndex.HornsShadow] = Color.FromHexString(hs);
+        Colors[PaletteIndex.Scales] = Color.FromHex(s);
+        Colors[PaletteIndex.ScalesHighlight] = Color.FromHex(sh);
+        Colors[PaletteIndex.ScalesShadow] = Color.FromHex(ss);
+        Colors[PaletteIndex.Horns] = Color.FromHex(h);
+        Colors[PaletteIndex.Eyes] = Color.FromHex(e);
+        Colors[PaletteIndex.Whites] = Color.FromHex(w);
+        Colors[PaletteIndex.HornsShadow] = Color.FromHex(hs);
     }
 
     public Palette(Palette other)

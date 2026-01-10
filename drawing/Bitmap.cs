@@ -35,7 +35,7 @@ public class Bitmap : IStaticFieldEnumeration
     private Bitmap(string name)
     {
         Name = name;
-        Resource = LoadResource($"/resources/{name}.png");
+        Resource = LoadResource($"/resources/sprites/{name}.png");
     }
 
     private static SKBitmap LoadResource(string path)

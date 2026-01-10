@@ -1,0 +1,32 @@
+<Window
+    x:Class="yoksdotnet.windows.AddPaletteDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ydnwindows="clr-namespace:yoksdotnet.windows" 
+    mc:Ignorable="d"
+    Title="Add palette"
+    SizeToContent="WidthAndHeight" 
+    WindowStartupLocation="CenterScreen"
+    ResizeMode="NoResize"
+>
+    <Window.DataContext>
+        <ydnwindows:AddPaletteDialogViewModel x:Name="ViewModel" />
+    </Window.DataContext>
+    
+    <StackPanel Orientation="Vertical" Margin="16">
+        <ListBox 
+            ItemsSource="{Binding PredefinedPalettes}"
+            SelectedItem="{Binding SelectedPalette}"
+        >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Key}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Button Click="OnAdd">Add</Button>
+    </StackPanel>
+</Window>
