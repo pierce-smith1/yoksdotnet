@@ -1,13 +1,15 @@
 ﻿<Window 
     x:Class="yoksdotnet.windows.PaletteCustomizer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ydnwindows="clr-namespace:yoksdotnet.windows" 
-    xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+    xmlns:dd="urn:gong-wpf-dragdrop"
+    xmlns:ydnwindows="clr-namespace:yoksdotnet.windows"
     mc:Ignorable="d"
-    Title="PaletteCustomizer" Height="450" Width="800"
+    Title="Custom palettes" 
+    Height="450" 
+    Width="800"
 >
     <Window.DataContext>
         <ydnwindows:PaletteCustomizerViewModel x:Name="ViewModel" />
@@ -35,31 +37,52 @@
         <ListBox Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="2" 
             HorizontalContentAlignment="Stretch" 
             VerticalContentAlignment="Center"
-            ItemsSource="{Binding PaletteViews}" 
-            SelectedItem="{Binding SelectedPaletteEntry}"
+            ItemsSource="{Binding PaletteEntries}" 
+            SelectedItem="{Binding SelectedEntry}"
+            dd:DragDrop.IsDragSource="True"
+            dd:DragDrop.IsDropTarget="True"
         >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel>
-                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.ScalesHex}" />
-                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.HornsHex}" />
-                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.EyesHex}" Margin="0,0,5,0" />
+                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding PaletteView.ScalesHex}" />
+                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding PaletteView.HornsHex}" />
+                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding PaletteView.EyesHex}" Margin="0,0,5,0" />
 
-                        <Button DockPanel.Dock="Right" Click="OnDeletePalette" Tag="{Binding Key}">Delete</Button>
+                        <Button DockPanel.Dock="Right" Click="OnDeletePalette" Tag="{Binding Id}">Delete</Button>
+                        <Button DockPanel.Dock="Right" Click="OnCopyPalette" Tag="{Binding Id}">Copy</Button>
                         
-                        <TextBox Text="{Binding Mode=OneWay, Path=Key}" />
+                        <TextBox 
+                            VerticalContentAlignment="Center" 
+                            Text="{Binding Name}" 
+                            Tag="{Binding Id}"
+                            GotKeyboardFocus="OnEntryKeyboardFocused"
+                        />
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         
-        <Grid Grid.Row="3" Grid.Column="0"  Margin="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <DockPanel Grid.Row="3" Grid.Column="0" Margin="2">
+            <Button DockPanel.Dock="Right" Click="OnAddPalette">Add</Button>
             
-            <Button Grid.Column="0" DockPanel.Dock="Right" Click="OnAddPalette">New</Button>
-        </Grid>
+            <ComboBox
+                ItemsSource="{Binding PredefinedPalettes}"
+                SelectedItem="{Binding PaletteToAdd}"
+            >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.ScalesHex}" />
+                            <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.HornsHex}" />
+                            <Rectangle Width="8" Stretch="Fill" Fill="{Binding Value.EyesHex}" Margin="0,0,5,0" />
+                            
+                            <Label VerticalContentAlignment="Center" Content="{Binding Key}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </DockPanel>
 
         <DockPanel Grid.Row="3" Grid.Column="1" LastChildFill="False" Margin="2">
             <Button DockPanel.Dock="Right" Click="OnSave">Save</Button>
@@ -73,12 +96,23 @@
 
         <DockPanel Grid.Row="1" Grid.Column="1" Margin="2">
             <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom">
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <Label FontWeight="Bold">Currently editing:</Label>
-                    <Label Content="{Binding SelectedPaletteIndexName}" />
+                    <Label Content="{Binding SelectedIndexName}" />
                 </StackPanel>
-                <Slider IsEnabled="{Binding IsPaletteSelected}" Value="{Binding Hue}" Minimum="0" Maximum="360" Margin="0,4,0,4" />
-                <Image Source="/resources/ui/hue-strip.png" Stretch="Fill" Height="15" Margin="4,0,4,0" />
+
+                <Slider Margin="0,4,0,4"
+                    IsEnabled="{Binding IsPaletteSelected}" 
+                    Value="{Binding Hue}" 
+                    Minimum="0" 
+                    Maximum="360" 
+                />
+                
+                <Image Visibility="{Binding HueStripVisibility}"
+                    Source="/resources/ui/hue-strip.png" 
+                    Stretch="Fill" 
+                    Height="10"  
+                />
             </StackPanel>
 
             <WindowsFormsHost Grid.Row="1" Grid.Column="1"

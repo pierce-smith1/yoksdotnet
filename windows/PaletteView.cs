@@ -17,7 +17,6 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
             OnPropertyChanged(nameof(ScalesHex));
         }
     }
-    public string ScalesHex => BackingPalette.ScalesHex;
 
     public Color ScalesHighlight
     {
@@ -29,7 +28,6 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
             OnPropertyChanged(nameof(ScalesHighlightHex));
         }
     }
-    public string ScalesHighlightHex => BackingPalette.ScalesHighlightHex;
 
     public Color ScalesShadow
     {
@@ -41,7 +39,6 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
             OnPropertyChanged(nameof(ScalesShadowHex));
         }
     }
-    public string ScalesShadowHex => BackingPalette.ScalesShadowHex;
 
     public Color Horns
     {
@@ -53,8 +50,6 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
             OnPropertyChanged(nameof(HornsHex));
         }
     }
-    public string HornsHex => BackingPalette.HornsHex;
-
 
     public Color Eyes
     {
@@ -66,7 +61,6 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
             OnPropertyChanged(nameof(EyesHex));
         }
     }
-    public string EyesHex => BackingPalette.EyesHex;
 
     public Color Whites
     {
@@ -78,7 +72,6 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
             OnPropertyChanged(nameof(WhitesHex));
         }
     }
-    public string WhitesHex => BackingPalette.WhitesHex;
 
     public Color HornsShadow
     {
@@ -90,7 +83,6 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
             OnPropertyChanged(nameof(HornsShadowHex));
         }
     }
-    public string HornsShadowHex => BackingPalette.HornsShadowHex;
 
     public Color this[PaletteIndex index]
     {
@@ -102,6 +94,13 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
             OnPropertyChanged($"{index.Name}Hex");
         }
     }
+    public string ScalesHex => Scales.AsHex();
+    public string ScalesHighlightHex => ScalesHighlight.AsHex();
+    public string ScalesShadowHex => ScalesShadow.AsHex();
+    public string HornsHex => Horns.AsHex();
+    public string EyesHex => Eyes.AsHex();
+    public string WhitesHex => Whites.AsHex();
+    public string HornsShadowHex => HornsShadow.AsHex();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

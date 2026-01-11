@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text.Json.Serialization;
 using yoksdotnet.common;
 using yoksdotnet.drawing;
 using yoksdotnet.logic.scene.patterns;
@@ -28,8 +28,10 @@ public class ScrOptions
     public bool AnimationPatternDoesChange { get; set; } = true;
     public double AnimationPatternChangeFrequency { get; set; } = 0.5;
 
-    public Dictionary<string, Palette> CustomPaletteColors { get; set; } = new() {
-        { "Chasnah", new(
+    // Custom palettes are serialized and de-serialized separately. See OptionsSaver.
+    [JsonIgnore]
+    public List<CustomPaletteEntry> CustomPalettes { get; set; } = [
+        new("Chasnah", new(
             "#6f31dd",
             "#932de3",
             "#3a12a2",
@@ -37,8 +39,8 @@ public class ScrOptions
             "#e227ff",
             "#f6f5f4",
             "#e959f5"
-        )},
-        { "Ellai", new(
+        )),
+        new("Ellai", new(
             "#97cc72",
             "#caecb1",
             "#338527",
@@ -46,8 +48,8 @@ public class ScrOptions
             "#f04f2a",
             "#ffffff",
             "#45160e"
-        )},
-    };
+        )),
+    ];
 
     public int GetActualSpriteCount(double width, double height)
     {
@@ -115,5 +117,6 @@ public class ScrOptions
 
         return propertiesRequiringRefresh.Contains(propertyName);
     }
-
 }
+
+public record CustomPaletteEntry(string Name, Palette Palette) { }

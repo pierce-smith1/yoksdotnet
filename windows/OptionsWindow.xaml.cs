@@ -64,8 +64,6 @@ public partial class OptionsWindow : Window
         ViewModel.AnimationStartingPattern = options.AnimationStartingPattern;
         ViewModel.AnimationPatternChangeFrequency = options.AnimationPatternChangeFrequency;
         ViewModel.AnimationPatternDoesChange = options.AnimationPatternDoesChange;
-
-        ViewModel.CustomPaletteColors = options.CustomPaletteColors;
     }
 
     private void OnCancel(object? _sender, RoutedEventArgs _e)
@@ -75,10 +73,10 @@ public partial class OptionsWindow : Window
 
     private void OnCustomizePalettes(object? _sender, RoutedEventArgs _e)
     {
-        var paletteCustomizeDialog = new PaletteCustomizer(ViewModel.CustomPaletteColors);
+        var paletteCustomizeDialog = new PaletteCustomizer(ViewModel.BackingOptions.CustomPalettes);
         if (paletteCustomizeDialog.ShowDialog() is true)
         {
-            ViewModel.CustomPaletteColors = paletteCustomizeDialog.GetPaletteState();
+            ViewModel.BackingOptions.CustomPalettes = paletteCustomizeDialog.GetPaletteState();
         }
     }
 }
@@ -196,6 +194,7 @@ public class OptionsViewModel : INotifyPropertyChanged
         set 
         {
             BackingOptions.AnimationStartingPattern = value;
+
             OnPropertyChanged(nameof(AnimationStartingPattern));
         }
     }
@@ -217,16 +216,6 @@ public class OptionsViewModel : INotifyPropertyChanged
         {
             BackingOptions.AnimationPatternChangeFrequency = value;
             OnPropertyChanged(nameof(AnimationPatternChangeFrequency));
-        }
-    }
-
-    public Dictionary<string, Palette> CustomPaletteColors
-    {
-        get => BackingOptions.CustomPaletteColors;
-        set
-        {
-            BackingOptions.CustomPaletteColors = value;
-            OnPropertyChanged(nameof(CustomPaletteColors));
         }
     }
 

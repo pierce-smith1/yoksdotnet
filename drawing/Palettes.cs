@@ -103,47 +103,40 @@ public class Palette
 
     public Color Scales
     {
-        get => this[PaletteIndex.Scales];
-        set => this[PaletteIndex.Scales] = value;
+        get => Colors[PaletteIndex.Scales];
+        set => Colors[PaletteIndex.Scales] = value;
     }
     public Color ScalesHighlight
     {
-        get => this[PaletteIndex.ScalesHighlight];
-        set => this[PaletteIndex.ScalesHighlight] = value;
+        get => Colors[PaletteIndex.ScalesHighlight];
+        set => Colors[PaletteIndex.ScalesHighlight] = value;
     }
     public Color ScalesShadow
     {
-        get => this[PaletteIndex.ScalesShadow];
-        set => this[PaletteIndex.ScalesShadow] = value;
+        get => Colors[PaletteIndex.ScalesShadow];
+        set => Colors[PaletteIndex.ScalesShadow] = value;
     }
     public Color Horns
     {
-        get => this[PaletteIndex.Horns];
-        set => this[PaletteIndex.Horns] = value;
+        get => Colors[PaletteIndex.Horns];
+        set => Colors[PaletteIndex.Horns] = value;
     }
     public Color Eyes
     {
-        get => this[PaletteIndex.Eyes];
-        set => this[PaletteIndex.Eyes] = value;
+        get => Colors[PaletteIndex.Eyes];
+        set => Colors[PaletteIndex.Eyes] = value;
     }
     public Color Whites
     {
-        get => this[PaletteIndex.Whites];
-        set => this[PaletteIndex.Whites] = value;
+        get => Colors[PaletteIndex.Whites];
+        set => Colors[PaletteIndex.Whites] = value;
     }
     public Color HornsShadow
     {
-        get => this[PaletteIndex.HornsShadow];
-        set => this[PaletteIndex.HornsShadow] = value;
+        get => Colors[PaletteIndex.HornsShadow];
+        set => Colors[PaletteIndex.HornsShadow] = value;
     }
 
-    public string ScalesHex => Scales.AsHex();
-    public string ScalesHighlightHex => ScalesHighlight.AsHex();
-    public string ScalesShadowHex => ScalesShadow.AsHex();
-    public string HornsHex => Horns.AsHex();
-    public string EyesHex => Eyes.AsHex();
-    public string WhitesHex => Whites.AsHex();
-    public string HornsShadowHex => HornsShadow.AsHex();
 
     public Palette()
         : this("#000000", "#ff00ff", "#ff00ff", "#000000", "#ff00ff", "#000000", "#ff00ff") 
