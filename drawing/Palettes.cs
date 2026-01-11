@@ -54,6 +54,11 @@ public record Color(byte R, byte G, byte B)
             : 0
             ;
 
+        while (h < 0)
+        {
+            h += 360;
+        }
+
         var l = (cmax + cmin) / 2;
 
         var s = (delta == 0) ? 0
