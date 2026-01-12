@@ -505,21 +505,32 @@ public partial class PaletteCustomizer : Window
         var exportPath = Path.Combine(folderDialog.FolderName, entry.Name);
 
         var imageExporter = new ImageExporter(exportPath);
-        foreach (var bitmap in StaticFieldEnumerations.GetAll<Bitmap>())
-        {
-            var exportResult = imageExporter.Export(bitmap, entry.Palette);
+        var exportResults = StaticFieldEnumerations.GetAll<Bitmap>()
+            .Select(b => imageExporter.Export(b, entry.Palette));
 
-            if (exportResult == ImageExportResult.NoPermission)
-            {
-                System.Windows.MessageBox.Show
-                (
-                    "It seems I don't have permission to write files here. Try somewhere else?",
-                    "Export error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
-                break;
-            }
+        if (exportResults.All(r => r == ImageExportResult.Ok))
+        {
+            Process.Start("explorer.exe", exportPath);
+        }
+        else if (exportResults.Any(r => r == ImageExportResult.NoPermission))
+        {
+            System.Windows.MessageBox.Show
+            (
+                "It seems I don't have permission to write files here. Try somewhere else?",
+                "Export error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
+        }
+        else
+        {
+            System.Windows.MessageBox.Show
+            (
+                "Something went wrong trying to write files. Check that the folder you're trying to write to still exists.",
+                "Export error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
         }
     }
 }

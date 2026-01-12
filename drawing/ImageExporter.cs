@@ -38,6 +38,10 @@ public class ImageExporter(string _exportPath)
         {
             return ImageExportResult.NoPermission;
         }
+        catch (IOException)
+        {
+            return ImageExportResult.UnknownError;
+        }
     }
 }
 
@@ -45,4 +49,5 @@ public enum ImageExportResult
 {
     Ok,
     NoPermission,
+    UnknownError,
 }
