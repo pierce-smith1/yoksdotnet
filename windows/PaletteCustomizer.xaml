@@ -34,7 +34,9 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
+        <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding GroupName}" />
+
         <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="False" Margin="2">
             <Button DockPanel.Dock="Right" Click="OnExport">Export as PNG</Button>
         </DockPanel>

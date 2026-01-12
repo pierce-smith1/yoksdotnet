@@ -322,10 +322,7 @@ public class PaletteGroup : IStaticFieldEnumeration
         Name = displayName;
     }
 
-    public override string ToString()
-    {
-        return Name;
-    }
+    public override string ToString() => Name;
 }
 
 [JsonDerivedType(typeof(SingleGroup), nameof(SingleGroup))]
@@ -334,23 +331,8 @@ public class PaletteGroup : IStaticFieldEnumeration
 [JsonDerivedType(typeof(ImFeelingLucky), nameof(ImFeelingLucky))]
 public record PaletteChoice
 {
-    public record SingleGroup(PaletteGroup Group) : PaletteChoice()
-    {
-        public override string ToString() => Group.ToString();
-    }
-
-    public record AllGroups() : PaletteChoice()
-    {
-        public override string ToString() => "Everything";
-    };
-
-    public record UserDefined() : PaletteChoice()
-    {
-        public override string ToString() => "Custom";
-    }
-
-    public record ImFeelingLucky() : PaletteChoice()
-    {
-        public override string ToString() => "I'm Feeling Lucky";
-    }
+    public record SingleGroup(PaletteGroup Group) : PaletteChoice;
+    public record AllGroups : PaletteChoice;
+    public record UserDefined(string GroupName) : PaletteChoice;
+    public record ImFeelingLucky : PaletteChoice;
 }

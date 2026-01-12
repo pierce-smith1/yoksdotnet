@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -52,7 +54,6 @@ public partial class OptionsWindow : Window
         ViewModel.FamilyDiversity = options.FamilyDiversity;
         ViewModel.FamilySize = options.FamilySize;
         ViewModel.FamilyImpostorDensity = options.FamilyImpostorDensity;
-        ViewModel.FamilyPaletteChoice = options.FamilyPaletteChoice;
 
         ViewModel.IndividualScale = options.IndividualScale;
         ViewModel.IndividualEmotionScale = options.IndividualEmotionScale;
@@ -64,6 +65,9 @@ public partial class OptionsWindow : Window
         ViewModel.AnimationStartingPattern = options.AnimationStartingPattern;
         ViewModel.AnimationPatternChangeFrequency = options.AnimationPatternChangeFrequency;
         ViewModel.AnimationPatternDoesChange = options.AnimationPatternDoesChange;
+
+        ViewModel.CustomPalettes = options.CustomPalettes;
+        ViewModel.FamilyPaletteChoice = new(options.FamilyPaletteChoice);
     }
 
     private void OnCancel(object? _sender, RoutedEventArgs _e)
@@ -71,12 +75,96 @@ public partial class OptionsWindow : Window
         Close();
     }
 
-    private void OnCustomizePalettes(object? _sender, RoutedEventArgs _e)
+    private void OnEditPaletteGroup(object? _sender, RoutedEventArgs _e)
     {
-        var paletteCustomizeDialog = new PaletteCustomizer(ViewModel.BackingOptions.CustomPalettes);
+        if (ViewModel.FamilyPaletteChoice.Choice is not PaletteChoice.UserDefined groupChoice)
+        {
+            return;
+        }
+
+        var group = ViewModel.CustomPalettes.Single(e => e.Name == groupChoice.GroupName);
+
+        var paletteCustomizeDialog = new PaletteCustomizer(group.Name, group.Entries);
         if (paletteCustomizeDialog.ShowDialog() is true)
         {
-            ViewModel.BackingOptions.CustomPalettes = paletteCustomizeDialog.GetPaletteState();
+            var newGroupName = paletteCustomizeDialog.EditedPaletteGroup.Name;
+
+            ViewModel.FamilyPaletteChoice = new(new PaletteChoice.UserDefined(newGroupName));
+
+            ViewModel.CustomPalettes = 
+            [
+                paletteCustomizeDialog.EditedPaletteGroup,
+                ..ViewModel.CustomPalettes.Where(e => e.Name != groupChoice.GroupName)
+            ];
+
+            _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
+        }
+    }
+
+    private void OnDeletePaletteGroup(object _sender, RoutedEventArgs _e)
+    {
+        if (ViewModel.FamilyPaletteChoice.Choice is not PaletteChoice.UserDefined groupChoice)
+        {
+            return;
+        }
+
+        var group = ViewModel.CustomPalettes.Single(e => e.Name == groupChoice.GroupName);
+
+        var confirmResult = (group.Entries.Count == 0)
+            ? MessageBoxResult.Yes
+            : MessageBox.Show
+            (
+                $"Are you sure you want to delete '{groupChoice.GroupName}' and the {group.Entries.Count} {(group.Entries.Count == 1 ? "yokin" : "yokins")} inside of it?",
+                "Confirm deletion",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning
+            );
+
+        if (confirmResult == MessageBoxResult.Yes)
+        {
+            ViewModel.FamilyPaletteChoice = new(new ScrOptions().FamilyPaletteChoice);
+
+            ViewModel.CustomPalettes = ViewModel.CustomPalettes
+                .Where(e => e.Name != groupChoice.GroupName)
+                .ToList();
+
+            _optionsSaver.Save(ViewModel.BackingOptions);
+        }
+    }
+
+    private void OnPaletteSelected(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems is not { Count: 1 })
+        {
+            return;
+        }
+
+        if (e.AddedItems[0] is PaletteChoiceEntry entry && entry.Choice is not null)
+        {
+            return;
+        }
+
+        CreateCustomPaletteSet();
+    }
+
+    private void CreateCustomPaletteSet()
+    {
+        var paletteCustomizeDialog = new PaletteCustomizer("New palette set", []);
+        if (paletteCustomizeDialog.ShowDialog() is true)
+        {
+            ViewModel.CustomPalettes = 
+            [
+                ..ViewModel.CustomPalettes, 
+                paletteCustomizeDialog.EditedPaletteGroup
+            ];
+
+            ViewModel.FamilyPaletteChoice = new(new PaletteChoice.UserDefined(paletteCustomizeDialog.EditedPaletteGroup.Name));
+
+            _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
+        }
+        else
+        {
+            ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.FamilyPaletteChoice);
         }
     }
 }
@@ -116,12 +204,17 @@ public class OptionsViewModel : INotifyPropertyChanged
         }
     }
 
-    public PaletteChoice FamilyPaletteChoice 
+    public PaletteChoiceEntry FamilyPaletteChoice 
     {
-        get => BackingOptions.FamilyPaletteChoice;
+        get => new(BackingOptions.FamilyPaletteChoice);
         set 
         {
-            BackingOptions.FamilyPaletteChoice = value;
+            if (value.Choice is null)
+            {
+                return;
+            }
+
+            BackingOptions.FamilyPaletteChoice = value.Choice;
             OnPropertyChanged(nameof(FamilyPaletteChoice));
             OnPropertyChanged(nameof(PaletteCustomizeVisibility));
         }
@@ -219,15 +312,29 @@ public class OptionsViewModel : INotifyPropertyChanged
         }
     }
 
-    public Visibility PaletteCustomizeVisibility => (FamilyPaletteChoice is PaletteChoice.UserDefined)
+    public List<CustomPaletteGroup> CustomPalettes
+    {
+        get => BackingOptions.CustomPalettes;
+        set
+        {
+            BackingOptions.CustomPalettes = value;
+            OnPropertyChanged(nameof(CustomPalettes));
+            OnPropertyChanged(nameof(PaletteChoices));
+        }
+    }
+
+    public Visibility PaletteCustomizeVisibility => (FamilyPaletteChoice.Choice is PaletteChoice.UserDefined)
         ? Visibility.Visible
         : Visibility.Hidden;
 
-    public List<PaletteChoice> PaletteChoices { get; init; } = [
-        ..StaticFieldEnumerations.GetAll<PaletteGroup>().Select(g => new PaletteChoice.SingleGroup(g)),
-        new PaletteChoice.AllGroups(),
-        new PaletteChoice.ImFeelingLucky(),
-        new PaletteChoice.UserDefined(),
+    public List<PaletteChoiceEntry> PaletteChoices => [
+        ..StaticFieldEnumerations.GetAll<PaletteGroup>()
+            .Select(g => new PaletteChoiceEntry(new PaletteChoice.SingleGroup(g))),
+        new(new PaletteChoice.AllGroups()),
+        new(new PaletteChoice.ImFeelingLucky()),
+        ..CustomPalettes
+            .Select(e => new PaletteChoiceEntry(new PaletteChoice.UserDefined(e.Name))),
+        new(null),
     ];
 
     public List<PatternChoice> PatternChoices => [
@@ -243,4 +350,18 @@ public class OptionsViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
+}
+
+public record PaletteChoiceEntry(PaletteChoice? Choice)
+{
+    public override string ToString() => Choice switch
+    {
+        PaletteChoice.SingleGroup(var group) => group.Name,
+        PaletteChoice.AllGroups => "Everything",
+        PaletteChoice.UserDefined(var name) => $"{name} (custom)",
+        PaletteChoice.ImFeelingLucky => "I'm Feeling Llucky",
+        null => "Create new palette set...",
+
+        _ => throw new InvalidOperationException(),
+    };
 }

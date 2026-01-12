@@ -13,9 +13,9 @@ public class ImageExporter(string _exportPath)
     {
         try
         {
-            var imagePath = Path.Combine(_exportPath, $"{bitmap.Name}.png");
-
             Directory.CreateDirectory(_exportPath);
+
+            var imagePath = Path.Combine(_exportPath, $"{bitmap.Name}.png");
 
             var size = Bitmap.BitmapSize();
 

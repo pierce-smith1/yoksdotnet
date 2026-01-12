@@ -83,19 +83,27 @@
                 <Label Grid.Row="2" Grid.Column="3" FontWeight="Normal">All</Label>
 
                 <!-- Palette -->
-                <Label Grid.Row="3" Grid.Column="0" FontWeight="SemiBold">Palette:</Label>
+                <Label Grid.Row="3" Grid.Column="0" FontWeight="SemiBold">Palette set:</Label>
                 <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" 
                     ItemsSource="{Binding PaletteChoices}"
                     SelectedValue="{Binding FamilyPaletteChoice}"
                     Height="25"
+                    SelectionChanged="OnPaletteSelected"
                 >
                 </ComboBox>
 
-                <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" 
+                <Button Grid.Row="4" Grid.Column="1" 
                     Visibility="{Binding PaletteCustomizeVisibility}"
-                    Click="OnCustomizePalettes"
+                    Click="OnDeletePaletteGroup"
                 >
-                    Customize
+                    Delete
+                </Button>
+                
+                <Button Grid.Row="4" Grid.Column="2" 
+                    Visibility="{Binding PaletteCustomizeVisibility}"
+                    Click="OnEditPaletteGroup"
+                >
+                    Edit
                 </Button>
             </Grid>
         </GroupBox>
@@ -165,8 +173,7 @@
                     ItemsSource="{Binding PatternChoices}"
                     SelectedValue="{Binding AnimationStartingPattern}"
                     Height="25"
-                >
-                </ComboBox>
+                />
                 <Button Grid.Row="0" Grid.Column="3">Customize</Button>
 
                 <!-- Speed -->

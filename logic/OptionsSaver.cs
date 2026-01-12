@@ -46,7 +46,7 @@ public class OptionsSaver
         File.WriteAllText(_optionsPath, serialized);
     }
 
-    public void SaveCustomPalettes(List<CustomPaletteEntry> palettes)
+    public void SaveCustomPalettes(List<CustomPaletteGroup> palettes)
     {
         Directory.CreateDirectory(_optionsDirPath);
 
@@ -62,7 +62,7 @@ public class OptionsSaver
             var palettesJson = File.ReadAllText(_paletteDataPath);
 
             var loadedOptions = JsonSerializer.Deserialize<ScrOptions>(optionsJson, _jsonOptions);
-            var loadedCustomPalettes = JsonSerializer.Deserialize<List<CustomPaletteEntry>>(palettesJson, _jsonOptions);
+            var loadedCustomPalettes = JsonSerializer.Deserialize<List<CustomPaletteGroup>>(palettesJson, _jsonOptions);
 
             if (loadedOptions is null)
             {

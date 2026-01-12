@@ -7,13 +7,12 @@ using yoksdotnet.windows;
 
 namespace yoksdotnet;
 
-internal record RunType()
+internal record RunType
 {
-    internal record Configure() : RunType();
-    internal record Show() : RunType();
-    internal record Preview(nint WindowHandle) : RunType();
-    internal record Debug(bool WithOptions) : RunType();
-    internal record DebugPaletteCustomizer() : RunType();
+    internal record Configure : RunType;
+    internal record Show : RunType;
+    internal record Preview(nint WindowHandle) : RunType;
+    internal record Debug(bool WithOptions) : RunType;
 }
 
 public partial class App : Application
@@ -55,13 +54,6 @@ public partial class App : Application
 
                 break;
             }
-            case RunType.DebugPaletteCustomizer:
-            {
-                var options = new OptionsSaver().Load() ?? new();
-                MainWindow = new PaletteCustomizer(options.CustomPalettes);
-
-                break;
-            }
             case null:
             {
                 Shutdown();
@@ -86,7 +78,6 @@ public partial class App : Application
             ["/d"] => new RunType.Debug(WithOptions: false),
             ["/dd"] => new RunType.Debug(WithOptions: true),
             ["/s"] => new RunType.Show(),
-            ["/u"] => new RunType.DebugPaletteCustomizer(),
             ["/s", var handle] => new RunType.Show(),
             ["/p", var handle] => new RunType.Preview(nint.Parse(handle)),
 

@@ -7,12 +7,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
-
+using System.Windows.Navigation;
 using yoksdotnet.common;
 using yoksdotnet.drawing;
 using yoksdotnet.logic;
@@ -78,7 +79,7 @@ public partial class PaletteCustomizer : Window
     private readonly SKRuntimeEffectUniforms _colorSelectShaderUniforms;
     private readonly Dictionary<PaletteIndex, List<Point>> _paletteIndexRegions;
 
-    public PaletteCustomizer(List<CustomPaletteEntry> customPalettes)
+    public PaletteCustomizer(string groupName, List<CustomPaletteEntry> customPalettes)
     {
         InitializeComponent();
 
@@ -123,6 +124,7 @@ public partial class PaletteCustomizer : Window
 
         ViewModel.PaletteToAdd = ViewModel.PredefinedPalettes.First();
         ViewModel.SelectedEntry = ViewModel.PaletteEntries.FirstOrDefault();
+        ViewModel.GroupName = groupName;
 
         _colorSelectShader = SKRuntimeEffect.Create(@"
             uniform half2 resolution;
@@ -167,25 +169,29 @@ public partial class PaletteCustomizer : Window
         RefreshSurfaces();
     }
 
-    public List<CustomPaletteEntry> GetPaletteState()
-    {
-        return ViewModel.PaletteEntries
-            .Select(entry => new CustomPaletteEntry(entry.Name, entry.Palette))
-            .ToList();
+    public CustomPaletteGroup EditedPaletteGroup 
+    { 
+        get
+        {
+            var entries = ViewModel.PaletteEntries
+                .Select(entry => new CustomPaletteEntry(entry.Name, entry.Palette))
+                .ToList();
+
+            return new(ViewModel.GroupName, entries);
+        } 
     }
 
-    protected void OnSave(object? _sender, RoutedEventArgs _e)
+    protected void OnSave(object _sender, RoutedEventArgs _e)
     {
-        _optionsSaver.SaveCustomPalettes(GetPaletteState());
         DialogResult = true;
     }
 
-    protected void OnCancel(object? _sender, RoutedEventArgs _e)
+    protected void OnCancel(object _sender, RoutedEventArgs _e)
     {
         DialogResult = false;
     }
 
-    protected void OnAddPalette(object? _sender, RoutedEventArgs _e)
+    protected void OnAddPalette(object _sender, RoutedEventArgs _e)
     {
         var name = ViewModel.PaletteToAdd.Key;
         var palette = ViewModel.PaletteToAdd.Value;
@@ -194,7 +200,7 @@ public partial class PaletteCustomizer : Window
         ViewModel.SelectedEntry = newEntry;
     }
 
-    protected void OnDeletePalette(object? sender, RoutedEventArgs _e)
+    protected void OnDeletePalette(object sender, RoutedEventArgs _e)
     {
         if (sender is not Button button)
         {
@@ -537,6 +543,17 @@ public partial class PaletteCustomizer : Window
 
 public class PaletteCustomizerViewModel : INotifyPropertyChanged
 {
+    private string _groupName = "New custom palettes";
+    public string GroupName
+    {
+        get => _groupName;
+        set
+        {
+            _groupName = value;
+            OnPropertyChanged(nameof(GroupName));
+        }
+    }
+
     public Dictionary<string, PaletteView> PredefinedPalettes { get; init; } = StaticFieldEnumerations.GetAll<PredefinedPalette>()
         .Select(p => (p.Name, new PaletteView(p)))
         .ToDictionary();
