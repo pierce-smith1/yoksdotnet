@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Microsoft.Win32;
+using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
@@ -485,6 +487,40 @@ public partial class PaletteCustomizer : Window
 
         var glControl = InitCanvas(host, OnPaintColorSelect);
         glControl.MouseMove += OnColorSelectMouseMove;
+    }
+
+    private void OnExport(object _sender, RoutedEventArgs _e)
+    {
+        if (ViewModel.SelectedEntry is not { } entry)
+        {
+            return;
+        }
+
+        var folderDialog = new OpenFolderDialog();
+        if (folderDialog.ShowDialog() is not true)
+        {
+            return;
+        }
+
+        var exportPath = Path.Combine(folderDialog.FolderName, entry.Name);
+
+        var imageExporter = new ImageExporter(exportPath);
+        foreach (var bitmap in StaticFieldEnumerations.GetAll<Bitmap>())
+        {
+            var exportResult = imageExporter.Export(bitmap, entry.Palette);
+
+            if (exportResult == ImageExportResult.NoPermission)
+            {
+                System.Windows.MessageBox.Show
+                (
+                    "It seems I don't have permission to write files here. Try somewhere else?",
+                    "Export error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+                break;
+            }
+        }
     }
 }
 

@@ -29,12 +29,17 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="False" Margin="2">
+            <Button DockPanel.Dock="Right" Click="OnExport">Export as PNG</Button>
+        </DockPanel>
 
-        <ListBox Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="2" 
+        <ListBox Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Margin="2" 
             HorizontalContentAlignment="Stretch" 
             VerticalContentAlignment="Center"
             ItemsSource="{Binding PaletteEntries}" 
@@ -89,12 +94,12 @@
             <Button DockPanel.Dock="Right" Click="OnCancel">Cancel</Button>
         </DockPanel>
 
-        <WindowsFormsHost Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="2"
+        <WindowsFormsHost Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="2"
             x:Name="PreviewCanvas"
             Initialized="InitPreviewCanvas"
         />
 
-        <DockPanel Grid.Row="1" Grid.Column="1" Margin="2">
+        <DockPanel Grid.Row="2" Grid.Column="1" Margin="2">
             <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom">
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <Label FontWeight="Bold">Currently editing:</Label>
@@ -115,7 +120,7 @@
                 />
             </StackPanel>
 
-            <WindowsFormsHost Grid.Row="1" Grid.Column="1"
+            <WindowsFormsHost Grid.Row="2" Grid.Column="1"
                 x:Name="ColorSelectCanvas"
                 Initialized="InitColorSelectCanvas"
             />
