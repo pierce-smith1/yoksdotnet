@@ -121,7 +121,6 @@ public partial class PaletteCustomizer : Window
         }
 
         ViewModel.PaletteToAdd = ViewModel.PredefinedPalettes.First();
-        ViewModel.SelectedEntry = ViewModel.PaletteEntries.FirstOrDefault();
         ViewModel.GroupName = groupName;
 
         _colorSelectShader = SKRuntimeEffect.Create(@"
@@ -542,16 +541,6 @@ public partial class PaletteCustomizer : Window
     {
         var shareDialog = new PaletteExportDialog(EditedPaletteGroup);
         shareDialog.ShowDialog();
-    }
-
-    private void ListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-    {
-        ;
-    }
-
-    private void DockPanel_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-
     }
 }
 

@@ -35,7 +35,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding GroupName}" />
+        <TextBox Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" Text="{Binding GroupName}" />
         
         <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="False" Margin="2">
             <Button DockPanel.Dock="Right" Click="OnExport">Save sprites...</Button>
@@ -48,7 +48,6 @@
             ItemsSource="{Binding PaletteEntries}" 
             SelectedItem="{Binding SelectedEntry}"
             SelectionMode="Single"
-            SelectionChanged="ListBox_SelectionChanged"
             dd:DragDrop.IsDragSource="True"
             dd:DragDrop.IsDropTarget="True"
         >
@@ -56,10 +55,8 @@
                 <DataTemplate>
                     <DockPanel>
                         <Rectangle DockPanel.Dock="Left" Width="8" Fill="{Binding PaletteView.ScalesHex}" />
-                        <!--
                         <Rectangle DockPanel.Dock="Left" Width="8" Fill="{Binding PaletteView.HornsHex}" />
                         <Rectangle DockPanel.Dock="Left" Width="8" Fill="{Binding PaletteView.EyesHex}" Margin="0,0,5,0" />
-                        -->
 
                         <Button DockPanel.Dock="Right" Click="OnDeletePalette" Tag="{Binding Id}">Delete</Button>
                         <Button DockPanel.Dock="Right" Click="OnCopyPalette" Tag="{Binding Id}">Copy</Button>
