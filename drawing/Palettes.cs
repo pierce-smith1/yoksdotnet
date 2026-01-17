@@ -333,6 +333,6 @@ public record PaletteChoice
 {
     public record SingleGroup(PaletteGroup Group) : PaletteChoice;
     public record AllGroups : PaletteChoice;
-    public record UserDefined(string GroupName) : PaletteChoice;
+    public record UserDefined(string SetId, string Name) : PaletteChoice;
     public record ImFeelingLucky : PaletteChoice;
 }
