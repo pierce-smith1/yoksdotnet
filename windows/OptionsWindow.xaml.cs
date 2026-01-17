@@ -12,14 +12,6 @@ using yoksdotnet.logic.scene.patterns;
 
 namespace yoksdotnet.windows;
 
-// Please keep in mind while reading this code that XAML is a momument to human stupidity,
-// and any attempt to do anything remotely useful will necessarily result in a sprawling
-// wasteland of meaningless and error-prone boilerplate.
-//
-// If it looks stupid, it is, and you will just have to live with that.
-// Press CTRL+C, then CTRL+V, shed a tear for the time you will soon waste debugging a
-// subtle bug as the result of your copy-pasting, and then move on.
-
 public partial class OptionsWindow : Window
 {
     private readonly OptionsSaver _optionsSaver = new();
@@ -128,7 +120,7 @@ public partial class OptionsWindow : Window
                 .Where(e => e.Id != groupChoice.SetId)
                 .ToList();
 
-            _optionsSaver.Save(ViewModel.BackingOptions);
+            _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
     }
 
