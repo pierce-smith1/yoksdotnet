@@ -48,11 +48,11 @@ public class PaletteExporter
 
     public CustomPaletteSet? Import(string encoded)
     {
-        var stream = new MemoryStream(Convert.FromBase64String(encoded));
-        var reader = new BinaryReader(stream);
-
         try
         {
+            var stream = new MemoryStream(Convert.FromBase64String(encoded));
+            var reader = new BinaryReader(stream);
+
             var _version = reader.ReadByte();
             var setName = reader.ReadString();
             var entryCount = reader.ReadInt32();
@@ -81,7 +81,7 @@ public class PaletteExporter
             var set = new CustomPaletteSet(Guid.NewGuid().ToString(), setName, entries);
             return set;
         }
-        catch (EndOfStreamException)
+        catch (Exception ex) when (ex is FormatException || ex is EndOfStreamException)
         {
             return null;
         }

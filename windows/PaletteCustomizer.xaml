@@ -35,10 +35,13 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" Text="{Binding GroupName}" />
+        <TextBox Grid.Row="0" Grid.Column="0" Margin="2"
+            VerticalContentAlignment="Center" 
+            Text="{Binding GroupName}" 
+        />
         
         <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="False" Margin="2">
-            <Button DockPanel.Dock="Right" Click="OnExport">Save sprites...</Button>
+            <Button DockPanel.Dock="Right" IsEnabled="{Binding IsPaletteSelected}" Click="OnExport">Save sprites...</Button>
             <Button DockPanel.Dock="Right" Click="OnShare">Share...</Button>
         </DockPanel>
 

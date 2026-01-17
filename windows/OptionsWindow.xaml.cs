@@ -424,7 +424,11 @@ public record PaletteChoiceEntry
     public bool IsCustom => Choice is PaletteChoice.UserDefined;
     public bool IsSpecial => Choice is null;
     public FontStyle Style => IsSpecial ? FontStyles.Italic : FontStyles.Normal;
-    public string? ExtraText => IsCustom ? "(custom)" : null;
+    public string? TextPrefix => IsCustom 
+        ? "★" 
+        : IsSpecial
+        ? "+"
+        : null;
 
     public override string ToString() => Choice switch
     {
