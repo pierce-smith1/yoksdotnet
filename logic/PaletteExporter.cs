@@ -78,7 +78,7 @@ public class PaletteExporter
                 entries.Add(entry);
             }
 
-            var set = new CustomPaletteSet(setName, entries);
+            var set = new CustomPaletteSet(Guid.NewGuid().ToString(), setName, entries);
             return set;
         }
         catch (EndOfStreamException)

@@ -101,5 +101,5 @@ public class ScrOptions
 }
 
 
-public record CustomPaletteSet(string Name, List<CustomPaletteEntry> Entries);
+public record CustomPaletteSet(string Id, string Name, List<CustomPaletteEntry> Entries);
 public record CustomPaletteEntry(string Name, Palette Palette);

@@ -66,7 +66,9 @@ public partial class OptionsWindow : Window
         ViewModel.AnimationPatternChangeFrequency = options.AnimationPatternChangeFrequency;
         ViewModel.AnimationPatternDoesChange = options.AnimationPatternDoesChange;
 
-        ViewModel.CustomPalettes = options.CustomPalettes;
+        ViewModel.CustomPalettes = options.CustomPalettes
+            .Select(s => new CustomPaletteSetEntry(s))
+            .ToList();
         ViewModel.FamilyPaletteChoice = new(options.FamilyPaletteChoice);
     }
 
@@ -82,9 +84,9 @@ public partial class OptionsWindow : Window
             return;
         }
 
-        var group = ViewModel.CustomPalettes.Single(e => e.Name == groupChoice.GroupName);
+        var group = ViewModel.CustomPalettes.Single(e => e.Set.Name == groupChoice.GroupName);
 
-        var paletteCustomizeDialog = new PaletteCustomizer(group.Name, group.Entries);
+        var paletteCustomizeDialog = new PaletteCustomizer(group.Set.Name, group.Set.Entries);
         if (paletteCustomizeDialog.ShowDialog() is true)
         {
             var newGroupName = paletteCustomizeDialog.EditedPaletteGroup.Name;
@@ -186,7 +188,26 @@ public partial class OptionsWindow : Window
 
     private void ImportCustomPaletteSet()
     {
-        
+        var paletteImportDialog = new PaletteImportDialog();
+        if (paletteImportDialog.ShowDialog() is true && paletteImportDialog.ImportedPaletteSet is { } importedSet)
+        {
+            ViewModel.CustomPalettes =
+            [
+                ..ViewModel.CustomPalettes,
+                importedSet
+            ];
+
+            ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
+                .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.GroupName == importedSet.Name);
+
+            _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
+        }
+        else
+        {
+            ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.FamilyPaletteChoice);
+        }
+
+        _optionsSaver.Save(ViewModel.BackingOptions);
     }
 }
 
@@ -332,12 +353,16 @@ public class OptionsViewModel : INotifyPropertyChanged
         }
     }
 
-    public List<CustomPaletteSet> CustomPalettes
+    public List<CustomPaletteSetEntry> CustomPalettes
     {
-        get => BackingOptions.CustomPalettes;
+        get => BackingOptions.CustomPalettes
+            .Select(s => new CustomPaletteSetEntry(s))
+            .ToList();
         set
         {
-            BackingOptions.CustomPalettes = value;
+            BackingOptions.CustomPalettes = value
+                .Select(p => p.Set)
+                .ToList();
             OnPropertyChanged(nameof(CustomPalettes));
             OnPropertyChanged(nameof(PaletteChoices));
         }
@@ -375,6 +400,23 @@ public class OptionsViewModel : INotifyPropertyChanged
     }
 }
 
+public class CustomPaletteSetEntry
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public CustomPaletteSet Set { get; set; }
+
+    public CustomPaletteSetEntry(CustomPaletteSet set)
+    {
+        Set = set;
+    }
+
+    public CustomPaletteSetEntry(string id, CustomPaletteSet set)
+    {
+        Id = id;
+        Set = set;
+    }
+}
+
 public enum SpecialPaletteEntry
 {
     NewSet,
@@ -407,13 +449,13 @@ public record PaletteChoiceEntry
     {
         PaletteChoice.SingleGroup(var group) => group.Name,
         PaletteChoice.AllGroups => "Everything",
-        PaletteChoice.UserDefined(var name) => name,
+        PaletteChoice.UserDefined(var name) => $"* {name}",
         PaletteChoice.ImFeelingLucky => "I'm Feeling Llucky",
         
         null => SpecialEntry switch 
         { 
-            SpecialPaletteEntry.NewSet => "New custom palette...",
-            SpecialPaletteEntry.ImportPalette => "Import palette...",
+            SpecialPaletteEntry.NewSet => "+ New custom palette...",
+            SpecialPaletteEntry.ImportPalette => "+ Import palette...",
 
             _ => throw new InvalidOperationException(),
         },
