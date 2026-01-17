@@ -36,9 +36,10 @@
         </Grid.RowDefinitions>
 
         <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding GroupName}" />
-
+        
         <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="False" Margin="2">
-            <Button DockPanel.Dock="Right" Click="OnExport">Export as PNG</Button>
+            <Button DockPanel.Dock="Right" Click="OnExport">Save sprites...</Button>
+            <Button DockPanel.Dock="Right" Click="OnShare">Share...</Button>
         </DockPanel>
 
         <ListBox Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Margin="2" 
@@ -46,19 +47,23 @@
             VerticalContentAlignment="Center"
             ItemsSource="{Binding PaletteEntries}" 
             SelectedItem="{Binding SelectedEntry}"
+            SelectionMode="Single"
+            SelectionChanged="ListBox_SelectionChanged"
             dd:DragDrop.IsDragSource="True"
             dd:DragDrop.IsDropTarget="True"
         >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel>
-                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding PaletteView.ScalesHex}" />
-                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding PaletteView.HornsHex}" />
-                        <Rectangle Width="8" Stretch="Fill" Fill="{Binding PaletteView.EyesHex}" Margin="0,0,5,0" />
+                        <Rectangle DockPanel.Dock="Left" Width="8" Fill="{Binding PaletteView.ScalesHex}" />
+                        <!--
+                        <Rectangle DockPanel.Dock="Left" Width="8" Fill="{Binding PaletteView.HornsHex}" />
+                        <Rectangle DockPanel.Dock="Left" Width="8" Fill="{Binding PaletteView.EyesHex}" Margin="0,0,5,0" />
+                        -->
 
                         <Button DockPanel.Dock="Right" Click="OnDeletePalette" Tag="{Binding Id}">Delete</Button>
                         <Button DockPanel.Dock="Right" Click="OnCopyPalette" Tag="{Binding Id}">Copy</Button>
-                        
+
                         <TextBox 
                             VerticalContentAlignment="Center" 
                             Text="{Binding Name}" 

@@ -89,15 +89,17 @@ public partial class OptionsWindow : Window
         {
             var newGroupName = paletteCustomizeDialog.EditedPaletteGroup.Name;
 
-            ViewModel.FamilyPaletteChoice = new(new PaletteChoice.UserDefined(newGroupName));
-
             ViewModel.CustomPalettes = 
             [
                 paletteCustomizeDialog.EditedPaletteGroup,
                 ..ViewModel.CustomPalettes.Where(e => e.Name != groupChoice.GroupName)
             ];
 
+            ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
+                .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.GroupName == newGroupName);
+
             _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
+            _optionsSaver.Save(ViewModel.BackingOptions);
         }
     }
 
@@ -139,12 +141,21 @@ public partial class OptionsWindow : Window
             return;
         }
 
-        if (e.AddedItems[0] is PaletteChoiceEntry entry && entry.Choice is not null)
+        if (e.AddedItems[0] is PaletteChoiceEntry entry)
         {
-            return;
+            if (entry.SpecialEntry == SpecialPaletteEntry.NewSet)
+            {
+                CreateCustomPaletteSet();
+            }
+            else if (entry.SpecialEntry == SpecialPaletteEntry.ImportPalette)
+            {
+                ImportCustomPaletteSet();
+            }
+            else
+            {
+                return;
+            }
         }
-
-        CreateCustomPaletteSet();
     }
 
     private void CreateCustomPaletteSet()
@@ -158,7 +169,10 @@ public partial class OptionsWindow : Window
                 paletteCustomizeDialog.EditedPaletteGroup
             ];
 
-            ViewModel.FamilyPaletteChoice = new(new PaletteChoice.UserDefined(paletteCustomizeDialog.EditedPaletteGroup.Name));
+            var groupName = paletteCustomizeDialog.EditedPaletteGroup.Name;
+
+            ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
+                .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.GroupName == groupName);
 
             _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
@@ -166,6 +180,13 @@ public partial class OptionsWindow : Window
         {
             ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.FamilyPaletteChoice);
         }
+
+        _optionsSaver.Save(ViewModel.BackingOptions);
+    }
+
+    private void ImportCustomPaletteSet()
+    {
+        
     }
 }
 
@@ -209,7 +230,7 @@ public class OptionsViewModel : INotifyPropertyChanged
         get => new(BackingOptions.FamilyPaletteChoice);
         set 
         {
-            if (value.Choice is null)
+            if (value?.Choice is null)
             {
                 return;
             }
@@ -287,7 +308,6 @@ public class OptionsViewModel : INotifyPropertyChanged
         set 
         {
             BackingOptions.AnimationStartingPattern = value;
-
             OnPropertyChanged(nameof(AnimationStartingPattern));
         }
     }
@@ -312,7 +332,7 @@ public class OptionsViewModel : INotifyPropertyChanged
         }
     }
 
-    public List<CustomPaletteGroup> CustomPalettes
+    public List<CustomPaletteSet> CustomPalettes
     {
         get => BackingOptions.CustomPalettes;
         set
@@ -332,9 +352,12 @@ public class OptionsViewModel : INotifyPropertyChanged
             .Select(g => new PaletteChoiceEntry(new PaletteChoice.SingleGroup(g))),
         new(new PaletteChoice.AllGroups()),
         new(new PaletteChoice.ImFeelingLucky()),
+
         ..CustomPalettes
             .Select(e => new PaletteChoiceEntry(new PaletteChoice.UserDefined(e.Name))),
-        new(null),
+
+        new(SpecialPaletteEntry.NewSet),
+        new(SpecialPaletteEntry.ImportPalette),
     ];
 
     public List<PatternChoice> PatternChoices => [
@@ -352,15 +375,48 @@ public class OptionsViewModel : INotifyPropertyChanged
     }
 }
 
-public record PaletteChoiceEntry(PaletteChoice? Choice)
+public enum SpecialPaletteEntry
 {
+    NewSet,
+    ImportPalette,
+}
+
+public record PaletteChoiceEntry
+{
+
+    public PaletteChoice? Choice { get; init; }
+    public SpecialPaletteEntry? SpecialEntry { get; init; }
+
+    public PaletteChoiceEntry(PaletteChoice choice)
+    {
+        Choice = choice;
+    }
+
+    public PaletteChoiceEntry(SpecialPaletteEntry entry)
+    {
+        SpecialEntry = entry;
+    }
+
+    public string Name => ToString();
+    public bool IsCustom => Choice is PaletteChoice.UserDefined;
+    public bool IsSpecial => Choice is null;
+    public FontStyle Style => IsSpecial ? FontStyles.Italic : FontStyles.Normal;
+    public string? ExtraText => IsCustom ? "(custom)" : null;
+
     public override string ToString() => Choice switch
     {
         PaletteChoice.SingleGroup(var group) => group.Name,
         PaletteChoice.AllGroups => "Everything",
-        PaletteChoice.UserDefined(var name) => $"{name} (custom)",
+        PaletteChoice.UserDefined(var name) => name,
         PaletteChoice.ImFeelingLucky => "I'm Feeling Llucky",
-        null => "Create new palette set...",
+        
+        null => SpecialEntry switch 
+        { 
+            SpecialPaletteEntry.NewSet => "New custom palette...",
+            SpecialPaletteEntry.ImportPalette => "Import palette...",
+
+            _ => throw new InvalidOperationException(),
+        },
 
         _ => throw new InvalidOperationException(),
     };

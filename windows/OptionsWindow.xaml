@@ -90,6 +90,14 @@
                     Height="25"
                     SelectionChanged="OnPaletteSelected"
                 >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontStyle="{Binding Style}" Text="{Binding Name}" />
+                                <TextBlock Margin="5,0,0,0" FontStyle="Italic" Text="{Binding ExtraText}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
                 </ComboBox>
 
                 <Button Grid.Row="4" Grid.Column="1" 

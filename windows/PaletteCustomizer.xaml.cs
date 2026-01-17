@@ -7,13 +7,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
-using System.Windows.Navigation;
 using yoksdotnet.common;
 using yoksdotnet.drawing;
 using yoksdotnet.logic;
@@ -169,7 +167,7 @@ public partial class PaletteCustomizer : Window
         RefreshSurfaces();
     }
 
-    public CustomPaletteGroup EditedPaletteGroup 
+    public CustomPaletteSet EditedPaletteGroup 
     { 
         get
         {
@@ -196,7 +194,7 @@ public partial class PaletteCustomizer : Window
         var name = ViewModel.PaletteToAdd.Key;
         var palette = ViewModel.PaletteToAdd.Value;
 
-        var newEntry = ViewModel.AddPaletteView(name, palette);
+        var newEntry = ViewModel.AddPaletteView(name, new(palette.BackingPalette));
         ViewModel.SelectedEntry = newEntry;
     }
 
@@ -539,17 +537,33 @@ public partial class PaletteCustomizer : Window
             );
         }
     }
+
+    private void OnShare(object _sender, RoutedEventArgs _e)
+    {
+        var shareDialog = new PaletteExportDialog(EditedPaletteGroup);
+        shareDialog.ShowDialog();
+    }
+
+    private void ListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        ;
+    }
+
+    private void DockPanel_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+
+    }
 }
 
 public class PaletteCustomizerViewModel : INotifyPropertyChanged
 {
-    private string _groupName = "New custom palettes";
+    private string _groupName = "New palette set";
     public string GroupName
     {
-        get => _groupName;
+        get => _groupName.Trim();
         set
         {
-            _groupName = value;
+            _groupName = value.Trim();
             OnPropertyChanged(nameof(GroupName));
         }
     }

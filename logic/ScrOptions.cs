@@ -30,7 +30,7 @@ public class ScrOptions
 
     // Custom palettes are serialized and de-serialized separately. See OptionsSaver.
     [JsonIgnore]
-    public List<CustomPaletteGroup> CustomPalettes { get; set; } = [];
+    public List<CustomPaletteSet> CustomPalettes { get; set; } = [];
 
     public int GetActualSpriteCount(double width, double height)
     {
@@ -101,5 +101,5 @@ public class ScrOptions
 }
 
 
-public record CustomPaletteGroup(string Name, List<CustomPaletteEntry> Entries);
+public record CustomPaletteSet(string Name, List<CustomPaletteEntry> Entries);
 public record CustomPaletteEntry(string Name, Palette Palette);
