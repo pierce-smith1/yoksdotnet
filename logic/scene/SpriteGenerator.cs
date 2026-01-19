@@ -43,13 +43,21 @@ public class SpriteGenerator
 
     private (List<Palette> Palettes, int TotalPossibleCount) SelectPalettes()
     {
-        var possiblePalettes = Options.FamilyPaletteChoice switch
+        IEnumerable<Palette> possiblePalettes = Options.FamilyPaletteChoice switch
         {
-            PaletteChoice.SingleGroup choice => StaticFieldEnumerations.GetAll<PredefinedPalette>().Where(pair => pair.Group == choice.Group),
-            PaletteChoice.AllGroups => StaticFieldEnumerations.GetAll<PredefinedPalette>(),
+            PaletteChoice.SingleGroup choice =>
+                StaticFieldEnumerations.GetAll<PredefinedPalette>()
+                    .Where(pair => pair.Group == choice.Group),
+
+            PaletteChoice.AllGroups =>
+                StaticFieldEnumerations.GetAll<PredefinedPalette>(),
+
+            PaletteChoice.UserDefined(var setId, _) =>
+                Options.CustomPalettes.FirstOrDefault(s => s.Id == setId)?.Entries
+                    .Select(e => e.Palette),
 
             _ => throw new NotImplementedException(),
-        };
+        } ?? [new Palette()];
 
         var usableColorsCount = Math.Min(Options.GetActualColorCount(), possiblePalettes.Count());
 

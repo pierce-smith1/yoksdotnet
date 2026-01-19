@@ -48,6 +48,9 @@ public class ScrOptions
             PaletteChoice.AllGroups => StaticFieldEnumerations.GetAll<PredefinedPalette>().Count(),
             PaletteChoice.ImFeelingLucky => 30,
 
+            PaletteChoice.UserDefined(var setId, _) => 
+                CustomPalettes.FirstOrDefault(s => s.Id == setId)?.Entries.Count ?? 1,
+
             _ => throw new NotImplementedException(),
         };
 
