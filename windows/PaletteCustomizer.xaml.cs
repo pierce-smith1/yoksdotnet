@@ -165,6 +165,8 @@ public partial class PaletteCustomizer : Window
 
         _colorSelectShaderUniforms = new(_colorSelectShader);
 
+        ViewModel.SelectedEntry = ViewModel.PaletteEntries.FirstOrDefault();
+
         RefreshSurfaces();
     }
 
@@ -700,7 +702,28 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
     }
 }
 
-public record PaletteViewEntry(string Id, string Name, PaletteView PaletteView) 
+public class PaletteViewEntry(string id, string name, PaletteView paletteView) 
 {
+    public string Id => id;
+
+    private string _name = name;
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            _name = value;
+            OnPropertyChanged(nameof(Name));
+        }
+    }
+
+    public PaletteView PaletteView => paletteView;
     public Palette Palette => PaletteView.BackingPalette;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged(string name)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
 }

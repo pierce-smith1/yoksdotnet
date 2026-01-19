@@ -5,14 +5,16 @@ using Color = yoksdotnet.drawing.Color;
 
 namespace yoksdotnet.windows;
 
-public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
+public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 {
+    public Palette BackingPalette => _backingPalette;
+
     public Color Scales
     {
-        get => BackingPalette.Scales;
+        get => _backingPalette.Scales;
         set 
         {
-            BackingPalette.Scales = value;
+            _backingPalette.Scales = value;
             OnPropertyChanged(nameof(Scales));
             OnPropertyChanged(nameof(ScalesHex));
         }
@@ -20,10 +22,10 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
 
     public Color ScalesHighlight
     {
-        get => BackingPalette.ScalesHighlight;
+        get => _backingPalette.ScalesHighlight;
         set 
         {
-            BackingPalette.ScalesHighlight = value;
+            _backingPalette.ScalesHighlight = value;
             OnPropertyChanged(nameof(ScalesHighlight));
             OnPropertyChanged(nameof(ScalesHighlightHex));
         }
@@ -31,10 +33,10 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
 
     public Color ScalesShadow
     {
-        get => BackingPalette.ScalesShadow;
+        get => _backingPalette.ScalesShadow;
         set 
         {
-            BackingPalette.ScalesShadow = value;
+            _backingPalette.ScalesShadow = value;
             OnPropertyChanged(nameof(ScalesShadow));
             OnPropertyChanged(nameof(ScalesShadowHex));
         }
@@ -42,10 +44,10 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
 
     public Color Horns
     {
-        get => BackingPalette.Horns;
+        get => _backingPalette.Horns;
         set 
         {
-            BackingPalette.Horns = value;
+            _backingPalette.Horns = value;
             OnPropertyChanged(nameof(Horns));
             OnPropertyChanged(nameof(HornsHex));
         }
@@ -53,10 +55,10 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
 
     public Color Eyes
     {
-        get => BackingPalette.Eyes;
+        get => _backingPalette.Eyes;
         set 
         {
-            BackingPalette.Eyes = value;
+            _backingPalette.Eyes = value;
             OnPropertyChanged(nameof(Eyes));
             OnPropertyChanged(nameof(EyesHex));
         }
@@ -64,10 +66,10 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
 
     public Color Whites
     {
-        get => BackingPalette.Whites;
+        get => _backingPalette.Whites;
         set
         {
-            BackingPalette.Whites = value;
+            _backingPalette.Whites = value;
             OnPropertyChanged(nameof(Whites));
             OnPropertyChanged(nameof(WhitesHex));
         }
@@ -75,10 +77,10 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
 
     public Color HornsShadow
     {
-        get => BackingPalette.HornsShadow;
+        get => _backingPalette.HornsShadow;
         set
         {
-            BackingPalette.HornsShadow = value;
+            _backingPalette.HornsShadow = value;
             OnPropertyChanged(nameof(HornsShadow));
             OnPropertyChanged(nameof(HornsShadowHex));
         }
@@ -86,10 +88,10 @@ public record PaletteView(Palette BackingPalette) : INotifyPropertyChanged
 
     public Color this[PaletteIndex index]
     {
-        get => BackingPalette[index];
+        get => _backingPalette[index];
         set
         {
-            BackingPalette[index] = value;
+            _backingPalette[index] = value;
             OnPropertyChanged(index.Name);
             OnPropertyChanged($"{index.Name}Hex");
         }
