@@ -96,13 +96,13 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
             OnPropertyChanged($"{index.Name}Hex");
         }
     }
-    public string ScalesHex => Scales.AsHex();
-    public string ScalesHighlightHex => ScalesHighlight.AsHex();
-    public string ScalesShadowHex => ScalesShadow.AsHex();
-    public string HornsHex => Horns.AsHex();
-    public string EyesHex => Eyes.AsHex();
-    public string WhitesHex => Whites.AsHex();
-    public string HornsShadowHex => HornsShadow.AsHex();
+    public string ScalesHex => Scales.ToHex();
+    public string ScalesHighlightHex => ScalesHighlight.ToHex();
+    public string ScalesShadowHex => ScalesShadow.ToHex();
+    public string HornsHex => Horns.ToHex();
+    public string EyesHex => Eyes.ToHex();
+    public string WhitesHex => Whites.ToHex();
+    public string HornsShadowHex => HornsShadow.ToHex();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

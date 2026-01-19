@@ -93,7 +93,7 @@ public partial class PaletteCustomizer : Window
             Width = Bitmap.BitmapSize(),
             Height = Bitmap.BitmapSize(),
             AngleRadians = 0.0,
-            Palette = ViewModel.SelectedId is { } paletteId 
+            Palette = ViewModel.SelectedEntry?.Id is { } paletteId 
                 ? ViewModel.GetEntryWithId(paletteId).Palette
                 : GhostPalette,
             Bitmap = Bitmap.LkThumbsup,
@@ -103,14 +103,13 @@ public partial class PaletteCustomizer : Window
 
         ViewModel.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(ViewModel.SelectedId))
+            if (e.PropertyName == nameof(ViewModel.SelectedEntry))
             {
                 OnSelectedPaletteChanged();
             }
 
             if (new[] { nameof(ViewModel.Hue), nameof(ViewModel.Saturation), nameof(ViewModel.Lightness) }.Contains(e.PropertyName))
             {
-
                 ViewModel.UpdatePalette();
                 RefreshSurfaces();
             }
@@ -281,7 +280,7 @@ public partial class PaletteCustomizer : Window
 
     private void OnSelectedPaletteChanged()
     {
-        if (ViewModel.SelectedId is { } entryId)
+        if (ViewModel.SelectedEntry?.Id is { } entryId)
         {
             _currentSprite.Palette = ViewModel.GetEntryWithId(entryId).Palette;
         }
@@ -314,7 +313,7 @@ public partial class PaletteCustomizer : Window
 
     private void OnPaintPreviewMouseUp(object? sender, MouseEventArgs e)
     {
-        if (ViewModel.SelectedId is null)
+        if (ViewModel.SelectedEntry is null)
         {
             return;
         }
@@ -332,7 +331,7 @@ public partial class PaletteCustomizer : Window
 
     private void OnPreviewMouseMove(object? sender, MouseEventArgs e)
     {
-        if (ViewModel.SelectedId is null)
+        if (ViewModel.SelectedEntry is null)
         {
             return;
         }
@@ -441,7 +440,7 @@ public partial class PaletteCustomizer : Window
 
     private void OnColorSelectMouseMove(object? sender, MouseEventArgs e)
     {
-        if (ViewModel.SelectedId is null)
+        if (ViewModel.SelectedEntry is null)
         {
             return;
         }
@@ -546,6 +545,31 @@ public partial class PaletteCustomizer : Window
         var shareDialog = new PaletteExportDialog(EditedPaletteGroup);
         shareDialog.ShowDialog();
     }
+
+    private void OnManualHexChange(object sender, System.Windows.Input.KeyEventArgs _e)
+    {
+        if (sender is not TextBox textBox)
+        {
+            return;
+        }
+
+        if (ViewModel.SelectedEntry is not { } entry) 
+        {
+            return;
+        }
+
+        var hex = textBox.Text;
+        ViewModel.CurrentHex = hex;
+
+        var inputColor = Color.FromHex(hex);
+        if (inputColor is null)
+        {
+            return;
+        }
+
+        entry.Palette[ViewModel.SelectedIndex] = inputColor;
+        ViewModel.UpdateHsl();
+    }
 }
 
 public class PaletteCustomizerViewModel : INotifyPropertyChanged
@@ -596,8 +620,6 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         {
             _selectedEntry = value;
             OnPropertyChanged(nameof(SelectedEntry));
-            OnPropertyChanged(nameof(SelectedId));
-            OnPropertyChanged(nameof(SelectedName));
             OnPropertyChanged(nameof(IsPaletteSelected));
             OnPropertyChanged(nameof(HueStripVisibility));
         }
@@ -609,8 +631,6 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         return paletteView;
     }
 
-    public string? SelectedId => SelectedEntry?.Id;
-    public string? SelectedName => SelectedEntry?.Name;
     public bool IsPaletteSelected => SelectedEntry is not null;
     public Visibility HueStripVisibility => SelectedEntry is null 
         ? Visibility.Hidden 
@@ -624,11 +644,8 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         {
             _selectedIndex = value;
             OnPropertyChanged(nameof(SelectedIndex));
-            OnPropertyChanged(nameof(SelectedIndexName));
         }
     }
-
-    public string SelectedIndexName => SelectedIndex.ToString();
 
     private float _hue = 0;
     public float Hue
@@ -638,6 +655,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         {
             _hue = value;
             OnPropertyChanged(nameof(Hue));
+            UpdateHex();
         }
     }
 
@@ -649,6 +667,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         {
             _saturation = value;
             OnPropertyChanged(nameof(Saturation));
+            UpdateHex();
         }
     }
 
@@ -660,8 +679,23 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         {
             _lightness = value;
             OnPropertyChanged(nameof(Lightness));
+            UpdateHex();
         }
     }
+
+    private string _currentHex = "";
+    public string CurrentHex
+    {
+        get => _currentHex;
+        set
+        {
+            _currentHex = value;
+            OnPropertyChanged(nameof(CurrentHex));
+        }
+    }
+
+    public bool IsValidHex => Color.FromHex(CurrentHex) is not null;
+
     public void UpdateHsl()
     {
         if (SelectedEntry is null)
@@ -674,6 +708,11 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         Hue = (float)h;
         Saturation = (float)s;
         Lightness = (float)l;
+    }
+
+    public void UpdateHex()
+    {
+        CurrentHex = Color.FromHsl(Hue, Saturation, Lightness).ToHex();
     }
 
     public void UpdatePalette()

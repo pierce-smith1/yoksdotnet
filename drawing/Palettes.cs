@@ -23,18 +23,32 @@ public record PaletteIndex(string Name, string DisplayName, int Luminance) : ISt
 
 public record Color(byte R, byte G, byte B)
 {
-    public static Color FromHex(string hex)
+    public static Color? FromHex(string hex)
     {
+        hex = hex.Trim();
+
         if (hex.StartsWith('#'))
         {
             hex = hex[1..];
         }
 
-        var red = Convert.ToByte(hex[..2], 16);
-        var green = Convert.ToByte(hex[2..4], 16);
-        var blue = Convert.ToByte(hex[4..6], 16);
+        try
+        {
+            if (hex.Length != 6)
+            {
+                return null;
+            }
 
-        return new(red, green, blue);
+            var red = Convert.ToByte(hex[..2], 16);
+            var green = Convert.ToByte(hex[2..4], 16);
+            var blue = Convert.ToByte(hex[4..6], 16);
+
+            return new(red, green, blue);
+        } 
+        catch (FormatException)
+        {
+            return null;
+        }
     }
 
     public (double H, double S, double L) ToHsl()
@@ -68,7 +82,7 @@ public record Color(byte R, byte G, byte B)
         return (h, s * 100, l * 100);
     }
 
-    public string AsHex()
+    public string ToHex()
     {
         var hex = $"#{R:x2}{G:x2}{B:x2}";
         return hex;
@@ -94,11 +108,15 @@ public record Color(byte R, byte G, byte B)
             _ => (0.0, 0.0, 0.0)
         };
 
-        var r = rp + m;
-        var g = gp + m;
-        var b = bp + m;
+        var rc = rp + m;
+        var gc = gp + m;
+        var bc = bp + m;
 
-        return new((byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
+        var r = (byte)Math.Round(rc * 255);
+        var g = (byte)Math.Round(gc * 255);
+        var b = (byte)Math.Round(bc * 255);
+
+        return new(r, g, b);
     }
 };
 
