@@ -18,7 +18,6 @@
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Padding" Value="5,2" />
-            <Setter Property="Margin" Value="5,2" />
         </Style>
     </Window.Resources>
     
@@ -35,13 +34,18 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBox Grid.Row="0" Grid.Column="0" Margin="2"
+        <TextBox Grid.Row="0" Grid.Column="0" Margin="2" Padding="4"
             VerticalContentAlignment="Center" 
-            Text="{Binding GroupName}" 
+            Text="{Binding SetName}" 
         />
         
-        <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="False" Margin="2">
-            <Button DockPanel.Dock="Right" IsEnabled="{Binding IsPaletteSelected}" Click="OnExport">Save sprites...</Button>
+        <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="False">
+            <Button DockPanel.Dock="Right" Margin="4,0,0,0" 
+                IsEnabled="{Binding IsPaletteSelected}" 
+                Click="OnExport"
+            >
+                Save sprites...
+            </Button>
             <Button DockPanel.Dock="Right" Click="OnShare">Share...</Button>
         </DockPanel>
 
@@ -61,8 +65,8 @@
                         <Rectangle DockPanel.Dock="Left" Width="8" Fill="{Binding PaletteView.HornsHex}" />
                         <Rectangle DockPanel.Dock="Left" Width="8" Fill="{Binding PaletteView.EyesHex}" Margin="0,0,5,0" />
 
-                        <Button DockPanel.Dock="Right" Click="OnDeletePalette" Tag="{Binding Id}">Delete</Button>
-                        <Button DockPanel.Dock="Right" Click="OnCopyPalette" Tag="{Binding Id}">Copy</Button>
+                        <Button DockPanel.Dock="Right" Margin="4,0,0,0" Click="OnDeletePalette" Tag="{Binding Id}">Delete</Button>
+                        <Button DockPanel.Dock="Right" Margin="4,0,0,0" Click="OnCopyPalette" Tag="{Binding Id}">Copy</Button>
 
                         <TextBox 
                             VerticalContentAlignment="Center" 
@@ -76,13 +80,13 @@
         </ListBox>
         
         <DockPanel Grid.Row="3" Grid.Column="0" Margin="2">
-            <Button DockPanel.Dock="Right" Click="OnAddPalette">Add</Button>
+            <Button DockPanel.Dock="Right" Margin="4,0,0,0" Click="OnAddPalette">Add</Button>
             
             <ComboBox
                 ItemsSource="{Binding PredefinedPalettes}"
                 SelectedItem="{Binding PaletteToAdd}"
                 VerticalContentAlignment="Center"
-                Height="30"
+                Height="26"
                 Padding="5,0,5,0"
             >
                 <ComboBox.ItemTemplate>
@@ -108,8 +112,8 @@
                 KeyUp="OnManualHexChange"
             />
             
-            <Button DockPanel.Dock="Right" Click="OnSave">Save</Button>
-            <Button DockPanel.Dock="Right" Click="OnCancel">Cancel</Button>
+            <Button DockPanel.Dock="Right" Margin="2,0,0,0" Click="OnSave">Save</Button>
+            <Button DockPanel.Dock="Right" Margin="0,0,2,0" Click="OnCancel">Cancel</Button>
         </DockPanel>
 
         <WindowsFormsHost Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="2"

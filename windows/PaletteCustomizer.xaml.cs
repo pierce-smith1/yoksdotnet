@@ -9,7 +9,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Policy;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
@@ -121,7 +120,7 @@ public partial class PaletteCustomizer : Window
         }
 
         ViewModel.PaletteToAdd = ViewModel.PredefinedPalettes.First();
-        ViewModel.GroupName = set.Name;
+        ViewModel.SetName = set.Name;
         ViewModel.SetId = set.Id;
 
         _colorSelectShader = SKRuntimeEffect.Create(@"
@@ -177,7 +176,7 @@ public partial class PaletteCustomizer : Window
                 .Select(entry => new CustomPaletteEntry(entry.Name, entry.Palette))
                 .ToList();
 
-            return new(ViewModel.SetId, ViewModel.GroupName, entries);
+            return new(ViewModel.SetId, ViewModel.SetName, entries);
         } 
     }
 
@@ -576,14 +575,14 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
 {
     public string SetId { get; set; } = null!;
 
-    private string _groupName = "New palette set";
-    public string GroupName
+    private string _setName = "New palette set";
+    public string SetName
     {
-        get => _groupName.Trim();
+        get => _setName.Trim();
         set
         {
-            _groupName = value.Trim();
-            OnPropertyChanged(nameof(GroupName));
+            _setName = value.Trim();
+            OnPropertyChanged(nameof(SetName));
         }
     }
 
