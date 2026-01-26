@@ -7,7 +7,7 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.drawing;
 
-public class Bitmap : IStaticFieldEnumeration
+public class Bitmap : ISfe
 {
     public static int BitmapSize() => 128;
 

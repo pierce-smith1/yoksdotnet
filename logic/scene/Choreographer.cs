@@ -27,7 +27,7 @@ public class Choreographer
 
         _currentPattern = options.AnimationStartingPattern switch
         {
-            PatternChoice.Random => RandomUtils.SharedRng.Sample(options.AnimationPossiblePatterns),
+            PatternChoice.Random => options.AnimationPossiblePatterns.Sample(RandomUtils.SharedRng),
             PatternChoice.SinglePattern(Pattern p) => p,
 
             _ => throw new System.NotImplementedException(),
@@ -73,12 +73,12 @@ public class Choreographer
         var possiblePatterns = Options.AnimationPossiblePatterns
             .Where(pattern => pattern != _currentPattern);
 
-        if (! possiblePatterns.Any())
+        if (possiblePatterns.Count() == 0)
         {
             return;
         }
 
-        _currentPattern = RandomUtils.SharedRng.Sample(possiblePatterns);
+        _currentPattern = possiblePatterns.Sample(RandomUtils.SharedRng);
 
         _lastPatternChangeSeconds = Scene.Seconds;
     }

@@ -23,7 +23,7 @@ public class ScrOptions
     public double IndividualTrailLength { get; set; } = 0.1;
 
     public double AnimationSpeed { get; set; } = 0.2;
-    public List<Pattern> AnimationPossiblePatterns { get; set; } = [..StaticFieldEnumerations.GetAll<Pattern>()];
+    public List<Pattern> AnimationPossiblePatterns { get; set; } = [..Sfes.GetAll<Pattern>()];
     public PatternChoice AnimationStartingPattern { get; set; } = new PatternChoice.Random();
     public bool AnimationPatternDoesChange { get; set; } = true;
     public double AnimationPatternChangeFrequency { get; set; } = 0.5;
@@ -34,7 +34,7 @@ public class ScrOptions
 
     public int GetActualSpriteCount(double width, double height)
     {
-        var scalingFactor = Interpolation.InterpLinear(FamilySize, 0.0, 1.0, 0.2, 1.0);
+        var scalingFactor = Interp.Linear(FamilySize, 0.0, 1.0, 0.2, 1.0);
 
         var count = (width / 64) * (height / 64) * scalingFactor;
         return (int)count;
@@ -45,7 +45,7 @@ public class ScrOptions
         var maxColorCount = FamilyPaletteChoice switch
         {
             PaletteChoice.SingleGroup(PaletteGroup g) => PredefinedPalette.AllForGroup(g).Count(),
-            PaletteChoice.AllGroups => StaticFieldEnumerations.GetAll<PredefinedPalette>().Count(),
+            PaletteChoice.AllGroups => Sfes.GetAll<PredefinedPalette>().Count(),
             PaletteChoice.ImFeelingLucky => 30,
 
             PaletteChoice.UserDefined(var setId, _) => 
@@ -67,19 +67,19 @@ public class ScrOptions
     
     public double GetActualEmotionScale()
     {
-        var scale = Interpolation.InterpSqrt(IndividualEmotionScale, 0.0, 1.0, 0.0, 2.5);
+        var scale = Interp.Sqrt(IndividualEmotionScale, 0.0, 1.0, 0.0, 2.5);
         return scale;
     }
 
     public double GetActualPatternChangeFrequencySeconds()
     {
-        var seconds = Interpolation.InterpLinear(AnimationPatternChangeFrequency, 0.0, 1.0, 90.0, 5.0);
+        var seconds = Interp.Linear(AnimationPatternChangeFrequency, 0.0, 1.0, 90.0, 5.0);
         return seconds;
     }
 
     public double GetActualAnimationSpeedScale()
     {
-        var scale = Interpolation.InterpSquare(AnimationSpeed, 0.0, 1.0, 0.05, 0.5);
+        var scale = Interp.Square(AnimationSpeed, 0.0, 1.0, 0.05, 0.5);
         return scale;
     }
 

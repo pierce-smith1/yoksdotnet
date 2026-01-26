@@ -80,7 +80,8 @@
         </ListBox>
         
         <DockPanel Grid.Row="3" Grid.Column="0" Margin="2">
-            <Button DockPanel.Dock="Right" Margin="4,0,0,0" Click="OnAddPalette">Add</Button>
+            <Button DockPanel.Dock="Right" Margin="4,0,0,0" Click="OnAddRandomPalette">+ Random</Button>
+            <Button DockPanel.Dock="Right" Margin="4,0,0,0" Click="OnAddPalette">+ Add</Button>
             
             <ComboBox
                 ItemsSource="{Binding PredefinedPalettes}"

@@ -5,7 +5,7 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public class Pattern : IStaticFieldEnumeration
+public class Pattern : ISfe
 {
     public readonly static Pattern Lattice = new(
         "Lattice",

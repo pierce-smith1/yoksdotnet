@@ -62,6 +62,7 @@ public partial class PaletteCustomizer : Window
     private readonly EntityPainter _spritePainter;
     private readonly PreviewSprite _currentSprite;
     private readonly OptionsSaver _optionsSaver = new();
+    private readonly RandomPaletteGenerator _randomPaletteGenerator = new(new());
 
     public readonly Palette GhostPalette = new(
         "#aaaaaa",
@@ -199,6 +200,14 @@ public partial class PaletteCustomizer : Window
         ViewModel.SelectedEntry = newEntry;
     }
 
+    protected void OnAddRandomPalette(object _sender, RoutedEventArgs _e)
+    {
+        var palette = _randomPaletteGenerator.Generate(1).First();
+
+        var newEntry = ViewModel.AddPaletteView(_randomPaletteGenerator.NamePalette(palette), new(palette));
+        ViewModel.SelectedEntry = newEntry;
+    }
+
     protected void OnDeletePalette(object sender, RoutedEventArgs _e)
     {
         if (sender is not Button button)
@@ -249,7 +258,7 @@ public partial class PaletteCustomizer : Window
 
     private Dictionary<PaletteIndex, List<Point>> GetPaletteIndexRegionsFrom(SKBitmap bitmap)
     {
-        var indexes = StaticFieldEnumerations.GetAll<PaletteIndex>();
+        var indexes = Sfes.GetAll<PaletteIndex>();
 
         var regions = new Dictionary<PaletteIndex, List<Point>>();
 
@@ -378,16 +387,16 @@ public partial class PaletteCustomizer : Window
 
     private (float, float) ColorSelectCoordToSl(float x, float y, float width, float height)
     {
-        var saturation = (float)Interpolation.InterpLinear(y, 0, height, 0, 100);
-        var lightness = (float)Interpolation.InterpLinear(x, 0, width, 0, 100);
+        var saturation = (float)Interp.Linear(y, 0, height, 0, 100);
+        var lightness = (float)Interp.Linear(x, 0, width, 0, 100);
 
         return (saturation, lightness);
     }
 
     private (float, float) SlToColorSelectCoord(float saturation, float lightness, float width, float height)
     {
-        var x = (float)Interpolation.InterpLinear(lightness, 0, 100, 0, width);
-        var y = (float)Interpolation.InterpLinear(saturation, 0, 100, 0, height);
+        var x = (float)Interp.Linear(lightness, 0, 100, 0, width);
+        var y = (float)Interp.Linear(saturation, 0, 100, 0, height);
 
         return (x, y);
     }
@@ -510,7 +519,7 @@ public partial class PaletteCustomizer : Window
         var exportPath = Path.Combine(folderDialog.FolderName, entry.Name);
 
         var imageExporter = new ImageExporter(exportPath);
-        var exportResults = StaticFieldEnumerations.GetAll<Bitmap>()
+        var exportResults = Sfes.GetAll<Bitmap>()
             .Select(b => imageExporter.Export(b, entry.Palette));
 
         if (exportResults.All(r => r == ImageExportResult.Ok))
@@ -586,7 +595,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         }
     }
 
-    public Dictionary<string, PaletteView> PredefinedPalettes { get; init; } = StaticFieldEnumerations.GetAll<PredefinedPalette>()
+    public Dictionary<string, PaletteView> PredefinedPalettes { get; init; } = Sfes.GetAll<PredefinedPalette>()
         .Select(p => (p.Name, new PaletteView(p)))
         .ToDictionary();
 

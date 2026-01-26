@@ -36,10 +36,7 @@ public class Scene
 
         RandomUtils.SeedSharedRng(rngSeed);
 
-        _spriteGenerator = new()
-        {
-            Options = options,
-        };
+        _spriteGenerator = new(Options, RandomUtils.SharedRng);
 
         _choreographer = new(options: options, scene: this);
 

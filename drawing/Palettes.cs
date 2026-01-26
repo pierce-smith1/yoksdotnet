@@ -8,7 +8,7 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.drawing;
 
-public record PaletteIndex(string Name, string DisplayName, int Luminance) : IStaticFieldEnumeration
+public record PaletteIndex(string Name, string DisplayName, int Luminance) : ISfe
 {
     public readonly static PaletteIndex Scales = new(nameof(Scales), "Scales base", 160);
     public readonly static PaletteIndex ScalesHighlight = new(nameof(ScalesHighlight), "Scale highlights", 200);
@@ -207,7 +207,7 @@ public class Palette
         var greenTable = identityTable.ToArray();
         var blueTable = identityTable.ToArray();
 
-        foreach (var index in StaticFieldEnumerations.GetAll<PaletteIndex>())
+        foreach (var index in Sfes.GetAll<PaletteIndex>())
         {
             redTable[index.Luminance] = Colors[index].R;
             greenTable[index.Luminance] = Colors[index].G;
@@ -223,7 +223,7 @@ public class Palette
     }
 }
 
-public class PredefinedPalette : Palette, IStaticFieldEnumeration
+public class PredefinedPalette : Palette, ISfe
 {
     public static readonly PredefinedPalette Ascent = new(
         "Ascent",
@@ -322,13 +322,13 @@ public class PredefinedPalette : Palette, IStaticFieldEnumeration
 
     public static IEnumerable<PredefinedPalette> AllForGroup(PaletteGroup group)
     {
-        return StaticFieldEnumerations.GetAll<PredefinedPalette>().Where(p => p.Group == group);
+        return Sfes.GetAll<PredefinedPalette>().Where(p => p.Group == group);
     }
 
     public override string ToString() => Name;
 }
 
-public class PaletteGroup : IStaticFieldEnumeration
+public class PaletteGroup : ISfe
 {
     public static readonly PaletteGroup XpInspired = new("Classic");
     public static readonly PaletteGroup Fractalthorns = new("Fractalthorns Characters");

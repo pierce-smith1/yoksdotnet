@@ -13,7 +13,7 @@ public static class RandomUtils
         SharedRng = new Random(seed);
     }
 
-    public static T Sample<T>(this Random rng, IEnumerable<T> source)
+    public static T Sample<T>(this IEnumerable<T> source, Random rng)
     {
         if (!source.Any())
         {
@@ -24,12 +24,30 @@ public static class RandomUtils
         return source.ElementAt(index);
     }
 
-    public static T Sample<T>(this IEnumerable<T> source, Random rng)
+    public static T SampleWeighted<T>(this IEnumerable<T> source, Func<T, double> weightProvider, Random rng)
     {
-        return rng.Sample(source);
+        if (!source.Any())
+        {
+            throw new InvalidOperationException("Sample from empty list");
+        }
+
+        var totalWeight = source.Select(x => weightProvider(x)).Aggregate((a, b) => a + b);
+        var target = rng.NextDouble() * totalWeight;
+
+        var runningWeight = 0.0;
+        foreach (var item in source)
+        {
+            runningWeight += weightProvider(item);
+            if (runningWeight >= target)
+            {
+                return item;
+            }
+        }
+
+        return source.Last();
     }
 
-    public static T SampleExponential<T>(this Random rng, IEnumerable<T> source, double factor)
+    public static T SampleExponential<T>(this IEnumerable<T> source, Random rng, double factor)
     {
         if (!source.Any())
         {
@@ -48,11 +66,5 @@ public static class RandomUtils
                 }
             }
         }
-    }
-
-    public static EnumType SampleEnum<EnumType>(this Random rng) where EnumType : Enum
-    {
-        var enumValues = Enum.GetValues(typeof(EnumType)).Cast<EnumType>();
-        return rng.Sample(enumValues);
     }
 }
