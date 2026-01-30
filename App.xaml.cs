@@ -46,7 +46,7 @@ public partial class App : Application
             {
                 if (withOptions)
                 {
-                    _debugOptionsWindow = new OptionsWindow(new OptionsSaver().Load());
+                    _debugOptionsWindow = new OptionsWindow(OptionsStore.Load());
                     _debugOptionsWindow.Show();
                 }
 

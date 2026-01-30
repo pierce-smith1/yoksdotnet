@@ -1,18 +1,18 @@
 using System;
 using System.Linq;
 
-using yoksdotnet.common;
-
 namespace yoksdotnet.logic;
 
 public class PerlinNoiseGenerator
 {
+    private readonly Random _rng;
     private readonly int[] _permutation;
 
-    public PerlinNoiseGenerator()
+    public PerlinNoiseGenerator(Random rng)
     {
+        _rng = rng;
         _permutation = Enumerable.Range(0, 256).ToArray();
-        RandomUtils.SharedRng.Shuffle(_permutation);
+        _rng.Shuffle(_permutation);
         _permutation = [.._permutation, .._permutation];
     }
 

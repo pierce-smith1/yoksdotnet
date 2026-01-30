@@ -26,20 +26,20 @@ public class PaletteExporter
         {
             writer.Write(palette.Name);
 
-            WriteColor(writer, palette.Palette.Scales);
-            WriteColor(writer, palette.Palette.ScalesShadow);
-            WriteColor(writer, palette.Palette.ScalesHighlight);
-            WriteColor(writer, palette.Palette.Horns);
-            WriteColor(writer, palette.Palette.HornsShadow);
-            WriteColor(writer, palette.Palette.Whites);
-            WriteColor(writer, palette.Palette.Eyes);
+            WriteColor(writer, palette.Palette.scales);
+            WriteColor(writer, palette.Palette.scalesShadow);
+            WriteColor(writer, palette.Palette.scalesHighlight);
+            WriteColor(writer, palette.Palette.horns);
+            WriteColor(writer, palette.Palette.hornsShadow);
+            WriteColor(writer, palette.Palette.whites);
+            WriteColor(writer, palette.Palette.eyes);
         }
 
         var encoded = Convert.ToBase64String(stream.ToArray());
         return encoded;
     }
 
-    private static void WriteColor(BinaryWriter writer, Color color)
+    private static void WriteColor(BinaryWriter writer, RgbColor color)
     {
         writer.Write(color.R);
         writer.Write(color.G);
@@ -64,15 +64,15 @@ public class PaletteExporter
                 var entryName = reader.ReadString();
 
                 var palette = new Palette
-                (
-                    s: ReadColor(reader), 
-                    ss: ReadColor(reader),
-                    sh: ReadColor(reader), 
-                    h: ReadColor(reader), 
-                    hs: ReadColor(reader), 
-                    w: ReadColor(reader), 
-                    e: ReadColor(reader)
-                );
+                {
+                    scales = ReadColor(reader), 
+                    scalesShadow = ReadColor(reader),
+                    scalesHighlight = ReadColor(reader), 
+                    horns = ReadColor(reader), 
+                    hornsShadow = ReadColor(reader), 
+                    whites = ReadColor(reader), 
+                    eyes = ReadColor(reader)
+                };
 
                 var entry = new CustomPaletteEntry(entryName, palette);
                 entries.Add(entry);
@@ -87,7 +87,7 @@ public class PaletteExporter
         }
     }
 
-    private static Color ReadColor(BinaryReader reader)
+    private static RgbColor ReadColor(BinaryReader reader)
     {
         var r = reader.ReadByte();
         var g = reader.ReadByte();

@@ -4,31 +4,24 @@ using System.Linq;
 
 namespace yoksdotnet.common;
 
-public static class RandomUtils
+public class RandomSampler(Random rng)
 {
-    public static Random SharedRng { get; private set; } = new();
-
-    public static void SeedSharedRng(int seed)
-    {
-        SharedRng = new Random(seed);
-    }
-
-    public static T Sample<T>(this IEnumerable<T> source, Random rng)
+    public T? Sample<T>(IEnumerable<T> source) where T : class
     {
         if (!source.Any())
         {
-            throw new InvalidOperationException("Sample from empty list");
+            return null;
         }
 
         var index = rng.Next() % source.Count();
         return source.ElementAt(index);
     }
 
-    public static T SampleWeighted<T>(this IEnumerable<T> source, Func<T, double> weightProvider, Random rng)
+    public T? SampleWeighted<T>(IEnumerable<T> source, Func<T, double> weightProvider) where T : class
     {
         if (!source.Any())
         {
-            throw new InvalidOperationException("Sample from empty list");
+            return null;
         }
 
         var totalWeight = source.Select(x => weightProvider(x)).Aggregate((a, b) => a + b);
@@ -47,11 +40,11 @@ public static class RandomUtils
         return source.Last();
     }
 
-    public static T SampleExponential<T>(this IEnumerable<T> source, Random rng, double factor)
+    public T? SampleExponential<T>(IEnumerable<T> source, double factor) where T : class
     {
         if (!source.Any())
         {
-            throw new InvalidOperationException("Sample from empty list");
+            return null;
         }
 
         factor = Math.Clamp(factor, 0.1, 1.0);

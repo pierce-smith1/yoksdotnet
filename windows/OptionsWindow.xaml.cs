@@ -14,8 +14,6 @@ namespace yoksdotnet.windows;
 
 public partial class OptionsWindow : Window
 {
-    private readonly OptionsSaver _optionsSaver = new();
-
     public OptionsWindow(ScrOptions? debugOptions = null)
     {
         InitializeComponent();
@@ -25,7 +23,7 @@ public partial class OptionsWindow : Window
             ViewModel.IsDebugWindow = true;
         }
 
-        var options = debugOptions ?? _optionsSaver.Load() ?? new();
+        var options = debugOptions ?? OptionsStore.Load() ?? new();
 
         ViewModel.BackingOptions = options;
         InitializeModel(options);
@@ -33,7 +31,7 @@ public partial class OptionsWindow : Window
 
     protected void OnSave(object? _sender, RoutedEventArgs _e)
     {
-        _optionsSaver.Save(ViewModel.BackingOptions);
+        OptionsStore.Save(ViewModel.BackingOptions);
     }
 
     protected void OnDefaults(object? _sender, RoutedEventArgs _e)
@@ -88,8 +86,8 @@ public partial class OptionsWindow : Window
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
                 .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == set.Id);
 
-            _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
-            _optionsSaver.Save(ViewModel.BackingOptions);
+            OptionsStore.SaveCustomPalettes(ViewModel.CustomPalettes);
+            OptionsStore.Save(ViewModel.BackingOptions);
         }
     }
 
@@ -120,7 +118,7 @@ public partial class OptionsWindow : Window
                 .Where(e => e.Id != groupChoice.SetId)
                 .ToList();
 
-            _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
+            OptionsStore.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
     }
 
@@ -170,14 +168,14 @@ public partial class OptionsWindow : Window
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
                 .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == newSetId);
 
-            _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
+            OptionsStore.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
         else
         {
             ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.FamilyPaletteChoice);
         }
 
-        _optionsSaver.Save(ViewModel.BackingOptions);
+        OptionsStore.Save(ViewModel.BackingOptions);
     }
 
     private void ImportCustomPaletteSet()
@@ -363,7 +361,7 @@ public class OptionsViewModel : INotifyPropertyChanged
         : Visibility.Hidden;
 
     public List<PaletteChoiceEntry> PaletteChoices => [
-        ..Sfes.GetAll<PaletteGroup>()
+        ..SfEnums.GetAll<PaletteGroup>()
             .Select(g => new PaletteChoiceEntry(new PaletteChoice.SingleGroup(g))),
 
         new(new PaletteChoice.AllGroups()),

@@ -43,11 +43,11 @@ public class PreviewSprite : Sprite
         return hoveredPalette.GetPaint();
     }
 
-    private Color ToHoveredColor(Color c)
+    private RgbColor ToHoveredColor(RgbColor c)
     {
         const int lightenAmount = 100;
 
-        var newColor = new Color(
+        var newColor = new RgbColor(
             (byte)Math.Clamp(c.R + lightenAmount, 0, 255),
             (byte)Math.Clamp(c.G + lightenAmount, 0, 255),
             (byte)Math.Clamp(c.B + lightenAmount, 0, 255)
@@ -59,9 +59,8 @@ public class PreviewSprite : Sprite
 
 public partial class PaletteCustomizer : Window
 {
-    private readonly EntityPainter _spritePainter;
+    private readonly SpritePainter _spritePainter;
     private readonly PreviewSprite _currentSprite;
-    private readonly OptionsSaver _optionsSaver = new();
     private readonly RandomPaletteGenerator _randomPaletteGenerator = new(new());
 
     public readonly Palette GhostPalette = new(
@@ -82,7 +81,7 @@ public partial class PaletteCustomizer : Window
     {
         InitializeComponent();
 
-        _spritePainter = new EntityPainter();
+        _spritePainter = new SpritePainter();
         _currentSprite = new PreviewSprite()
         {
             Id = 0,
@@ -258,7 +257,7 @@ public partial class PaletteCustomizer : Window
 
     private Dictionary<PaletteIndex, List<Point>> GetPaletteIndexRegionsFrom(SKBitmap bitmap)
     {
-        var indexes = Sfes.GetAll<PaletteIndex>();
+        var indexes = SfEnums.GetAll<PaletteIndex>();
 
         var regions = new Dictionary<PaletteIndex, List<Point>>();
 
@@ -519,7 +518,7 @@ public partial class PaletteCustomizer : Window
         var exportPath = Path.Combine(folderDialog.FolderName, entry.Name);
 
         var imageExporter = new ImageExporter(exportPath);
-        var exportResults = Sfes.GetAll<Bitmap>()
+        var exportResults = SfEnums.GetAll<Bitmap>()
             .Select(b => imageExporter.Export(b, entry.Palette));
 
         if (exportResults.All(r => r == ImageExportResult.Ok))
@@ -569,7 +568,7 @@ public partial class PaletteCustomizer : Window
         var hex = textBox.Text;
         ViewModel.CurrentHex = hex;
 
-        var inputColor = Color.FromHex(hex);
+        var inputColor = RgbColor.FromHex(hex);
         if (inputColor is null)
         {
             return;
@@ -595,7 +594,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         }
     }
 
-    public Dictionary<string, PaletteView> PredefinedPalettes { get; init; } = Sfes.GetAll<PredefinedPalette>()
+    public Dictionary<string, PaletteView> PredefinedPalettes { get; init; } = SfEnums.GetAll<PredefinedPalette>()
         .Select(p => (p.Name, new PaletteView(p)))
         .ToDictionary();
 
@@ -702,7 +701,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         }
     }
 
-    public bool IsValidHex => Color.FromHex(CurrentHex) is not null;
+    public bool IsValidHex => RgbColor.FromHex(CurrentHex) is not null;
 
     public void UpdateHsl()
     {
@@ -720,14 +719,14 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
 
     public void UpdateHex()
     {
-        CurrentHex = Color.FromHsl(Hue, Saturation, Lightness).ToHex();
+        CurrentHex = RgbColor.FromHsl(Hue, Saturation, Lightness).ToHex();
     }
 
     public void UpdatePalette()
     {
         if (SelectedEntry is { } selectedEntry)
         {
-            selectedEntry.PaletteView[SelectedIndex] = Color.FromHsl(Hue, Saturation, Lightness);
+            selectedEntry.PaletteView[SelectedIndex] = RgbColor.FromHsl(Hue, Saturation, Lightness);
             OnPropertyChanged(nameof(PaletteEntries));
         }
     }

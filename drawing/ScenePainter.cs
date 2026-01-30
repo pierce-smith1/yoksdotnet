@@ -12,7 +12,7 @@ public class ScenePainter
 
     public Sprite? DebuggedSprite { get; set; } = null;
 
-    private readonly EntityPainter _spritePainter = new();
+    private readonly SpritePainter _spritePainter = new();
     private readonly DebugPainter _debugPainter = new();
 
     public void Draw(SKCanvas canvas)

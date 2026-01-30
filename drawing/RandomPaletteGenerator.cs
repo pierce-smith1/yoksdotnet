@@ -81,13 +81,13 @@ public class RandomPaletteGenerator(Random _rng)
         return $"{name[0..1].ToUpper()}{name[1..]}";
     }
 
-    private Color GetRandomSaturatedColor()
+    private RgbColor GetRandomSaturatedColor()
     {
         var h = _rng.NextDouble() * 360;
         var s = Interp.Linear(_rng.NextDouble(), 0.0, 1.0, 30.0, 50.0);
         var l = Interp.Linear(_rng.NextDouble(), 0.0, 1.0, 30.0, 70.0);
 
-        var color = Color.FromHsl(h, s, l);
+        var color = RgbColor.FromHsl(h, s, l);
         return color;
     }
 
@@ -134,29 +134,29 @@ public class RandomPaletteGenerator(Random _rng)
 
         if (anomalies.Contains(PaletteAnomaly.DarkEyes))
         {
-            palette.Whites = new Color(0, 0, 0);
+            palette.Whites = new RgbColor(0, 0, 0);
             palette.Eyes = LightenColor(GenerateBaseColor(parameters));
         }
 
         return palette;
     }
 
-    private Color GenerateBaseColor(PaletteGenerationParameters parameters)
+    private RgbColor GenerateBaseColor(PaletteGenerationParameters parameters)
     {
         var baseColor = ScrambleColor(parameters.BaseColor, parameters.ColorScrambleIntensity);
         return baseColor;
     }
 
-    private Color GenerateNeutralColor(PaletteGenerationParameters parameters)
+    private RgbColor GenerateNeutralColor(PaletteGenerationParameters parameters)
     {
-        var neutralBase = Color.FromHsl(0.0, 0.0, Interp.Linear(_rng.NextDouble(), 0.0, 1.0, 30.0, 70.0));
+        var neutralBase = RgbColor.FromHsl(0.0, 0.0, Interp.Linear(_rng.NextDouble(), 0.0, 1.0, 30.0, 70.0));
         var neutralColor = ScrambleColor(neutralBase, 0.2);
         return neutralColor;
     }
 
-    private Color ScrambleColor(Color color, double intensity)
+    private RgbColor ScrambleColor(RgbColor color, double intensity)
     {
-        var newColor = new Color
+        var newColor = new RgbColor
         (
             ScrambleColorChannel(color.R, intensity),
             ScrambleColorChannel(color.G, intensity),
@@ -177,35 +177,35 @@ public class RandomPaletteGenerator(Random _rng)
         return (byte)Math.Clamp(Math.Round(newValue), 0, 255);
     }
 
-    private Color DarkenColor(Color color)
+    private RgbColor DarkenColor(RgbColor color)
     {
         var (h, s, l) = color.ToHsl();
 
         h = ShiftHueTowards(hue: h, target: 240.0, factor: 1.2);
         l /= 2;
 
-        var newColor = Color.FromHsl(h, s, l);
+        var newColor = RgbColor.FromHsl(h, s, l);
         return newColor;
     }
 
-    private Color LightenColor(Color color)
+    private RgbColor LightenColor(RgbColor color)
     {
         var (h, s, l) = color.ToHsl();
 
         h = ShiftHueTowards(hue: h, target: 50.0, factor: 1.2);
         l = Interp.Linear(l, 0.0, 100.0, 50.0, 100.0);
 
-        var newColor = Color.FromHsl(h, s, l);
+        var newColor = RgbColor.FromHsl(h, s, l);
         return newColor;
     }
 
-    private Color WhitenColor(Color color)
+    private RgbColor WhitenColor(RgbColor color)
     {
         var (h, s, l) = color.ToHsl();
 
         l = Interp.Linear(l, 0.0, 100.0, 90.0, 100.0);
 
-        var newColor = Color.FromHsl(h, s, l);
+        var newColor = RgbColor.FromHsl(h, s, l);
         return newColor;
     }
 
@@ -221,7 +221,7 @@ public class RandomPaletteGenerator(Random _rng)
 
 public record PaletteGenerationParameters
 (
-    Color BaseColor,
+    RgbColor BaseColor,
     double ColorScrambleIntensity,
     Dictionary<PaletteAnomaly, double> AnomalyChances,
     Dictionary<PaletteColoringStyle, double> ColoringStyleWeights

@@ -7,32 +7,35 @@ using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
 
-public class SpriteGenerator(ScrOptions _options, Random _rng)
+public class SpriteGenerator(ScrOptions options, Random rng)
 {
+    private readonly RandomPaletteGenerator _randomPaletteGenerator = new(rng);
+    private readonly RandomSampler _sampler = new(rng);
 
-    private readonly RandomPaletteGenerator _randomPaletteGenerator = new(new());
+    private int _runningId = 0;
 
-    private static int _runningId = 0;
 
     public IEnumerable<Sprite> Make(double spreadX = 1.0, double spreadY = 1.0)
     {
         var sprites = new List<Sprite>();
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
-        for (var i = 0; i < _options.GetActualSpriteCount(spreadX, spreadY); i++)
+        for (var i = 0; i < options.GetActualSpriteCount(spreadX, spreadY); i++)
         {
-            var palette = selectedPalettes.SampleExponential(_rng, 1.0 - (double)selectedPalettes.Count / totalPossibleCount);
-            var newSprite = new Yokin(palette)
+            var palette = _sampler.SampleExponential(selectedPalettes, 1.0 - (double)selectedPalettes.Count / totalPossibleCount);
+            palette ??= Palette.DefaultPalette;
+
+            var newSprite = new Yokin
             {
-                Id = _runningId++,
-                Brand = _rng.NextDouble(),
-                Home = new(_rng.NextDouble() * spreadX, _rng.NextDouble() * spreadY),
-                Offset = new(0, 0),
-                Scale = _options.IndividualScale,
-                Width = Bitmap.BitmapSize(),
-                Height = Bitmap.BitmapSize(),
-                AngleRadians = 0.0,
-                EmotionScale = _options.GetActualEmotionScale(),
+                id = _runningId++,
+                brand = rng.NextDouble(),
+                palette = palette,
+                home = new(rng.NextDouble() * spreadX, rng.NextDouble() * spreadY),
+                offset = new(0, 0),
+                scale = options.IndividualScale,
+                width = Bitmap.BitmapSize(),
+                height = Bitmap.BitmapSize(),
+                angleRadians = 0.0,
             };
 
             sprites.Add(newSprite);
@@ -43,34 +46,34 @@ public class SpriteGenerator(ScrOptions _options, Random _rng)
 
     private (List<Palette> Palettes, int TotalPossibleCount) SelectPalettes()
     {
-        IEnumerable<Palette> possiblePalettes = _options.FamilyPaletteChoice switch
+        IEnumerable<Palette> possiblePalettes = options.FamilyPaletteChoice switch
         {
             PaletteChoice.SingleGroup choice =>
-                Sfes.GetAll<PredefinedPalette>()
+                SfEnums.GetAll<PredefinedPalette>()
                     .Where(pair => pair.Group == choice.Group),
 
             PaletteChoice.AllGroups =>
-                Sfes.GetAll<PredefinedPalette>(),
+                SfEnums.GetAll<PredefinedPalette>(),
 
             PaletteChoice.UserDefined(var setId, _) =>
-                _options.CustomPalettes.FirstOrDefault(s => s.Id == setId)?.Entries
+                options.CustomPalettes.FirstOrDefault(s => s.Id == setId)?.Entries
                     .Select(e => e.Palette),
 
             PaletteChoice.ImFeelingLucky =>
-                _randomPaletteGenerator.Generate(_options.GetActualColorCount()),
+                _randomPaletteGenerator.Generate(options.GetActualColorCount()),
 
             _ => throw new NotImplementedException(),
-        } ?? [new Palette()];
+        } ?? [Palette.DefaultPalette];
 
         if (possiblePalettes.Count() == 0)
         {
-            possiblePalettes = [new Palette()];
+            possiblePalettes = [Palette.DefaultPalette];
         }
 
-        var usableColorsCount = Math.Min(_options.GetActualColorCount(), possiblePalettes.Count());
+        var usableColorsCount = Math.Min(options.GetActualColorCount(), possiblePalettes.Count());
 
         var selectedPalettes = possiblePalettes
-            .OrderBy(x => RandomUtils.SharedRng.Next())
+            .OrderBy(x => rng.Next())
             .Take(usableColorsCount);
 
         return ([..selectedPalettes], possiblePalettes.Count());

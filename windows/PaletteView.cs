@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using yoksdotnet.drawing;
 
-using Color = yoksdotnet.drawing.Color;
+using RgbColor = yoksdotnet.drawing.RgbColor;
 
 namespace yoksdotnet.windows;
 
@@ -9,7 +9,7 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 {
     public Palette BackingPalette => _backingPalette;
 
-    public Color Scales
+    public RgbColor Scales
     {
         get => _backingPalette.Scales;
         set 
@@ -20,7 +20,7 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
         }
     }
 
-    public Color ScalesHighlight
+    public RgbColor ScalesHighlight
     {
         get => _backingPalette.ScalesHighlight;
         set 
@@ -31,7 +31,7 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
         }
     }
 
-    public Color ScalesShadow
+    public RgbColor ScalesShadow
     {
         get => _backingPalette.ScalesShadow;
         set 
@@ -42,7 +42,7 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
         }
     }
 
-    public Color Horns
+    public RgbColor Horns
     {
         get => _backingPalette.Horns;
         set 
@@ -53,7 +53,7 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
         }
     }
 
-    public Color Eyes
+    public RgbColor Eyes
     {
         get => _backingPalette.Eyes;
         set 
@@ -64,7 +64,7 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
         }
     }
 
-    public Color Whites
+    public RgbColor Whites
     {
         get => _backingPalette.Whites;
         set
@@ -75,7 +75,7 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
         }
     }
 
-    public Color HornsShadow
+    public RgbColor HornsShadow
     {
         get => _backingPalette.HornsShadow;
         set
@@ -86,7 +86,7 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
         }
     }
 
-    public Color this[PaletteIndex index]
+    public RgbColor this[PaletteIndex index]
     {
         get => _backingPalette[index];
         set

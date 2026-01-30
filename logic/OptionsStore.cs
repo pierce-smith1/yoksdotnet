@@ -7,20 +7,20 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.logic;
 
-public class OptionsSaver
+public static class OptionsStore
 {
     public readonly static string OptionsDirName = "yoksdotnet";
 
     public readonly static string OptionsFileName = "ydn-options.json";
     public readonly static string PaletteDataFileName = "ydn-custom-palettes.json";
 
-    private readonly string _appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private static readonly string _appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-    private readonly string _optionsDirPath;
-    private readonly string _optionsPath;
-    private readonly string _paletteDataPath;
+    private static readonly string _optionsDirPath;
+    private static readonly string _optionsPath;
+    private static readonly string _paletteDataPath;
 
-    private readonly JsonSerializerOptions _jsonOptions = new()
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = true,
         Converters =
@@ -30,7 +30,7 @@ public class OptionsSaver
         },
     };
 
-    public OptionsSaver()
+    static OptionsStore()
     {
         _optionsDirPath = Path.Combine(_appDataPath, OptionsDirName);
 
@@ -38,7 +38,7 @@ public class OptionsSaver
         _paletteDataPath = Path.Combine(_optionsDirPath, PaletteDataFileName);
     }
 
-    public void Save(ScrOptions options)
+    public static void Save(ScrOptions options)
     {
         Directory.CreateDirectory(_optionsDirPath);
 
@@ -46,7 +46,7 @@ public class OptionsSaver
         File.WriteAllText(_optionsPath, serialized);
     }
 
-    public void SaveCustomPalettes(List<CustomPaletteSet> palettes)
+    public static void SaveCustomPalettes(List<CustomPaletteSet> palettes)
     {
         Directory.CreateDirectory(_optionsDirPath);
 
@@ -54,7 +54,7 @@ public class OptionsSaver
         File.WriteAllText(_paletteDataPath, serialized);
     }
 
-    public ScrOptions? Load()
+    public static ScrOptions? Load()
     {
         try
         {

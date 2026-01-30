@@ -38,7 +38,6 @@ public partial class DisplayWindow : Window
 
     private DisplayMode _displayMode;
     private ScenePainter _scenePainter;
-    private OptionsSaver _optionsSaver = new();
 
     public record DisplayMode()
     {

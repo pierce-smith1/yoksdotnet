@@ -31,14 +31,14 @@ namespace yoksdotnet.common;
 
 // If you plan to use a class as an SFE, you should tag it with this interface.
 // This will allow it to be serialized into JSON and used with the below helper functions.
-interface ISfe
+public interface ISfEnum
 {
-    public string Name { get; init; }
+    public string Name { get; }
 }
 
-static class Sfes
+public static class SfEnums
 {
-    public static IEnumerable<T> GetAll<T>() where T : class, ISfe 
+    public static IEnumerable<T> GetAll<T>() where T : class, ISfEnum 
     {
         var instances = typeof(T)
             .GetFields(BindingFlags.Public | BindingFlags.Static)
@@ -59,7 +59,7 @@ public class JsonSfeConverterFactory : JsonConverterFactory
 {
     public override bool CanConvert(Type typeToConvert)
     {
-        var canConvert = typeToConvert.GetInterfaces().Any(i => i == typeof(ISfe));
+        var canConvert = typeToConvert.GetInterfaces().Any(i => i == typeof(ISfEnum));
         return canConvert;
     }
 
@@ -74,7 +74,7 @@ public class JsonSfeConverterFactory : JsonConverterFactory
         return null;
     }
 
-    private class JsonSfeConverter<T>() : JsonConverter<T> where T : class, ISfe
+    private class JsonSfeConverter<T>() : JsonConverter<T> where T : class, ISfEnum
     {
         public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -84,7 +84,7 @@ public class JsonSfeConverterFactory : JsonConverterFactory
                 return null;
             }
 
-            var value = Sfes.GetAll<T>().FirstOrDefault(v => v.Name == name);
+            var value = SfEnums.GetAll<T>().FirstOrDefault(v => v.Name == name);
             return value;
         }
 

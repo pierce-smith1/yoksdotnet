@@ -7,7 +7,7 @@ namespace yoksdotnet.drawing;
 
 public class ImageExporter(string _exportPath)
 {
-    private readonly EntityPainter _painter = new();
+    private readonly SpritePainter _painter = new();
 
     public ImageExportResult Export(Bitmap bitmap, Palette palette)
     {

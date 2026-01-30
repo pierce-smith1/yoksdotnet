@@ -6,20 +6,11 @@ using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.drawing;
 
-public class DebugPainter
+public static class DebugPainter
 {
-    private List<string> InfoToReport(Sprite sprite)
+    public static void DrawDebugInfo(SKCanvas canvas, Sprite sprite)
     {
-        return sprite is Yokin yokin ?
-        [
-            $"X: {yokin.Home.X}",
-            $"Y: {yokin.Home.Y}",
-        ] : [];
-    }
-
-    public void DrawDebugInfo(SKCanvas canvas, Sprite sprite)
-    {
-        var spriteRect = sprite.GetRect();
+        var spriteRect = SpritePainter.GetRect(sprite);
 
         var borderRectPaint = new SKPaint
         {
@@ -48,5 +39,14 @@ public class DebugPainter
             };
             canvas.DrawText(line, textPos, textPaint);
         }
+    }
+
+    private static List<string> InfoToReport(Sprite sprite)
+    {
+        return sprite is Yokin yokin ?
+        [
+            $"X: {yokin.home.X}",
+            $"Y: {yokin.home.Y}",
+        ] : [];
     }
 }

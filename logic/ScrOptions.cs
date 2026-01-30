@@ -23,7 +23,7 @@ public class ScrOptions
     public double IndividualTrailLength { get; set; } = 0.1;
 
     public double AnimationSpeed { get; set; } = 0.2;
-    public List<Pattern> AnimationPossiblePatterns { get; set; } = [..Sfes.GetAll<Pattern>()];
+    public List<Pattern> AnimationPossiblePatterns { get; set; } = [..SfEnums.GetAll<Pattern>()];
     public PatternChoice AnimationStartingPattern { get; set; } = new PatternChoice.Random();
     public bool AnimationPatternDoesChange { get; set; } = true;
     public double AnimationPatternChangeFrequency { get; set; } = 0.5;
@@ -45,7 +45,7 @@ public class ScrOptions
         var maxColorCount = FamilyPaletteChoice switch
         {
             PaletteChoice.SingleGroup(PaletteGroup g) => PredefinedPalette.AllForGroup(g).Count(),
-            PaletteChoice.AllGroups => Sfes.GetAll<PredefinedPalette>().Count(),
+            PaletteChoice.AllGroups => SfEnums.GetAll<PredefinedPalette>().Count(),
             PaletteChoice.ImFeelingLucky => 30,
 
             PaletteChoice.UserDefined(var setId, _) => 

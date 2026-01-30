@@ -1,33 +1,26 @@
-﻿namespace yoksdotnet.logic.scene;
+﻿using System.Collections.Generic;
 
-public class EmotionHandler
+namespace yoksdotnet.logic.scene;
+
+public class EmotionHandler(Scene scene, PerlinNoiseGenerator noiseGenerator)
 {
-    public required Scene Scene { get; init; }
-    public required ScrOptions Options { get; init; }
-
-    private readonly PerlinNoiseGenerator _perlinNoiseGenerator = new();
-
-    public void UpdateEmotions(Sprite sprite)
+    public void UpdateEmotions(IEnumerable<Yokin> yokins)
     {
-        if (sprite is not Yokin yokin)
+        foreach (var yokin in yokins)
         {
-            return;
+            yokin.emotions.Ambition = GetNoiseForSprite(yokin, 0.0);
+            yokin.emotions.Empathy = GetNoiseForSprite(yokin, 1000.0);
+            yokin.emotions.Optimism = GetNoiseForSprite(yokin, 2000.0);
         }
-
-        yokin.SetEmotionVector(
-            ambition: GetNoiseForSprite(sprite, 0.0),
-            empathy: GetNoiseForSprite(sprite, 1000.0),
-            optimism: GetNoiseForSprite(sprite, 2000.0)
-        );
     }
 
     private double GetNoiseForSprite(Sprite sprite, double zOffset)
     {
-        var noise = _perlinNoiseGenerator.Get
+        var noise = noiseGenerator.Get
         (
-            sprite.Home.X / 1000.0, 
-            sprite.Home.Y / 1000.0, 
-            (Scene.Seconds + zOffset) / 50.0
+            sprite.home.X / 1000.0, 
+            sprite.home.Y / 1000.0, 
+            (scene.seconds + zOffset) / 50.0
         );
         var result = (noise * 2) - 1;
         return result;

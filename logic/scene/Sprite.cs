@@ -1,119 +1,45 @@
 ﻿using SkiaSharp;
 using System;
-using System.Security.Policy;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
 
-public record struct Point(double X, double Y);
 
-public partial class MoverState {}
-
-public abstract class Sprite
+public class Sprite
 {
-    public int Id { get; init; }
-    public double Brand { get; init; }
+    public required int id;
+    public required double brand;
+    public required Palette palette;
 
-    public Point Home = new(0, 0);
-    public Point Offset = new(0, 0);
+    public Point home = new(0.0, 0.0);
+    public Point offset = new(0.0, 0.0);
 
-    public double Scale = 1.0;
-    public double Width = Bitmap.BitmapSize();
-    public double Height = Bitmap.BitmapSize();
-    public double AngleRadians = 0.0;
+    public double scale = 1.0;
+    public double width = Bitmap.BitmapSize();
+    public double height = Bitmap.BitmapSize();
+    public double angleRadians = 0.0;
 
-    public MoverState MoverState { get; init; } = new();
-
-    public abstract Bitmap GetBitmap();
-    public abstract SKPaint GetPaint();
-
-    public Point GetFinalPos()
+    public Point FinalPos => new(home.X + offset.X, home.Y + offset.Y);
+    public (Point topLeft, Point bottomRight) Bounds
     {
-        return new(Home.X + Offset.X, Home.Y + Offset.Y);
-    }
-
-    public (Point TopLeft, Point BotRight) GetBounds()
-    {
-        var final = GetFinalPos();
-
-        var topLeft = final;
-        var botRight = new Point(final.X + (Width * Scale), final.Y + (Height * Scale));
-
-        return (topLeft, botRight);
-    }
-}
-
-public class SimpleSprite(Bitmap _bitmap, Palette _palette) : Sprite
-{
-    public override Bitmap GetBitmap() => _bitmap;
-    public override SKPaint GetPaint() => _palette.GetPaint();
-}
-
-public class Yokin(Palette _palette) : Sprite
-{
-    public record struct EmotionVector(double Empathy, double Ambition, double Optimism);
-
-    public required double EmotionScale { get; set; }
-    private EmotionVector Emotion = new();
-
-    public Palette Palette { get; init; } = _palette;
-    private SKPaint Paint { get; init; } = _palette.GetPaint();
-
-    public override SKPaint GetPaint() => Paint;
-
-    public override Bitmap GetBitmap()
-    {
-        var ambitionRanking = getEmotionRanking(GetEmotionVector().Ambition) + 1;
-        var empathyRanking = getEmotionRanking(GetEmotionVector().Empathy) + 1;
-        var optimismRanking = getEmotionRanking(GetEmotionVector().Optimism) + 1;
-
-        Bitmap[][][] emotionMap =
-        [
-            [
-                [Bitmap.LkSix, Bitmap.LkHusk, Bitmap.LkHusk],
-                [Bitmap.LkUnamused, Bitmap.LkUnamused, Bitmap.LkSix],
-                [Bitmap.LkXd, Bitmap.LkXd, Bitmap.LkSix],
-            ],
-            [
-                [Bitmap.LkUnamused, Bitmap.LkUnamused, Bitmap.Lk],
-                [Bitmap.LkConcern, Bitmap.Lk, Bitmap.Lk],
-                [Bitmap.LkConcern, Bitmap.LkThumbsup, Bitmap.LkThumbsup],
-            ],
-            [
-                [Bitmap.LkExhausted, Bitmap.LkExhausted, Bitmap.LkExhausted],
-                [Bitmap.LkThink, Bitmap.LkThink, Bitmap.LkJoy],
-                [Bitmap.LkJoy, Bitmap.LkCool, Bitmap.LkSix],
-            ],
-        ];
-
-        var result = emotionMap[empathyRanking][optimismRanking][ambitionRanking];
-        return result;
-
-        static int getEmotionRanking(double emotion)
+        get
         {
-            if (emotion < -0.66) return -1;
-            if (emotion < 0.66) return 0;
-            return 1;
+            var topLeft = FinalPos;
+            var botRight = new Point(FinalPos.X + (width * scale), FinalPos.Y + (height * scale));
+
+            return (topLeft, botRight);
         }
     }
+}
 
-    public EmotionVector GetEmotionVector()
-    {
-        return new(Emotion.Empathy * EmotionScale, Emotion.Ambition * EmotionScale, Emotion.Optimism * EmotionScale);
-    }
+public class Yokin : Sprite
+{
+    public EmotionVector emotions = new(0.0, 0.0, 0.0);
+}
 
-    public void SetEmotionVector(double empathy, double ambition, double optimism)
-    {
-        Emotion.Empathy = empathy;
-        Emotion.Ambition = ambition;
-        Emotion.Optimism = optimism;
-    }
+public record struct Point(double X, double Y);
 
-    public double GetEmotionStrength()
-    {
-        var (e, a, o) = GetEmotionVector();
-
-        var strength =  Math.Sqrt(e * e + a * a + o * o);
-        return strength;
-    }
+public record struct EmotionVector(double Ambition, double Empathy, double Optimism)
+{
+    public readonly double Magnitude => Math.Sqrt(Ambition * Ambition + Empathy * Empathy + Optimism * Optimism);
 }

@@ -5,47 +5,11 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public class Pattern : ISfe
+public record Pattern(string Name) : ISfEnum
 {
-    public readonly static Pattern Lattice = new(
-        "Lattice",
-        MoverState.OffscreenBehaviors.Wrap,
-        (scene, sprite, allSprites) => {}
-    );
-
-    public readonly static Pattern Roamers = new(
-        "Roamers",
-        MoverState.OffscreenBehaviors.Wrap,
-        (scene, sprite, allSprites) =>
-        {
-            sprite.Home.X += sprite.Brand * scene.LastDtMs;
-            sprite.Home.Y += Math.Sin(scene.Seconds * sprite.Brand) * scene.LastDtMs;
-        }
-    );
-
-    public readonly static Pattern Waves = new(
-        "Waves",
-        MoverState.OffscreenBehaviors.Wrap,
-        (scene, sprite, allSprites) =>
-        {
-            sprite.Home.X += Math.Sin(scene.Seconds * sprite.Brand) * scene.LastDtMs;
-            sprite.Home.Y += Math.Cos(scene.Seconds * sprite.Brand) * scene.LastDtMs;
-        }
-    );
-
-    public string Name { get; init; }
-    public MoverState.OffscreenBehaviors OffscreenBehavior { get; init; }
-    public MoveFunction Move { get; init; }
-
-    private Pattern(
-        string displayName, 
-        MoverState.OffscreenBehaviors offScreenBehavior, 
-        MoveFunction moveFn
-    ) {
-        Name = displayName;
-        OffscreenBehavior = offScreenBehavior;
-        Move = moveFn;
-    }
+    public readonly static Pattern Lattice = new("Lattice");
+    public readonly static Pattern Roamers = new("Roamers");
+    public readonly static Pattern Waves = new("Waves");
 
     public override string ToString() => Name;
 }
