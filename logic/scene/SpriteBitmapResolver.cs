@@ -2,13 +2,23 @@
 
 namespace yoksdotnet.logic.scene;
 
-public static class YokinFaceResolver
+public static class SpriteBitmapResolver
 {
-    public static Bitmap GetFace(Yokin yokin)
+    public static Bitmap GetBitmap(Sprite sprite)
     {
-        var ambitionRanking = GetEmotionRanking(yokin.emotions.Ambition) + 1;
-        var empathyRanking = GetEmotionRanking(yokin.emotions.Empathy) + 1;
-        var optimismRanking = GetEmotionRanking(yokin.emotions.Optimism) + 1;
+        if (sprite.fixedBitmap is not null)
+        {
+            return sprite.fixedBitmap;
+        }
+
+        if (sprite.emotions is not { } emotions)
+        {
+            return Bitmap.Lk;
+        }
+
+        var ambitionRanking = GetEmotionRanking(emotions.Ambition) + 1;
+        var empathyRanking = GetEmotionRanking(emotions.Empathy) + 1;
+        var optimismRanking = GetEmotionRanking(emotions.Optimism) + 1;
 
         Bitmap[][][] emotionMap =
         [

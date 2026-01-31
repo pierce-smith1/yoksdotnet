@@ -6,22 +6,22 @@ namespace yoksdotnet.common;
 
 public class RandomSampler(Random rng)
 {
-    public T? Sample<T>(IEnumerable<T> source) where T : class
+    public T Sample<T>(IEnumerable<T> source)
     {
         if (!source.Any())
         {
-            return null;
+            throw new InvalidOperationException("Sample from empty list");
         }
 
         var index = rng.Next() % source.Count();
         return source.ElementAt(index);
     }
 
-    public T? SampleWeighted<T>(IEnumerable<T> source, Func<T, double> weightProvider) where T : class
+    public T SampleWeighted<T>(IEnumerable<T> source, Func<T, double> weightProvider)
     {
         if (!source.Any())
         {
-            return null;
+            throw new InvalidOperationException("Sample from empty list");
         }
 
         var totalWeight = source.Select(x => weightProvider(x)).Aggregate((a, b) => a + b);
@@ -40,11 +40,11 @@ public class RandomSampler(Random rng)
         return source.Last();
     }
 
-    public T? SampleExponential<T>(IEnumerable<T> source, double factor) where T : class
+    public T SampleExponential<T>(IEnumerable<T> source, double factor) 
     {
         if (!source.Any())
         {
-            return null;
+            throw new InvalidOperationException("Sample from empty list");
         }
 
         factor = Math.Clamp(factor, 0.1, 1.0);

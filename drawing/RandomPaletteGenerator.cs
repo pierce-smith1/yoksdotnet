@@ -5,24 +5,26 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.drawing;
 
-public class RandomPaletteGenerator(Random _rng)
+public class RandomPaletteGenerator(Random rng)
 {
+    private readonly RandomSampler _sampler = new(rng);
+
     public List<Palette> Generate(int amount)
     {
         var parameters = new PaletteGenerationParameters(
             BaseColor: GetRandomSaturatedColor(),
-            ColorScrambleIntensity: Interp.Power(_rng.NextDouble(), 1.5, 0.0, 1.0, 0.0, 1.0),
+            ColorScrambleIntensity: Interp.Power(rng.NextDouble(), 1.5, 0.0, 1.0, 0.0, 1.0),
             AnomalyChances: new()
             {
-                [PaletteAnomaly.Crystalline] = _rng.NextDouble() < (1.0 / 50.0) ? 1.0 : 0.1,
-                [PaletteAnomaly.DarkEyes] = _rng.NextDouble() < (1.0 / 50.0) ? 1.0 : 0.1,
+                [PaletteAnomaly.Crystalline] = rng.NextDouble() < (1.0 / 50.0) ? 1.0 : 0.1,
+                [PaletteAnomaly.DarkEyes] = rng.NextDouble() < (1.0 / 50.0) ? 1.0 : 0.1,
             },
             ColoringStyleWeights: new()
             {
-                [PaletteColoringStyle.AllNeutral] = _rng.NextDouble() < (1.0 / 50.0) ? 100.0 : 1.0,
-                [PaletteColoringStyle.NeutralHorns] = _rng.NextDouble() < (1.0 / 50.0) ? 100.0 : 3.0,
-                [PaletteColoringStyle.NeutralScales] = _rng.NextDouble() < (1.0 / 50.0) ? 100.0 : 1.0,
-                [PaletteColoringStyle.AllColored] = _rng.NextDouble() < (1.0 / 50.0) ? 100.0 : 0.5,
+                [PaletteColoringStyle.AllNeutral] = rng.NextDouble() < (1.0 / 50.0) ? 100.0 : 1.0,
+                [PaletteColoringStyle.NeutralHorns] = rng.NextDouble() < (1.0 / 50.0) ? 100.0 : 3.0,
+                [PaletteColoringStyle.NeutralScales] = rng.NextDouble() < (1.0 / 50.0) ? 100.0 : 1.0,
+                [PaletteColoringStyle.AllColored] = rng.NextDouble() < (1.0 / 50.0) ? 100.0 : 0.5,
             }
         );
 
@@ -68,13 +70,13 @@ public class RandomPaletteGenerator(Random _rng)
             "ii",
         ];
 
-        var nextIsConsonant = _rng.NextDouble() < 0.5;
-        var phonemeCount = (int)Interp.Sqrt(_rng.NextDouble(), 0.0, 1.0, 2.0, 6.0);
+        var nextIsConsonant = rng.NextDouble() < 0.5;
+        var phonemeCount = (int)Interp.Sqrt(rng.NextDouble(), 0.0, 1.0, 2.0, 6.0);
 
         var name = "";
         for (int i = 0; i < phonemeCount; i++)
         {
-            name += nextIsConsonant ? consonants.Sample(_rng) : vowels.Sample(_rng);
+            name += nextIsConsonant ? _sampler.Sample(consonants) : _sampler.Sample(vowels);
             nextIsConsonant = !nextIsConsonant;
         }
 
@@ -83,18 +85,17 @@ public class RandomPaletteGenerator(Random _rng)
 
     private RgbColor GetRandomSaturatedColor()
     {
-        var h = _rng.NextDouble() * 360;
-        var s = Interp.Linear(_rng.NextDouble(), 0.0, 1.0, 30.0, 50.0);
-        var l = Interp.Linear(_rng.NextDouble(), 0.0, 1.0, 30.0, 70.0);
+        var h = rng.NextDouble() * 360;
+        var s = Interp.Linear(rng.NextDouble(), 0.0, 1.0, 30.0, 50.0);
+        var l = Interp.Linear(rng.NextDouble(), 0.0, 1.0, 30.0, 70.0);
 
-        var color = RgbColor.FromHsl(h, s, l);
+        var color = ColorConverter.FromHsl(new(h, s, l));
         return color;
     }
 
     private Palette GeneratePalette(PaletteGenerationParameters parameters)
     {
-        var coloringStyle = Enum.GetValues<PaletteColoringStyle>()
-            .SampleWeighted(s => parameters.ColoringStyleWeights[s], _rng);
+        var coloringStyle = _sampler.SampleWeighted(Enum.GetValues<PaletteColoringStyle>(), s => parameters.ColoringStyleWeights[s]);
 
         var (scalesBase, hornsBase) = coloringStyle switch
         {
@@ -105,28 +106,31 @@ public class RandomPaletteGenerator(Random _rng)
             _ => throw new NotImplementedException(),
         };
 
-        var palette = new Palette(
-            s: scalesBase,
-            sh: LightenColor(scalesBase),
-            ss: DarkenColor(scalesBase),
-            h: hornsBase,
-            hs: DarkenColor(hornsBase),
-            e: DarkenColor(GenerateBaseColor(parameters)),
-            w: WhitenColor(scalesBase)
-        );
+        var palette = new Palette 
+        { 
+            scales = scalesBase,
+            scalesHighlight = LightenColor(scalesBase),
+            scalesShadow = DarkenColor(scalesBase),
+            horns = hornsBase,
+            hornsShadow = DarkenColor(hornsBase),
+            eyes = DarkenColor(GenerateBaseColor(parameters)),
+            whites = WhitenColor(scalesBase)
+        };
 
         var anomalies = Enum.GetValues<PaletteAnomaly>()
-            .Where(a => _rng.NextDouble() < parameters.AnomalyChances.GetValueOrDefault(a));
+            .Where(a => rng.NextDouble() < parameters.AnomalyChances.GetValueOrDefault(a));
 
         if (anomalies.Contains(PaletteAnomaly.Crystalline))
         {
-            var crystalPalette = new Palette(palette)
+            var crystalPalette = new Palette
             {
-                ScalesHighlight = palette.ScalesShadow,
-                ScalesShadow = palette.ScalesHighlight,
-
-                Horns = palette.HornsShadow,
-                HornsShadow = palette.Horns
+                scales = palette.scales,
+                scalesHighlight = palette.scalesShadow,
+                scalesShadow = palette.scalesHighlight,
+                horns = palette.hornsShadow,
+                hornsShadow = palette.horns,
+                eyes = palette.eyes,
+                whites = palette.whites,
             };
 
             palette = crystalPalette;
@@ -134,8 +138,8 @@ public class RandomPaletteGenerator(Random _rng)
 
         if (anomalies.Contains(PaletteAnomaly.DarkEyes))
         {
-            palette.Whites = new RgbColor(0, 0, 0);
-            palette.Eyes = LightenColor(GenerateBaseColor(parameters));
+            palette.whites = new RgbColor(0, 0, 0);
+            palette.eyes = LightenColor(GenerateBaseColor(parameters));
         }
 
         return palette;
@@ -149,7 +153,8 @@ public class RandomPaletteGenerator(Random _rng)
 
     private RgbColor GenerateNeutralColor(PaletteGenerationParameters parameters)
     {
-        var neutralBase = RgbColor.FromHsl(0.0, 0.0, Interp.Linear(_rng.NextDouble(), 0.0, 1.0, 30.0, 70.0));
+        var lightness = Interp.Linear(rng.NextDouble(), 0.0, 1.0, 30.0, 70.0);
+        var neutralBase = ColorConverter.FromHsl(new(0.0, 0.0, lightness));
         var neutralColor = ScrambleColor(neutralBase, 0.2);
         return neutralColor;
     }
@@ -172,40 +177,40 @@ public class RandomPaletteGenerator(Random _rng)
 
         var min = Math.Max(value - scrambleRange + Math.Max(value + scrambleRange - 255, 0), 0);
         var max = Math.Min(value + scrambleRange - Math.Min(value - scrambleRange + 255, 0), 255);
-        var newValue = Interp.Linear(_rng.NextDouble(), 0.0, 1.0, min, max);
+        var newValue = Interp.Linear(rng.NextDouble(), 0.0, 1.0, min, max);
 
         return (byte)Math.Clamp(Math.Round(newValue), 0, 255);
     }
 
     private RgbColor DarkenColor(RgbColor color)
     {
-        var (h, s, l) = color.ToHsl();
+        var (h, s, l) = ColorConverter.ToHsl(color);
 
         h = ShiftHueTowards(hue: h, target: 240.0, factor: 1.2);
         l /= 2;
 
-        var newColor = RgbColor.FromHsl(h, s, l);
+        var newColor = ColorConverter.FromHsl(new(h, s, l));
         return newColor;
     }
 
     private RgbColor LightenColor(RgbColor color)
     {
-        var (h, s, l) = color.ToHsl();
+        var (h, s, l) = ColorConverter.ToHsl(color);
 
         h = ShiftHueTowards(hue: h, target: 50.0, factor: 1.2);
         l = Interp.Linear(l, 0.0, 100.0, 50.0, 100.0);
 
-        var newColor = RgbColor.FromHsl(h, s, l);
+        var newColor = ColorConverter.FromHsl(new(h, s, l));
         return newColor;
     }
 
     private RgbColor WhitenColor(RgbColor color)
     {
-        var (h, s, l) = color.ToHsl();
+        var (h, s, l) = ColorConverter.ToHsl(color);
 
         l = Interp.Linear(l, 0.0, 100.0, 90.0, 100.0);
 
-        var newColor = RgbColor.FromHsl(h, s, l);
+        var newColor = ColorConverter.FromHsl(new(h, s, l));
         return newColor;
     }
 

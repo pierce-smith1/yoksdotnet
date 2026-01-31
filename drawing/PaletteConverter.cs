@@ -6,6 +6,22 @@ namespace yoksdotnet.drawing;
 
 public static class PaletteConverter
 {
+    public static Palette Copy(Palette palette)
+    {
+        var copy = new Palette
+        {
+            scales = palette.scales,
+            scalesHighlight = palette.scalesHighlight,
+            scalesShadow = palette.scalesShadow,
+            horns = palette.horns,
+            hornsShadow = palette.hornsShadow,
+            eyes = palette.eyes,
+            whites = palette.whites,
+        };
+
+        return copy;
+    }
+
     public static SKPaint ToSkPaint(Palette palette)
     {
         var identityTable = Enumerable.Range(0, 256).Select(i => (byte)i);
@@ -35,13 +51,13 @@ public static class PaletteConverter
     {
         var palette = new Palette
         {
-            scales = ColorConverter.FromHex(s),
-            scalesHighlight = ColorConverter.FromHex(sh),
-            scalesShadow = ColorConverter.FromHex(ss),
-            horns = ColorConverter.FromHex(h),
-            hornsShadow = ColorConverter.FromHex(hs),
-            eyes = ColorConverter.FromHex(e),
-            whites = ColorConverter.FromHex(w),
+            scales = ColorConverter.FromHexCertain(s),
+            scalesHighlight = ColorConverter.FromHexCertain(sh),
+            scalesShadow = ColorConverter.FromHexCertain(ss),
+            horns = ColorConverter.FromHexCertain(h),
+            hornsShadow = ColorConverter.FromHexCertain(hs),
+            eyes = ColorConverter.FromHexCertain(e),
+            whites = ColorConverter.FromHexCertain(w),
         };
 
         return palette;
@@ -51,13 +67,13 @@ public static class PaletteConverter
     {
         var palette = new PredefinedPalette(name, group)
         {
-            scales = ColorConverter.FromHex(s),
-            scalesHighlight = ColorConverter.FromHex(sh),
-            scalesShadow = ColorConverter.FromHex(ss),
-            horns = ColorConverter.FromHex(h),
-            hornsShadow = ColorConverter.FromHex(hs),
-            eyes = ColorConverter.FromHex(e),
-            whites = ColorConverter.FromHex(w),
+            scales = ColorConverter.FromHexCertain(s),
+            scalesHighlight = ColorConverter.FromHexCertain(sh),
+            scalesShadow = ColorConverter.FromHexCertain(ss),
+            horns = ColorConverter.FromHexCertain(h),
+            hornsShadow = ColorConverter.FromHexCertain(hs),
+            eyes = ColorConverter.FromHexCertain(e),
+            whites = ColorConverter.FromHexCertain(w),
         };
 
         return palette;

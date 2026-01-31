@@ -25,7 +25,7 @@ public class SpriteGenerator(ScrOptions options, Random rng)
             var palette = _sampler.SampleExponential(selectedPalettes, 1.0 - (double)selectedPalettes.Count / totalPossibleCount);
             palette ??= Palette.DefaultPalette;
 
-            var newSprite = new Yokin
+            var newSprite = new Sprite
             {
                 id = _runningId++,
                 brand = rng.NextDouble(),
@@ -36,6 +36,12 @@ public class SpriteGenerator(ScrOptions options, Random rng)
                 width = Bitmap.BitmapSize(),
                 height = Bitmap.BitmapSize(),
                 angleRadians = 0.0,
+
+                addons = new SpriteAddons
+                {
+                    emotions = new(0.0, 0.0, 0.0),
+                    cachedPaint = PaletteConverter.ToSkPaint(palette),
+                }
             };
 
             sprites.Add(newSprite);

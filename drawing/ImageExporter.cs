@@ -1,6 +1,7 @@
 ﻿using SkiaSharp;
 using System;
 using System.IO;
+using yoksdotnet.drawing.painters;
 using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.drawing;

@@ -11,7 +11,7 @@ public class SpriteChoregrapher(Scene scene, ScrOptions options, Random rng)
     private readonly EmotionHandler _emotionHandler = new(scene, new(rng));
     private readonly RandomSampler _sampler = new(rng);
     private readonly PatternMover _mover = new(scene);
-    private readonly YokinShaker _yokinShaker = new(rng);
+    private readonly SpriteShaker _shaker = new(rng);
 
     public void HandleFrame()
     {
@@ -22,9 +22,8 @@ public class SpriteChoregrapher(Scene scene, ScrOptions options, Random rng)
 
         _mover.MoveByPattern(scene.currentPattern ?? Pattern.Lattice);
 
-        var yokins = scene.sprites.Where(s => s is Yokin).Cast<Yokin>();
-        _yokinShaker.ShakeYokins(yokins);
-        _emotionHandler.UpdateEmotions(yokins);
+        _shaker.ApplyEmotionShake(scene.sprites);
+        _emotionHandler.UpdateEmotions(scene.sprites);
     }
 
     public bool ShouldChangePattern()

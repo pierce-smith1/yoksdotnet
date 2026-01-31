@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
 using System;
@@ -14,91 +13,22 @@ using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using yoksdotnet.common;
 using yoksdotnet.drawing;
+using yoksdotnet.drawing.painters;
 using yoksdotnet.logic;
-using yoksdotnet.logic.scene;
 
 using Button = System.Windows.Controls.Button;
-using Point = (int X, int Y);
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace yoksdotnet.windows;
 
-public class PreviewSprite : Sprite
-{
-    public required Bitmap Bitmap { get; set; }
-    public required Palette Palette { get; set; }
-    public PaletteIndex? HoveredIndex { get; set; }
-
-    public override Bitmap GetBitmap() => Bitmap;
-    public override SKPaint GetPaint() 
-    {
-        if (HoveredIndex is null)
-        {
-            return Palette.GetPaint();
-        }
-
-        var hoveredPalette = new Palette(Palette);
-        hoveredPalette[HoveredIndex] = ToHoveredColor(Palette[HoveredIndex]);
-
-        return hoveredPalette.GetPaint();
-    }
-
-    private RgbColor ToHoveredColor(RgbColor c)
-    {
-        const int lightenAmount = 100;
-
-        var newColor = new RgbColor(
-            (byte)Math.Clamp(c.R + lightenAmount, 0, 255),
-            (byte)Math.Clamp(c.G + lightenAmount, 0, 255),
-            (byte)Math.Clamp(c.B + lightenAmount, 0, 255)
-        );
-        
-        return newColor;
-    }
-}
-
 public partial class PaletteCustomizer : Window
 {
-    private readonly SpritePainter _spritePainter;
-    private readonly PreviewSprite _currentSprite;
     private readonly RandomPaletteGenerator _randomPaletteGenerator = new(new());
-
-    public readonly Palette GhostPalette = new(
-        "#aaaaaa",
-        "#aaaaaa",
-        "#aaaaaa",
-        "#aaaaaa",
-        "#aaaaaa",
-        "#cccccc",
-        "#aaaaaa"
-    );
-
-    private readonly SKRuntimeEffect _colorSelectShader;
-    private readonly SKRuntimeEffectUniforms _colorSelectShaderUniforms;
-    private readonly Dictionary<PaletteIndex, List<Point>> _paletteIndexRegions;
+    private readonly SpriteEditPreviewPainter _previewPainter = new(Bitmap.LkThumbsup); 
 
     public PaletteCustomizer(CustomPaletteSet set)
     {
         InitializeComponent();
-
-        _spritePainter = new SpritePainter();
-        _currentSprite = new PreviewSprite()
-        {
-            Id = 0,
-            Brand = 0,
-            Home = new(0, 0),
-            Offset = new(0, 0),
-            Scale = 1,
-            Width = Bitmap.BitmapSize(),
-            Height = Bitmap.BitmapSize(),
-            AngleRadians = 0.0,
-            Palette = ViewModel.SelectedEntry?.Id is { } paletteId 
-                ? ViewModel.GetEntryWithId(paletteId).Palette
-                : GhostPalette,
-            Bitmap = Bitmap.LkThumbsup,
-        };
-
-        _paletteIndexRegions = GetPaletteIndexRegionsFrom(_currentSprite.Bitmap.Resource);
 
         ViewModel.PropertyChanged += (s, e) =>
         {
@@ -122,46 +52,6 @@ public partial class PaletteCustomizer : Window
         ViewModel.PaletteToAdd = ViewModel.PredefinedPalettes.First();
         ViewModel.SetName = set.Name;
         ViewModel.SetId = set.Id;
-
-        _colorSelectShader = SKRuntimeEffect.Create(@"
-            uniform half2 resolution;
-            uniform half hue;
-
-            half mod(half a, half b) {
-                return a - b * floor(a / b);
-            }
-
-            half4 coord_to_rgb(vec2 coord) {
-                half h = hue;
-                half l = coord.x;
-                half s = coord.y;
-
-                half c = (1 - abs(2.0 * l - 1)) * s;
-                half x = c * (1 - abs(mod(h / 60, 2.0) - 1));
-                half m = l - c / 2.0;
-
-                if (h < 60.0) {
-                    return half4(c + m, x + m, m, 1.0);
-                } else if (h < 120.0) {
-                    return half4(x + m, c + m, m, 1.0);
-                } else if (h < 180.0) {
-                    return half4(m, c + m, x + m, 1.0);
-                } else if (h < 240.0) {
-                    return half4(m, x + m, c + m, 1.0);
-                } else if (h < 300.0) {
-                    return half4(x + m, m, c + m, 1.0);
-                } else {
-                    return half4(c + m, m, x + m, 1.0);
-                }
-            }
-
-            half4 main(vec2 coord) {
-                half4 rgb = coord_to_rgb(coord / resolution);
-                return half4(rgb.r, rgb.g, rgb.b, 1.0);
-            }
-        ", out var _errorText);
-
-        _colorSelectShaderUniforms = new(_colorSelectShader);
 
         ViewModel.SelectedEntry = ViewModel.PaletteEntries.FirstOrDefault();
 
@@ -249,53 +139,14 @@ public partial class PaletteCustomizer : Window
         }
 
         var thisPaletteEntry = ViewModel.PaletteEntries.Single(e => e.Id == paletteId);
-        var paletteCopy = new Palette(thisPaletteEntry.Palette);
+        var paletteCopy = PaletteConverter.Copy(thisPaletteEntry.Palette);
 
         var newEntry = ViewModel.AddPaletteView(thisPaletteEntry.Name, new(paletteCopy));
         ViewModel.SelectedEntry = newEntry;
     }
 
-    private Dictionary<PaletteIndex, List<Point>> GetPaletteIndexRegionsFrom(SKBitmap bitmap)
-    {
-        var indexes = SfEnums.GetAll<PaletteIndex>();
-
-        var regions = new Dictionary<PaletteIndex, List<Point>>();
-
-        for (var y = 0; y < bitmap.Height; y++)
-        {
-            for (var x = 0; x < bitmap.Width; x++)
-            {
-                var color = bitmap.GetPixel(x, y);
-                if (color.Alpha != 255)
-                {
-                    continue;
-                }
-
-                var index = indexes.FirstOrDefault(i => i.Luminance == color.Red);
-                if (index is null)
-                {
-                    continue;
-                }
-
-                regions.TryAdd(index, []);
-                regions[index].Add((x, y));
-            }
-        }
-
-        return regions;
-    }
-
     private void OnSelectedPaletteChanged()
     {
-        if (ViewModel.SelectedEntry?.Id is { } entryId)
-        {
-            _currentSprite.Palette = ViewModel.GetEntryWithId(entryId).Palette;
-        }
-        else
-        {
-            _currentSprite.Palette = GhostPalette;
-        }
-
         ViewModel.UpdateHsl();
         RefreshSurfaces();
     }
@@ -308,14 +159,7 @@ public partial class PaletteCustomizer : Window
 
     private void OnPaintPreview(object? sender, SKPaintGLSurfaceEventArgs e)
     {
-        var ctx = e.Surface.Canvas;
-
-        _currentSprite.Home.X = (ctx.LocalClipBounds.Width / 2) - (Bitmap.BitmapSize() / 2);
-        _currentSprite.Home.Y = (ctx.LocalClipBounds.Height / 2) - (Bitmap.BitmapSize() / 2);
-
-        ctx.Clear(new SKColor(0x11, 0x11, 0x11));
-
-        _spritePainter.Draw(ctx, _currentSprite);
+        _previewPainter.Draw(e.Surface.Canvas, ViewModel.SelectedEntry?.Palette);
     }
 
     private void OnPaintPreviewMouseUp(object? sender, MouseEventArgs e)
@@ -325,12 +169,12 @@ public partial class PaletteCustomizer : Window
             return;
         }
 
-        if (_currentSprite.HoveredIndex is null)
+        if (_previewPainter.HoveredIndex is null)
         {
             return;
         }
 
-        ViewModel.SelectedIndex = _currentSprite.HoveredIndex;
+        ViewModel.SelectedIndex = _previewPainter.HoveredIndex;
 
         ViewModel.UpdateHsl();
         RefreshSurfaces();
@@ -348,24 +192,8 @@ public partial class PaletteCustomizer : Window
             return;
         }
 
-        var pos = (e.X, e.Y);
+        _previewPainter.UpdateHoveredIndex(e.X, e.Y, glControl.Width, glControl.Height);
 
-        foreach (var (index, points) in _paletteIndexRegions)
-        {
-            var offsetPoints = points.Select(p => (
-                p.X + glControl.Width / 2 - Bitmap.BitmapSize() / 2,
-                p.Y + glControl.Height / 2 - Bitmap.BitmapSize() / 2
-            ));
-
-            if (offsetPoints.Contains(pos))
-            {
-                _currentSprite.HoveredIndex = index;
-                RefreshSurfaces();
-                return;
-            }
-        }
-
-        _currentSprite.HoveredIndex = null;
         RefreshSurfaces();
     }
 
@@ -384,22 +212,6 @@ public partial class PaletteCustomizer : Window
         ViewModel.SelectedEntry = ViewModel.GetEntryWithId(entryId);
     }
 
-    private (float, float) ColorSelectCoordToSl(float x, float y, float width, float height)
-    {
-        var saturation = (float)Interp.Linear(y, 0, height, 0, 100);
-        var lightness = (float)Interp.Linear(x, 0, width, 0, 100);
-
-        return (saturation, lightness);
-    }
-
-    private (float, float) SlToColorSelectCoord(float saturation, float lightness, float width, float height)
-    {
-        var x = (float)Interp.Linear(lightness, 0, 100, 0, width);
-        var y = (float)Interp.Linear(saturation, 0, 100, 0, height);
-
-        return (x, y);
-    }
-
     private void OnPaintColorSelect(object? sender, SKPaintGLSurfaceEventArgs e)
     {
         var ctx = e.Surface.Canvas;
@@ -410,39 +222,7 @@ public partial class PaletteCustomizer : Window
             return;
         }
 
-        _colorSelectShaderUniforms["resolution"] = new float[] {e.Info.Width, e.Info.Height};
-        _colorSelectShaderUniforms["hue"] = ViewModel.Hue;
-        var selectPaint = new SKPaint()
-        {
-            Shader = _colorSelectShader.ToShader(isOpaque: true, uniforms: _colorSelectShaderUniforms),
-        };
-
-        ctx.DrawRect(0, 0, e.Info.Width, e.Info.Height, selectPaint);
-
-        const float selectedBoxSize = 30;
-
-        var (selectedX, selectedY) = SlToColorSelectCoord(ViewModel.Saturation, ViewModel.Lightness, e.Info.Width, e.Info.Height);
-
-        var selectedBoxFill = new SKPaint()
-        {
-            Color = SKColor.FromHsl(ViewModel.Hue, ViewModel.Saturation, ViewModel.Lightness),
-        };
-
-        var selectedBoxStroke = new SKPaint()
-        {
-            Color = SKColors.White,
-            Style = SKPaintStyle.Stroke,
-        };
-
-        var selectedBoxBounds = SKRect.Create(
-            x: selectedX - selectedBoxSize / 2,
-            y: selectedY - selectedBoxSize / 2,
-            width: selectedBoxSize,
-            height: selectedBoxSize
-        );
-
-        ctx.DrawRect(selectedBoxBounds, selectedBoxFill);
-        ctx.DrawRect(selectedBoxBounds, selectedBoxStroke);
+        ColorSelectPainter.Draw(ctx, new(ViewModel.Hue, ViewModel.Saturation, ViewModel.Lightness));
     }
 
     private void OnColorSelectMouseMove(object? sender, MouseEventArgs e)
@@ -462,7 +242,7 @@ public partial class PaletteCustomizer : Window
             return;
         }
 
-        var (saturation, lightness) = ColorSelectCoordToSl(e.X, e.Y, glControl.Width, glControl.Height);
+        var (saturation, lightness) = SlXyConverter.CoordToSl(e.X, e.Y, glControl.Width, glControl.Height);
 
         ViewModel.Saturation = saturation;
         ViewModel.Lightness = lightness;
@@ -568,13 +348,13 @@ public partial class PaletteCustomizer : Window
         var hex = textBox.Text;
         ViewModel.CurrentHex = hex;
 
-        var inputColor = RgbColor.FromHex(hex);
+        var inputColor = ColorConverter.FromHex(hex);
         if (inputColor is null)
         {
             return;
         }
 
-        entry.Palette[ViewModel.SelectedIndex] = inputColor;
+        entry.Palette[ViewModel.SelectedIndex] = inputColor.Value;
         ViewModel.UpdateHsl();
     }
 }
@@ -701,7 +481,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         }
     }
 
-    public bool IsValidHex => RgbColor.FromHex(CurrentHex) is not null;
+    public bool IsValidHex => ColorConverter.FromHex(CurrentHex) is not null;
 
     public void UpdateHsl()
     {
@@ -710,7 +490,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
             return;
         }
 
-        var (h, s, l) = SelectedEntry.PaletteView[SelectedIndex].ToHsl();
+        var (h, s, l) = ColorConverter.ToHsl(SelectedEntry.PaletteView[SelectedIndex]);
 
         Hue = (float)h;
         Saturation = (float)s;
@@ -719,14 +499,14 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
 
     public void UpdateHex()
     {
-        CurrentHex = RgbColor.FromHsl(Hue, Saturation, Lightness).ToHex();
+        CurrentHex = ColorConverter.ToHex(ColorConverter.FromHsl(new(Hue, Saturation, Lightness)));
     }
 
     public void UpdatePalette()
     {
         if (SelectedEntry is { } selectedEntry)
         {
-            selectedEntry.PaletteView[SelectedIndex] = RgbColor.FromHsl(Hue, Saturation, Lightness);
+            selectedEntry.PaletteView[SelectedIndex] = ColorConverter.FromHsl(new(Hue, Saturation, Lightness));
             OnPropertyChanged(nameof(PaletteEntries));
         }
     }

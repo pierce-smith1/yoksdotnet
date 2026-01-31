@@ -5,7 +5,7 @@ namespace yoksdotnet.drawing;
 
 public static class ColorConverter
 {
-    public static RgbColor FromHex(string hex)
+    public static RgbColor? FromHex(string hex)
     {
         hex = hex.Trim();
 
@@ -14,13 +14,13 @@ public static class ColorConverter
             hex = hex[1..];
         }
 
+        if (hex.Length != 6)
+        {
+            return null;
+        }
+
         try
         {
-            if (hex.Length != 6)
-            {
-                throw new InvalidOperationException($"Color hex code '{hex}' is not valid");
-            }
-
             var red = Convert.ToByte(hex[..2], 16);
             var green = Convert.ToByte(hex[2..4], 16);
             var blue = Convert.ToByte(hex[4..6], 16);
@@ -29,9 +29,22 @@ public static class ColorConverter
         } 
         catch (FormatException)
         {
-            throw new InvalidOperationException($"Color hex code '{hex}' is not valid");
+            return null;
         }
     }
+
+    public static RgbColor FromHexCertain(string hex)
+    {
+        var color = FromHex(hex);
+
+        if (color is null)
+        {
+            throw new FormatException($"Hex color code '{hex}' is not valid");
+        }
+
+        return color.Value;
+    }
+
     public static string ToHex(RgbColor color)
     {
         var hex = $"#{color.R:x2}{color.G:x2}{color.B:x2}";

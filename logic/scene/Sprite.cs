@@ -1,9 +1,7 @@
-﻿using SkiaSharp;
-using System;
+﻿using System;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
-
 
 public class Sprite
 {
@@ -19,6 +17,8 @@ public class Sprite
     public double height = Bitmap.BitmapSize();
     public double angleRadians = 0.0;
 
+    public SpriteAddons addons = new();
+
     public Point FinalPos => new(home.X + offset.X, home.Y + offset.Y);
     public (Point topLeft, Point bottomRight) Bounds
     {
@@ -32,14 +32,4 @@ public class Sprite
     }
 }
 
-public class Yokin : Sprite
-{
-    public EmotionVector emotions = new(0.0, 0.0, 0.0);
-}
-
 public record struct Point(double X, double Y);
-
-public record struct EmotionVector(double Ambition, double Empathy, double Optimism)
-{
-    public readonly double Magnitude => Math.Sqrt(Ambition * Ambition + Empathy * Empathy + Optimism * Optimism);
-}

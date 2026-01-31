@@ -8,8 +8,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
-
-using yoksdotnet.drawing;
+using yoksdotnet.drawing.painters;
 using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
 
@@ -38,13 +37,6 @@ public partial class DisplayWindow : Window
 
     private DisplayMode _displayMode;
     private ScenePainter _scenePainter;
-
-    public record DisplayMode()
-    {
-        public record Debug(OptionsWindow? DebugOptionsWindow) : DisplayMode();
-        public record Screensaver() : DisplayMode();
-        public record Preview(nint parentHandle) : DisplayMode();
-    }
 
     public DisplayWindow(DisplayMode mode)
     {
@@ -209,3 +201,11 @@ public partial class DisplayWindow : Window
         System.Windows.Application.Current.Shutdown();
     }
 }
+
+public record DisplayMode()
+{
+    public record Debug(OptionsWindow? DebugOptionsWindow) : DisplayMode();
+    public record Screensaver() : DisplayMode();
+    public record Preview(nint parentHandle) : DisplayMode();
+}
+

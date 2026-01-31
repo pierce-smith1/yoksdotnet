@@ -4,13 +4,18 @@ namespace yoksdotnet.logic.scene;
 
 public class EmotionHandler(Scene scene, PerlinNoiseGenerator noiseGenerator)
 {
-    public void UpdateEmotions(IEnumerable<Yokin> yokins)
+    public void UpdateEmotions(IEnumerable<Sprite> sprites)
     {
-        foreach (var yokin in yokins)
+        foreach (var sprite in sprites)
         {
-            yokin.emotions.Ambition = GetNoiseForSprite(yokin, 0.0);
-            yokin.emotions.Empathy = GetNoiseForSprite(yokin, 1000.0);
-            yokin.emotions.Optimism = GetNoiseForSprite(yokin, 2000.0);
+            if (sprite.addons.emotions is not { } emotions)
+            {
+                continue;
+            }
+
+            emotions.ambition = GetNoiseForSprite(sprite, 0.0);
+            emotions.empathy = GetNoiseForSprite(sprite, 1000.0);
+            emotions.optimism = GetNoiseForSprite(sprite, 2000.0);
         }
     }
 

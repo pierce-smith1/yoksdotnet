@@ -1,10 +1,9 @@
 ﻿using SkiaSharp;
 
 using System.Collections.Generic;
-
 using yoksdotnet.logic.scene;
 
-namespace yoksdotnet.drawing;
+namespace yoksdotnet.drawing.painters;
 
 public static class DebugPainter
 {
