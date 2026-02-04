@@ -17,6 +17,16 @@ public class RandomSampler(Random rng)
         return source.ElementAt(index);
     }
 
+    public T? SampleOrDefault<T>(IEnumerable<T> source)
+    {
+        if (!source.Any())
+        {
+            return default;
+        }
+
+        return Sample(source);
+    }
+
     public T SampleWeighted<T>(IEnumerable<T> source, Func<T, double> weightProvider)
     {
         if (!source.Any())

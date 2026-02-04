@@ -46,7 +46,7 @@ public class PatternMover(Scene scene)
         var xInBounds = bounds.bottomRight.X >= 0 && bounds.topLeft.X <= scene.width;
         var yInBounds = bounds.bottomRight.Y >= 0 && bounds.topLeft.Y <= scene.height;
 
-        if (!yInBounds || !xInBounds)
+        if (yInBounds && xInBounds)
         {
             return;
         }

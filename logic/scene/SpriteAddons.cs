@@ -10,6 +10,7 @@ public class SpriteAddons
     public EmotionVector? emotions = null;
     public SKPaint? cachedPaint = null;
 }
+
 public class EmotionVector(double ambition, double empathy, double optimism)
 {
     public double ambition = ambition;

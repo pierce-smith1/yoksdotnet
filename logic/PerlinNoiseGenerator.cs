@@ -61,19 +61,19 @@ public class PerlinNoiseGenerator
         return result;
     }
 
-    private double Fade(double t)
+    private static double Fade(double t)
     {
         var result = t * t * t * (t * (t * 6 - 15) + 10);
         return result;
     }
 
-    private double Lerp(double t, double a, double b)
+    private static double Lerp(double t, double a, double b)
     {
         var result = a + t * (b - a);
         return result;
     }
 
-    private double Grad(int hash, double x, double y, double z)
+    private static double Grad(int hash, double x, double y, double z)
     {
         int direction = hash & 15;
         

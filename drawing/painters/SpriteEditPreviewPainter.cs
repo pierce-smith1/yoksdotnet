@@ -14,8 +14,6 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
     private readonly PaletteIndexRegions _paletteIndexRegions = ComputeIndexRegions(bitmap.Resource);
     private readonly Sprite _previewSprite = new()
     {
-        id = 0,
-        brand = 0.0,
         palette = Palette.DefaultPalette,
     };
 

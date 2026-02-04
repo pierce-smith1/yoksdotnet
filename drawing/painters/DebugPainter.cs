@@ -42,10 +42,10 @@ public static class DebugPainter
 
     private static List<string> InfoToReport(Sprite sprite)
     {
-        return sprite is Yokin yokin ?
-        [
-            $"X: {yokin.home.X}",
-            $"Y: {yokin.home.Y}",
-        ] : [];
+        return [
+            $"A: {sprite.addons.emotions?.ambition}",
+            $"E: {sprite.addons.emotions?.empathy}",
+            $"O: {sprite.addons.emotions?.optimism}",
+        ];
     }
 }

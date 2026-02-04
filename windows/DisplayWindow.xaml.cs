@@ -1,6 +1,7 @@
 ﻿using SkiaSharp.Views.Desktop;
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -16,8 +17,6 @@ namespace yoksdotnet.windows;
 
 public partial class DisplayWindow : Window
 {
-    #region Win32 interop defs
-
     [DllImport("user32.dll")]
     static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
@@ -30,13 +29,12 @@ public partial class DisplayWindow : Window
     [DllImport("user32.dll")]
     static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
 
-    #endregion
+    private readonly int _animationFps = 60;
+    private readonly Scene _scene;
 
-    public Scene? Scene { get; private set; }
-    public int DesiredFps { get; private set; } = 60;
-
-    private DisplayMode _displayMode;
-    private ScenePainter _scenePainter;
+    private readonly DisplayMode _displayMode;
+    private readonly ScenePainter _scenePainter;
+    private readonly SceneSimulator _simulator;
 
     public DisplayWindow(DisplayMode mode)
     {
@@ -58,18 +56,13 @@ public partial class DisplayWindow : Window
                 break;
         }
 
-        Scene = new
-        (
-            options: GetOptions(),
-            width: (int)Width,
-            height: (int)Height
-        );
+        var rng = GetRng();
+        var options = GetOptions();
 
-        _scenePainter = new()
-        {
-            Scene = Scene,
-            DisplayMode = mode,
-        };
+        _scene = SceneCreation.NewScene(options, rng, (int)Width, (int)Height);
+
+        _scenePainter = new(_scene, mode);
+        _simulator = new(_scene, options, rng);
 
         StartLoop();
     }
@@ -113,12 +106,12 @@ public partial class DisplayWindow : Window
     {
         MainCanvas.Child.MouseUp += (s, e) =>
         {
-            var clickedSprite = Scene?.Sprites?.FirstOrDefault(sprite =>
+            var clickedSprite = _scene.sprites.FirstOrDefault(sprite =>
             {
-                var bounds = sprite.GetBounds();
+                var bounds = sprite.Bounds;
 
-                var mouseXIntersects = e.X > bounds.TopLeft.X && e.X < bounds.BotRight.X;
-                var mouseYIntersects = e.Y > bounds.TopLeft.Y && e.Y < bounds.BotRight.Y;
+                var mouseXIntersects = e.X > bounds.topLeft.X && e.X < bounds.bottomRight.X;
+                var mouseYIntersects = e.Y > bounds.topLeft.Y && e.Y < bounds.bottomRight.Y;
 
                 return mouseXIntersects && mouseYIntersects;
             });
@@ -128,19 +121,47 @@ public partial class DisplayWindow : Window
 
         if (debugOptionsWindow is not null)
         {
-            var rngSeed = Guid.NewGuid().GetHashCode();
-
             var viewModel = debugOptionsWindow.ViewModel;
             var debugOptions = viewModel.BackingOptions;
 
             viewModel.PropertyChanged += (s, e) =>
             {
-                if (Scene is not null && ScrOptions.PropertyRequiresSceneRefresh(e.PropertyName ?? ""))
+                if (PropertyRequiresSceneRefresh(e.PropertyName ?? ""))
                 {
-                    Scene.Refresh(debugOptions, (int)Width, (int)Height, rngSeed);
+                    RefreshScene();
                 }
             };
         }
+    }
+
+    private void RefreshScene()
+    {
+        var newScene = SceneCreation.NewScene(GetOptions(), GetRng(), (int)Width, (int)Height);
+
+        _scene.frame = newScene.frame;
+        _scene.seconds = newScene.seconds;
+        _scene.lastDtMs = newScene.lastDtMs;
+        _scene.lastTick = newScene.lastTick;
+        _scene.currentPattern = newScene.currentPattern;
+        _scene.patternLastChangedAt = newScene.patternLastChangedAt;
+        _scene.sprites = newScene.sprites;
+        _scene.width = newScene.width;
+        _scene.height = newScene.height;
+    }
+
+    private bool PropertyRequiresSceneRefresh(string propertyName)
+    {
+        List<string> propertiesRequiringRefresh = [
+            nameof(ScrOptions.FamilyDiversity),
+            nameof(ScrOptions.FamilySize),
+            nameof(ScrOptions.FamilyImpostorDensity),
+            nameof(ScrOptions.FamilyPaletteChoice),
+            nameof(ScrOptions.IndividualScale),
+            nameof(ScrOptions.IndividualEmotionScale),
+            nameof(ScrOptions.AnimationStartingPattern),
+        ];
+
+        return propertiesRequiringRefresh.Contains(propertyName);
     }
 
     private ScrOptions GetOptions()
@@ -150,12 +171,12 @@ public partial class DisplayWindow : Window
             return debugMode.DebugOptionsWindow.ViewModel.BackingOptions;
         }
 
-        var savedOptions = _optionsSaver.Load();
+        var savedOptions = OptionsStore.Load();
 
         if (savedOptions is null)
         {
             var defaultOptions = new ScrOptions();
-            _optionsSaver.Save(defaultOptions);
+            OptionsStore.Save(defaultOptions);
             
             return defaultOptions;
         }
@@ -163,16 +184,26 @@ public partial class DisplayWindow : Window
         return savedOptions;
     }
 
+    private Random GetRng()
+    {
+        if (_displayMode is DisplayMode.Debug debugMode && debugMode.DebugOptionsWindow is not null)
+        {
+            return new Random(2270);
+        }
+
+        return new Random();
+    }
+
     private void StartLoop()
     {
-        var loopTimer = new System.Timers.Timer(1000 / DesiredFps);
+        var loopTimer = new System.Timers.Timer(1000 / _animationFps);
         loopTimer.Elapsed += OnTick;
         loopTimer.Start();
     }
     
-    private void OnTick(object? sender, ElapsedEventArgs e)
+    private void OnTick(object? _sender, ElapsedEventArgs _e)
     {
-        Scene?.TickFrame();
+        _simulator.TickSimulation();
         RefreshSurface();
     }
 

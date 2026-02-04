@@ -192,14 +192,14 @@ public partial class OptionsWindow : Window
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
                 .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == importedSet.Id);
 
-            _optionsSaver.SaveCustomPalettes(ViewModel.CustomPalettes);
+            OptionsStore.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
         else
         {
             ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.FamilyPaletteChoice);
         }
 
-        _optionsSaver.Save(ViewModel.BackingOptions);
+        OptionsStore.Save(ViewModel.BackingOptions);
     }
 }
 
@@ -375,8 +375,8 @@ public class OptionsViewModel : INotifyPropertyChanged
     ];
 
     public List<PatternChoice> PatternChoices => [
-        ..AnimationPossiblePatterns.Select(p => new PatternChoice.SinglePattern(p)),
-        new PatternChoice.Random(),
+        ..AnimationPossiblePatterns.Select(p => new SinglePatternChoice(p)),
+        new RandomPatternChoice(),
     ];
 
     public ScrOptions BackingOptions { get; set; } = new();

@@ -11,10 +11,10 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 
     public RgbColor Scales
     {
-        get => _backingPalette.Scales;
+        get => _backingPalette.scales;
         set 
         {
-            _backingPalette.Scales = value;
+            _backingPalette.scales = value;
             OnPropertyChanged(nameof(Scales));
             OnPropertyChanged(nameof(ScalesHex));
         }
@@ -22,10 +22,10 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 
     public RgbColor ScalesHighlight
     {
-        get => _backingPalette.ScalesHighlight;
+        get => _backingPalette.scalesHighlight;
         set 
         {
-            _backingPalette.ScalesHighlight = value;
+            _backingPalette.scalesHighlight = value;
             OnPropertyChanged(nameof(ScalesHighlight));
             OnPropertyChanged(nameof(ScalesHighlightHex));
         }
@@ -33,10 +33,10 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 
     public RgbColor ScalesShadow
     {
-        get => _backingPalette.ScalesShadow;
+        get => _backingPalette.scalesShadow;
         set 
         {
-            _backingPalette.ScalesShadow = value;
+            _backingPalette.scalesShadow = value;
             OnPropertyChanged(nameof(ScalesShadow));
             OnPropertyChanged(nameof(ScalesShadowHex));
         }
@@ -44,10 +44,10 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 
     public RgbColor Horns
     {
-        get => _backingPalette.Horns;
+        get => _backingPalette.horns;
         set 
         {
-            _backingPalette.Horns = value;
+            _backingPalette.horns = value;
             OnPropertyChanged(nameof(Horns));
             OnPropertyChanged(nameof(HornsHex));
         }
@@ -55,10 +55,10 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 
     public RgbColor Eyes
     {
-        get => _backingPalette.Eyes;
+        get => _backingPalette.eyes;
         set 
         {
-            _backingPalette.Eyes = value;
+            _backingPalette.eyes = value;
             OnPropertyChanged(nameof(Eyes));
             OnPropertyChanged(nameof(EyesHex));
         }
@@ -66,10 +66,10 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 
     public RgbColor Whites
     {
-        get => _backingPalette.Whites;
+        get => _backingPalette.whites;
         set
         {
-            _backingPalette.Whites = value;
+            _backingPalette.whites = value;
             OnPropertyChanged(nameof(Whites));
             OnPropertyChanged(nameof(WhitesHex));
         }
@@ -77,10 +77,10 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
 
     public RgbColor HornsShadow
     {
-        get => _backingPalette.HornsShadow;
+        get => _backingPalette.hornsShadow;
         set
         {
-            _backingPalette.HornsShadow = value;
+            _backingPalette.hornsShadow = value;
             OnPropertyChanged(nameof(HornsShadow));
             OnPropertyChanged(nameof(HornsShadowHex));
         }
@@ -96,13 +96,13 @@ public class PaletteView(Palette _backingPalette) : INotifyPropertyChanged
             OnPropertyChanged($"{index.Name}Hex");
         }
     }
-    public string ScalesHex => Scales.ToHex();
-    public string ScalesHighlightHex => ScalesHighlight.ToHex();
-    public string ScalesShadowHex => ScalesShadow.ToHex();
-    public string HornsHex => Horns.ToHex();
-    public string EyesHex => Eyes.ToHex();
-    public string WhitesHex => Whites.ToHex();
-    public string HornsShadowHex => HornsShadow.ToHex();
+    public string ScalesHex => ColorConverter.ToHex(Scales);
+    public string ScalesHighlightHex => ColorConverter.ToHex(ScalesHighlight);
+    public string ScalesShadowHex => ColorConverter.ToHex(ScalesShadow);
+    public string HornsHex => ColorConverter.ToHex(Horns);
+    public string EyesHex => ColorConverter.ToHex(Eyes);
+    public string WhitesHex => ColorConverter.ToHex(Whites);
+    public string HornsShadowHex => ColorConverter.ToHex(HornsShadow);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

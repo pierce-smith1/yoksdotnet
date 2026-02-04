@@ -8,8 +8,6 @@ namespace yoksdotnet.drawing;
 
 public class ImageExporter(string _exportPath)
 {
-    private readonly SpritePainter _painter = new();
-
     public ImageExportResult Export(Bitmap bitmap, Palette palette)
     {
         try
@@ -24,7 +22,14 @@ public class ImageExporter(string _exportPath)
             var canvas = recorder.BeginRecording(SKRect.Create(size, size));
 
             canvas.Clear();
-            _painter.Draw(canvas, new SimpleSprite(bitmap, palette));
+            SpritePainter.Draw(canvas, new Sprite()
+            {
+                palette = palette,
+                addons = new()
+                {
+                    fixedBitmap = bitmap,
+                },
+            });
 
             var picture = recorder.EndRecording();
             var image = SKImage.FromPicture(picture, new SKSizeI(size, size));

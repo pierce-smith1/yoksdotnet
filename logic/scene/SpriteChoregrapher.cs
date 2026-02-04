@@ -8,7 +8,7 @@ namespace yoksdotnet.logic.scene;
 
 public class SpriteChoregrapher(Scene scene, ScrOptions options, Random rng)
 {
-    private readonly EmotionHandler _emotionHandler = new(scene, new(rng));
+    private readonly EmotionHandler _emotionHandler = new(scene, options, new(rng));
     private readonly RandomSampler _sampler = new(rng);
     private readonly PatternMover _mover = new(scene);
     private readonly SpriteShaker _shaker = new(rng);
@@ -33,12 +33,9 @@ public class SpriteChoregrapher(Scene scene, ScrOptions options, Random rng)
             return false;
         }
 
-        if (scene.patternLastChangedAt is null)
-        {
-            scene.patternLastChangedAt = DateTimeOffset.Now;
-        }
+        scene.patternLastChangedAt ??= DateTimeOffset.Now;
 
-        var shouldChange = DateTimeOffset.Now > scene.patternLastChangedAt?.AddSeconds(options.GetActualPatternChangeFrequencySeconds());
+        var shouldChange = DateTimeOffset.Now > scene.patternLastChangedAt?.AddSeconds(PatternChangeSeconds());
         return shouldChange;
     }
 
@@ -54,5 +51,11 @@ public class SpriteChoregrapher(Scene scene, ScrOptions options, Random rng)
 
         scene.currentPattern = _sampler.Sample(possiblePatterns);
         scene.patternLastChangedAt = DateTimeOffset.Now;
+    }
+
+    private double PatternChangeSeconds()
+    {
+        var seconds = Interp.Linear(options.AnimationPatternChangeFrequency, 0.0, 1.0, 90.0, 5.0);
+        return seconds;
     }
 }

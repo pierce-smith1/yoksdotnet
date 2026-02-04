@@ -14,13 +14,12 @@ public class SpriteGenerator(ScrOptions options, Random rng)
 
     private int _runningId = 0;
 
-
-    public IEnumerable<Sprite> Make(double spreadX = 1.0, double spreadY = 1.0)
+    public IEnumerable<Sprite> Make(double spreadX, double spreadY)
     {
         var sprites = new List<Sprite>();
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
-        for (var i = 0; i < options.GetActualSpriteCount(spreadX, spreadY); i++)
+        for (var i = 0; i < GetSpriteCount(spreadX, spreadY); i++)
         {
             var palette = _sampler.SampleExponential(selectedPalettes, 1.0 - (double)selectedPalettes.Count / totalPossibleCount);
             palette ??= Palette.DefaultPalette;
@@ -55,18 +54,16 @@ public class SpriteGenerator(ScrOptions options, Random rng)
         IEnumerable<Palette> possiblePalettes = options.FamilyPaletteChoice switch
         {
             PaletteChoice.SingleGroup choice =>
-                SfEnums.GetAll<PredefinedPalette>()
-                    .Where(pair => pair.Group == choice.Group),
+                SfEnums.GetAll<PredefinedPalette>().Where(pair => pair.Group == choice.Group),
 
             PaletteChoice.AllGroups =>
                 SfEnums.GetAll<PredefinedPalette>(),
 
             PaletteChoice.UserDefined(var setId, _) =>
-                options.CustomPalettes.FirstOrDefault(s => s.Id == setId)?.Entries
-                    .Select(e => e.Palette),
+                options.CustomPalettes.FirstOrDefault(s => s.Id == setId)?.Entries.Select(e => e.Palette),
 
             PaletteChoice.ImFeelingLucky =>
-                _randomPaletteGenerator.Generate(options.GetActualColorCount()),
+                _randomPaletteGenerator.Generate(GetColorCount()),
 
             _ => throw new NotImplementedException(),
         } ?? [Palette.DefaultPalette];
@@ -76,13 +73,41 @@ public class SpriteGenerator(ScrOptions options, Random rng)
             possiblePalettes = [Palette.DefaultPalette];
         }
 
-        var usableColorsCount = Math.Min(options.GetActualColorCount(), possiblePalettes.Count());
+        var usableColorsCount = Math.Min(GetColorCount(), possiblePalettes.Count());
 
         var selectedPalettes = possiblePalettes
             .OrderBy(x => rng.Next())
             .Take(usableColorsCount);
 
         return ([..selectedPalettes], possiblePalettes.Count());
+    }
+
+    private int GetSpriteCount(double width, double height)
+    {
+        var scalingFactor = Interp.Linear(options.FamilySize, 0.0, 1.0, 0.2, 1.0);
+
+        var count = (width / 64) * (height / 64) * scalingFactor;
+        return (int)count;
+    }
+
+    private int GetColorCount()
+    {
+        var maxColorCount = options.FamilyPaletteChoice switch
+        {
+            PaletteChoice.SingleGroup(PaletteGroup g) =>
+                SfEnums.GetAll<PredefinedPalette>().Where(p => p.Group == g).Count(),
+
+            PaletteChoice.AllGroups => SfEnums.GetAll<PredefinedPalette>().Count(),
+            PaletteChoice.ImFeelingLucky => 30,
+
+            PaletteChoice.UserDefined(var setId, _) =>
+                options.CustomPalettes.FirstOrDefault(s => s.Id == setId)?.Entries.Count ?? 1,
+
+            _ => throw new NotImplementedException(),
+        };
+
+        var count = Math.Max(2, (int)Math.Round(options.FamilyDiversity * maxColorCount));
+        return count;
     }
 }
 

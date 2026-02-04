@@ -7,13 +7,11 @@ using yoksdotnet.windows;
 
 namespace yoksdotnet;
 
-internal record RunType
-{
-    internal record Configure : RunType;
-    internal record Show : RunType;
-    internal record Preview(nint WindowHandle) : RunType;
-    internal record Debug(bool WithOptions) : RunType;
-}
+public record RunType;
+public record RunAsConfigure : RunType;
+public record RunAsScreensaver : RunType;
+public record RunAsPreview(nint WindowHandle) : RunType;
+public record RunAsDebug(bool WithOptions) : RunType;
 
 public partial class App : Application
 {
@@ -27,22 +25,22 @@ public partial class App : Application
 
         switch (runType)
         {
-            case RunType.Configure:
+            case RunAsConfigure:
             {
                 MainWindow = new OptionsWindow();
                 break;
             }
-            case RunType.Show:
+            case RunAsScreensaver:
             {
-                MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Screensaver());
+                MainWindow = new DisplayWindow(new DisplayMode.Screensaver());
                 break;
             }
-            case RunType.Preview(var parentHandle):
+            case RunAsPreview(var parentHandle):
             {
-                MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Preview(parentHandle));
+                MainWindow = new DisplayWindow(new DisplayMode.Preview(parentHandle));
                 break;
             }
-            case RunType.Debug(bool withOptions):
+            case RunAsDebug(bool withOptions):
             {
                 if (withOptions)
                 {
@@ -50,7 +48,7 @@ public partial class App : Application
                     _debugOptionsWindow.Show();
                 }
 
-                MainWindow = new DisplayWindow(new DisplayWindow.DisplayMode.Debug(_debugOptionsWindow));
+                MainWindow = new DisplayWindow(new DisplayMode.Debug(_debugOptionsWindow));
 
                 break;
             }
@@ -73,19 +71,19 @@ public partial class App : Application
 
         RunType? runType = normalizedArgs switch
         {
-            [] => new RunType.Configure(),
-            ["/c"] => new RunType.Configure(),
-            ["/d"] => new RunType.Debug(WithOptions: false),
-            ["/dd"] => new RunType.Debug(WithOptions: true),
-            ["/s"] => new RunType.Show(),
-            ["/s", var handle] => new RunType.Show(),
-            ["/p", var handle] => new RunType.Preview(nint.Parse(handle)),
+            [] => new RunAsConfigure(),
+            ["/c"] => new RunAsConfigure(),
+            ["/d"] => new RunAsDebug(WithOptions: false),
+            ["/dd"] => new RunAsDebug(WithOptions: true),
+            ["/s"] => new RunAsScreensaver(),
+            ["/s", var handle] => new RunAsScreensaver(),
+            ["/p", var handle] => new RunAsPreview(nint.Parse(handle)),
 
             [var flag] when flag.StartsWith("/s") && flag.Contains(':') => 
-                new RunType.Show(),
+                new RunAsScreensaver(),
 
             [var flag] when flag.StartsWith("/p") && flag.Contains(':') =>
-                new RunType.Preview(nint.Parse(flag.Split(':')[1])),
+                new RunAsPreview(nint.Parse(flag.Split(':')[1])),
 
             _ => null,
         };

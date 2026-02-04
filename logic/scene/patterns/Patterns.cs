@@ -14,17 +14,15 @@ public record Pattern(string Name) : ISfEnum
     public override string ToString() => Name;
 }
 
-[JsonDerivedType(typeof(Random), nameof(Random))]
-[JsonDerivedType(typeof(SinglePattern), nameof(SinglePattern))]
-public record PatternChoice
+[JsonDerivedType(typeof(RandomPatternChoice), nameof(RandomPatternChoice))]
+[JsonDerivedType(typeof(SinglePatternChoice), nameof(SinglePatternChoice))]
+public record PatternChoice;
+public record RandomPatternChoice : PatternChoice
 {
-    public record Random() : PatternChoice()
-    {
-        public override string ToString() => "Random";
-    }
-
-    public record SinglePattern(Pattern Pattern) : PatternChoice()
-    {
-        public override string ToString() => Pattern.Name;
-    }
+    public override string ToString() => "Random";
 }
+
+public record SinglePatternChoice(Pattern Pattern) : PatternChoice
+{
+    public override string ToString() => Pattern.Name;
+    }

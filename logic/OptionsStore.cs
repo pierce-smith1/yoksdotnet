@@ -23,6 +23,7 @@ public static class OptionsStore
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = true,
+        IncludeFields = true,
         Converters =
         {
             new JsonStringEnumConverter(),

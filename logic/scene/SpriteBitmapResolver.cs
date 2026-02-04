@@ -6,19 +6,19 @@ public static class SpriteBitmapResolver
 {
     public static Bitmap GetBitmap(Sprite sprite)
     {
-        if (sprite.fixedBitmap is not null)
+        if (sprite.addons.fixedBitmap is not null)
         {
-            return sprite.fixedBitmap;
+            return sprite.addons.fixedBitmap;
         }
 
-        if (sprite.emotions is not { } emotions)
+        if (sprite.addons.emotions is not { } emotions)
         {
             return Bitmap.Lk;
         }
 
-        var ambitionRanking = GetEmotionRanking(emotions.Ambition) + 1;
-        var empathyRanking = GetEmotionRanking(emotions.Empathy) + 1;
-        var optimismRanking = GetEmotionRanking(emotions.Optimism) + 1;
+        var ambitionRanking = GetEmotionRanking(emotions.ambition);
+        var empathyRanking = GetEmotionRanking(emotions.empathy);
+        var optimismRanking = GetEmotionRanking(emotions.optimism);
 
         Bitmap[][][] emotionMap =
         [
@@ -46,10 +46,10 @@ public static class SpriteBitmapResolver
     private static int GetEmotionRanking(double emotion)
     {
         var rank = emotion < -0.66
-            ? -1
+            ? 0 
             : emotion < 0.66
-            ? 0
-            : 1;
+            ? 1
+            : 2;
 
         return rank;
     }

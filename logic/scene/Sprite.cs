@@ -5,9 +5,9 @@ namespace yoksdotnet.logic.scene;
 
 public class Sprite
 {
-    public required int id;
-    public required double brand;
-    public required Palette palette;
+    public int id = 0;
+    public double brand = 0.0;
+    public Palette palette = Palette.DefaultPalette;
 
     public Point home = new(0.0, 0.0);
     public Point offset = new(0.0, 0.0);
@@ -30,6 +30,8 @@ public class Sprite
             return (topLeft, botRight);
         }
     }
+
+    public Bitmap CurrentBitmap => SpriteBitmapResolver.GetBitmap(this);
 }
 
 public record struct Point(double X, double Y);

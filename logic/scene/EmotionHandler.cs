@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using yoksdotnet.common;
 
 namespace yoksdotnet.logic.scene;
 
-public class EmotionHandler(Scene scene, PerlinNoiseGenerator noiseGenerator)
+public class EmotionHandler(Scene scene, ScrOptions options, PerlinNoiseGenerator noiseGenerator)
 {
     public void UpdateEmotions(IEnumerable<Sprite> sprites)
     {
@@ -13,9 +14,9 @@ public class EmotionHandler(Scene scene, PerlinNoiseGenerator noiseGenerator)
                 continue;
             }
 
-            emotions.ambition = GetNoiseForSprite(sprite, 0.0);
-            emotions.empathy = GetNoiseForSprite(sprite, 1000.0);
-            emotions.optimism = GetNoiseForSprite(sprite, 2000.0);
+            emotions.ambition = GetNoiseForSprite(sprite, 0.0) * GetNoiseFactor();
+            emotions.empathy = GetNoiseForSprite(sprite, 1000.0) * GetNoiseFactor();
+            emotions.optimism = GetNoiseForSprite(sprite, 2000.0) * GetNoiseFactor();
         }
     }
 
@@ -27,7 +28,14 @@ public class EmotionHandler(Scene scene, PerlinNoiseGenerator noiseGenerator)
             sprite.home.Y / 1000.0, 
             (scene.seconds + zOffset) / 50.0
         );
-        var result = (noise * 2) - 1;
+
+        var result = Interp.Linear(noise, 0.0, 1.0, -1.0, 1.0);
         return result;
+    }
+
+    private double GetNoiseFactor()
+    {
+        var factor = Interp.Linear(options.IndividualEmotionScale, 0.0, 1.0, 0.0, 2.0);
+        return factor;
     }
 }

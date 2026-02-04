@@ -47,7 +47,7 @@ public static class PaletteConverter
         return paint;
     }
 
-    public static Palette FromHexStrings(string s, string sh, string ss, string h, string hs, string e, string w)
+    public static Palette FromHexStrings(string s, string sh, string ss, string h, string e, string w, string hs)
     {
         var palette = new Palette
         {
@@ -63,7 +63,7 @@ public static class PaletteConverter
         return palette;
     }
 
-    public static PredefinedPalette FromHexStrings(string name, PaletteGroup group, string s, string sh, string ss, string h, string hs, string e, string w)
+    public static PredefinedPalette FromHexStrings(string name, PaletteGroup group, string s, string sh, string ss, string h, string e, string w, string hs)
     {
         var palette = new PredefinedPalette(name, group)
         {
