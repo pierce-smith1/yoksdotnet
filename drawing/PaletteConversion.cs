@@ -4,7 +4,7 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.drawing;
 
-public static class PaletteConverter
+public static class PaletteConversion
 {
     public static Palette Copy(Palette palette)
     {
@@ -51,13 +51,13 @@ public static class PaletteConverter
     {
         var palette = new Palette
         {
-            scales = ColorConverter.FromHexCertain(s),
-            scalesHighlight = ColorConverter.FromHexCertain(sh),
-            scalesShadow = ColorConverter.FromHexCertain(ss),
-            horns = ColorConverter.FromHexCertain(h),
-            hornsShadow = ColorConverter.FromHexCertain(hs),
-            eyes = ColorConverter.FromHexCertain(e),
-            whites = ColorConverter.FromHexCertain(w),
+            scales = ColorConversion.FromHexCertain(s),
+            scalesHighlight = ColorConversion.FromHexCertain(sh),
+            scalesShadow = ColorConversion.FromHexCertain(ss),
+            horns = ColorConversion.FromHexCertain(h),
+            hornsShadow = ColorConversion.FromHexCertain(hs),
+            eyes = ColorConversion.FromHexCertain(e),
+            whites = ColorConversion.FromHexCertain(w),
         };
 
         return palette;
@@ -67,13 +67,13 @@ public static class PaletteConverter
     {
         var palette = new PredefinedPalette(name, group)
         {
-            scales = ColorConverter.FromHexCertain(s),
-            scalesHighlight = ColorConverter.FromHexCertain(sh),
-            scalesShadow = ColorConverter.FromHexCertain(ss),
-            horns = ColorConverter.FromHexCertain(h),
-            hornsShadow = ColorConverter.FromHexCertain(hs),
-            eyes = ColorConverter.FromHexCertain(e),
-            whites = ColorConverter.FromHexCertain(w),
+            scales = ColorConversion.FromHexCertain(s),
+            scalesHighlight = ColorConversion.FromHexCertain(sh),
+            scalesShadow = ColorConversion.FromHexCertain(ss),
+            horns = ColorConversion.FromHexCertain(h),
+            hornsShadow = ColorConversion.FromHexCertain(hs),
+            eyes = ColorConversion.FromHexCertain(e),
+            whites = ColorConversion.FromHexCertain(w),
         };
 
         return palette;

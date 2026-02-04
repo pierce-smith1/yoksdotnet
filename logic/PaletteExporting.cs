@@ -5,9 +5,9 @@ using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic;
 
-public class PaletteExporter
+public static class PaletteExporting
 {
-    public string Export(CustomPaletteSet paletteGroup)
+    public static string Export(CustomPaletteSet paletteGroup)
     {
         // This may look like dramatic overengineering and it sort of is,
         // however the more elegant solution of "just serialize it to JSON"
@@ -46,7 +46,7 @@ public class PaletteExporter
         writer.Write(color.B);
     }
 
-    public CustomPaletteSet? Import(string encoded)
+    public static CustomPaletteSet? Import(string encoded)
     {
         try
         {

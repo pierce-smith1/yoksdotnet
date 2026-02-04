@@ -30,11 +30,10 @@ public partial class DisplayWindow : Window
     static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
 
     private readonly int _animationFps = 60;
-    private readonly Scene _scene;
+    private readonly AnimationContext _ctx;
 
     private readonly DisplayMode _displayMode;
     private readonly ScenePainter _scenePainter;
-    private readonly SceneSimulator _simulator;
 
     public DisplayWindow(DisplayMode mode)
     {
@@ -59,10 +58,10 @@ public partial class DisplayWindow : Window
         var rng = GetRng();
         var options = GetOptions();
 
-        _scene = SceneCreation.NewScene(options, rng, (int)Width, (int)Height);
+        var scene = SceneCreation.NewScene(options, rng, (int)Width, (int)Height);
+        _ctx = new AnimationContext(scene, options, rng);
 
-        _scenePainter = new(_scene, mode);
-        _simulator = new(_scene, options, rng);
+        _scenePainter = new(_ctx, mode);
 
         StartLoop();
     }
@@ -106,7 +105,7 @@ public partial class DisplayWindow : Window
     {
         MainCanvas.Child.MouseUp += (s, e) =>
         {
-            var clickedSprite = _scene.sprites.FirstOrDefault(sprite =>
+            var clickedSprite = _ctx.scene.sprites.FirstOrDefault(sprite =>
             {
                 var bounds = sprite.Bounds;
 
@@ -138,27 +137,19 @@ public partial class DisplayWindow : Window
     {
         var newScene = SceneCreation.NewScene(GetOptions(), GetRng(), (int)Width, (int)Height);
 
-        _scene.frame = newScene.frame;
-        _scene.seconds = newScene.seconds;
-        _scene.lastDtMs = newScene.lastDtMs;
-        _scene.lastTick = newScene.lastTick;
-        _scene.currentPattern = newScene.currentPattern;
-        _scene.patternLastChangedAt = newScene.patternLastChangedAt;
-        _scene.sprites = newScene.sprites;
-        _scene.width = newScene.width;
-        _scene.height = newScene.height;
+        _ctx.scene = newScene;
     }
 
-    private bool PropertyRequiresSceneRefresh(string propertyName)
+    private static bool PropertyRequiresSceneRefresh(string propertyName)
     {
         List<string> propertiesRequiringRefresh = [
-            nameof(ScrOptions.FamilyDiversity),
-            nameof(ScrOptions.FamilySize),
-            nameof(ScrOptions.FamilyImpostorDensity),
-            nameof(ScrOptions.FamilyPaletteChoice),
-            nameof(ScrOptions.IndividualScale),
-            nameof(ScrOptions.IndividualEmotionScale),
-            nameof(ScrOptions.AnimationStartingPattern),
+            nameof(OptionsViewModel.FamilyDiversity),
+            nameof(OptionsViewModel.FamilySize),
+            nameof(OptionsViewModel.FamilyImpostorDensity),
+            nameof(OptionsViewModel.FamilyPaletteChoice),
+            nameof(OptionsViewModel.IndividualScale),
+            nameof(OptionsViewModel.IndividualEmotionScale),
+            nameof(OptionsViewModel.AnimationStartingPattern),
         ];
 
         return propertiesRequiringRefresh.Contains(propertyName);
@@ -171,12 +162,12 @@ public partial class DisplayWindow : Window
             return debugMode.DebugOptionsWindow.ViewModel.BackingOptions;
         }
 
-        var savedOptions = OptionsStore.Load();
+        var savedOptions = OptionsStorage.Load();
 
         if (savedOptions is null)
         {
             var defaultOptions = new ScrOptions();
-            OptionsStore.Save(defaultOptions);
+            OptionsStorage.Save(defaultOptions);
             
             return defaultOptions;
         }
@@ -203,7 +194,7 @@ public partial class DisplayWindow : Window
     
     private void OnTick(object? _sender, ElapsedEventArgs _e)
     {
-        _simulator.TickSimulation();
+        SceneSimulation.HandleFrame(_ctx);
         RefreshSurface();
     }
 

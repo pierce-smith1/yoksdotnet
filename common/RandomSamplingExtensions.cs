@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace yoksdotnet.common;
 
-public class RandomSampler(Random rng)
+public static class RandomSamplingExtensions
 {
-    public T Sample<T>(IEnumerable<T> source)
+    public static T Sample<T>(this Random rng, IEnumerable<T> source)
     {
         if (!source.Any())
         {
@@ -17,17 +17,17 @@ public class RandomSampler(Random rng)
         return source.ElementAt(index);
     }
 
-    public T? SampleOrDefault<T>(IEnumerable<T> source)
+    public static T? SampleOrDefault<T>(this Random rng, IEnumerable<T> source)
     {
         if (!source.Any())
         {
             return default;
         }
 
-        return Sample(source);
+        return rng.Sample(source);
     }
 
-    public T SampleWeighted<T>(IEnumerable<T> source, Func<T, double> weightProvider)
+    public static T SampleWeighted<T>(this Random rng, IEnumerable<T> source, Func<T, double> weightProvider)
     {
         if (!source.Any())
         {
@@ -50,7 +50,7 @@ public class RandomSampler(Random rng)
         return source.Last();
     }
 
-    public T SampleExponential<T>(IEnumerable<T> source, double factor) 
+    public static T SampleExponential<T>(this Random rng, IEnumerable<T> source, double factor) 
     {
         if (!source.Any())
         {

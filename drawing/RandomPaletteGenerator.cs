@@ -7,8 +7,6 @@ namespace yoksdotnet.drawing;
 
 public class RandomPaletteGenerator(Random rng)
 {
-    private readonly RandomSampler _sampler = new(rng);
-
     public List<Palette> Generate(int amount)
     {
         var parameters = new PaletteGenerationParameters(
@@ -76,7 +74,7 @@ public class RandomPaletteGenerator(Random rng)
         var name = "";
         for (int i = 0; i < phonemeCount; i++)
         {
-            name += nextIsConsonant ? _sampler.Sample(consonants) : _sampler.Sample(vowels);
+            name += nextIsConsonant ? rng.Sample(consonants) : rng.Sample(vowels);
             nextIsConsonant = !nextIsConsonant;
         }
 
@@ -89,13 +87,13 @@ public class RandomPaletteGenerator(Random rng)
         var s = Interp.Linear(rng.NextDouble(), 0.0, 1.0, 30.0, 50.0);
         var l = Interp.Linear(rng.NextDouble(), 0.0, 1.0, 30.0, 70.0);
 
-        var color = ColorConverter.FromHsl(new(h, s, l));
+        var color = ColorConversion.FromHsl(new(h, s, l));
         return color;
     }
 
     private Palette GeneratePalette(PaletteGenerationParameters parameters)
     {
-        var coloringStyle = _sampler.SampleWeighted(Enum.GetValues<PaletteColoringStyle>(), s => parameters.ColoringStyleWeights[s]);
+        var coloringStyle = rng.SampleWeighted(Enum.GetValues<PaletteColoringStyle>(), s => parameters.ColoringStyleWeights[s]);
 
         var (scalesBase, hornsBase) = coloringStyle switch
         {
@@ -154,7 +152,7 @@ public class RandomPaletteGenerator(Random rng)
     private RgbColor GenerateNeutralColor(PaletteGenerationParameters parameters)
     {
         var lightness = Interp.Linear(rng.NextDouble(), 0.0, 1.0, 30.0, 70.0);
-        var neutralBase = ColorConverter.FromHsl(new(0.0, 0.0, lightness));
+        var neutralBase = ColorConversion.FromHsl(new(0.0, 0.0, lightness));
         var neutralColor = ScrambleColor(neutralBase, 0.2);
         return neutralColor;
     }
@@ -184,33 +182,33 @@ public class RandomPaletteGenerator(Random rng)
 
     private RgbColor DarkenColor(RgbColor color)
     {
-        var (h, s, l) = ColorConverter.ToHsl(color);
+        var (h, s, l) = ColorConversion.ToHsl(color);
 
         h = ShiftHueTowards(hue: h, target: 240.0, factor: 1.2);
         l /= 2;
 
-        var newColor = ColorConverter.FromHsl(new(h, s, l));
+        var newColor = ColorConversion.FromHsl(new(h, s, l));
         return newColor;
     }
 
     private RgbColor LightenColor(RgbColor color)
     {
-        var (h, s, l) = ColorConverter.ToHsl(color);
+        var (h, s, l) = ColorConversion.ToHsl(color);
 
         h = ShiftHueTowards(hue: h, target: 50.0, factor: 1.2);
         l = Interp.Linear(l, 0.0, 100.0, 50.0, 100.0);
 
-        var newColor = ColorConverter.FromHsl(new(h, s, l));
+        var newColor = ColorConversion.FromHsl(new(h, s, l));
         return newColor;
     }
 
     private RgbColor WhitenColor(RgbColor color)
     {
-        var (h, s, l) = ColorConverter.ToHsl(color);
+        var (h, s, l) = ColorConversion.ToHsl(color);
 
         l = Interp.Linear(l, 0.0, 100.0, 90.0, 100.0);
 
-        var newColor = ColorConverter.FromHsl(new(h, s, l));
+        var newColor = ColorConversion.FromHsl(new(h, s, l));
         return newColor;
     }
 

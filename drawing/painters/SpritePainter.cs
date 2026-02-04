@@ -7,8 +7,8 @@ public static class SpritePainter
 {
     public static void Draw(SKCanvas canvas, Sprite sprite)
     {
-        var skBitmap = SpriteBitmapResolver.GetBitmap(sprite).Resource;
-        var skPaint = sprite.addons.cachedPaint ?? PaletteConverter.ToSkPaint(sprite.palette);
+        var skBitmap = SpriteBitmaps.GetBitmap(sprite).Resource;
+        var skPaint = sprite.addons.cachedPaint ?? PaletteConversion.ToSkPaint(sprite.palette);
 
         canvas.DrawBitmap(skBitmap, GetRect(sprite), skPaint);
     }

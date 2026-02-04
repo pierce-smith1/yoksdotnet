@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace yoksdotnet.drawing;
 
-public static class ColorConverter
+public static class ColorConversion
 {
     public static RgbColor? FromHex(string hex)
     {

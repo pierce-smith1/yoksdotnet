@@ -23,7 +23,7 @@ public partial class OptionsWindow : Window
             ViewModel.IsDebugWindow = true;
         }
 
-        var options = debugOptions ?? OptionsStore.Load() ?? new();
+        var options = debugOptions ?? OptionsStorage.Load() ?? new();
 
         ViewModel.BackingOptions = options;
         InitializeModel(options);
@@ -31,7 +31,7 @@ public partial class OptionsWindow : Window
 
     protected void OnSave(object? _sender, RoutedEventArgs _e)
     {
-        OptionsStore.Save(ViewModel.BackingOptions);
+        OptionsStorage.Save(ViewModel.BackingOptions);
     }
 
     protected void OnDefaults(object? _sender, RoutedEventArgs _e)
@@ -41,23 +41,23 @@ public partial class OptionsWindow : Window
 
     protected void InitializeModel(ScrOptions options)
     {
-        ViewModel.FamilyDiversity = options.FamilyDiversity;
-        ViewModel.FamilySize = options.FamilySize;
-        ViewModel.FamilyImpostorDensity = options.FamilyImpostorDensity;
+        ViewModel.FamilyDiversity = options.diversity;
+        ViewModel.FamilySize = options.familySize;
+        ViewModel.FamilyImpostorDensity = options.impostorDensity;
 
-        ViewModel.IndividualScale = options.IndividualScale;
-        ViewModel.IndividualEmotionScale = options.IndividualEmotionScale;
-        ViewModel.IndividualTrailsEnabled = options.IndividualTrailsEnabled;
-        ViewModel.IndividualTrailLength = options.IndividualTrailLength;
+        ViewModel.IndividualScale = options.spriteScale;
+        ViewModel.IndividualEmotionScale = options.emotionScale;
+        ViewModel.IndividualTrailsEnabled = options.trailsEnabled;
+        ViewModel.IndividualTrailLength = options.trailLength;
 
-        ViewModel.AnimationSpeed = options.AnimationSpeed;
-        ViewModel.AnimationPossiblePatterns = options.AnimationPossiblePatterns;
-        ViewModel.AnimationStartingPattern = options.AnimationStartingPattern;
-        ViewModel.AnimationPatternChangeFrequency = options.AnimationPatternChangeFrequency;
-        ViewModel.AnimationPatternDoesChange = options.AnimationPatternDoesChange;
+        ViewModel.AnimationSpeed = options.animationSpeed;
+        ViewModel.AnimationPossiblePatterns = options.possiblePatterns;
+        ViewModel.AnimationStartingPattern = options.startingPattern;
+        ViewModel.AnimationPatternChangeFrequency = options.patternChangeFrequency;
+        ViewModel.AnimationPatternDoesChange = options.patternDoesChange;
 
-        ViewModel.CustomPalettes = options.CustomPalettes;
-        ViewModel.FamilyPaletteChoice = new(options.FamilyPaletteChoice);
+        ViewModel.CustomPalettes = options.customPalettes;
+        ViewModel.FamilyPaletteChoice = new(options.paletteChoice);
     }
 
     private void OnCancel(object? _sender, RoutedEventArgs _e)
@@ -86,8 +86,8 @@ public partial class OptionsWindow : Window
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
                 .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == set.Id);
 
-            OptionsStore.SaveCustomPalettes(ViewModel.CustomPalettes);
-            OptionsStore.Save(ViewModel.BackingOptions);
+            OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
+            OptionsStorage.Save(ViewModel.BackingOptions);
         }
     }
 
@@ -112,13 +112,13 @@ public partial class OptionsWindow : Window
 
         if (confirmResult == MessageBoxResult.Yes)
         {
-            ViewModel.FamilyPaletteChoice = new(new ScrOptions().FamilyPaletteChoice);
+            ViewModel.FamilyPaletteChoice = new(new ScrOptions().paletteChoice);
 
             ViewModel.CustomPalettes = ViewModel.CustomPalettes
                 .Where(e => e.Id != groupChoice.SetId)
                 .ToList();
 
-            OptionsStore.SaveCustomPalettes(ViewModel.CustomPalettes);
+            OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
     }
 
@@ -168,14 +168,14 @@ public partial class OptionsWindow : Window
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
                 .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == newSetId);
 
-            OptionsStore.SaveCustomPalettes(ViewModel.CustomPalettes);
+            OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
         else
         {
-            ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.FamilyPaletteChoice);
+            ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.paletteChoice);
         }
 
-        OptionsStore.Save(ViewModel.BackingOptions);
+        OptionsStorage.Save(ViewModel.BackingOptions);
     }
 
     private void ImportCustomPaletteSet()
@@ -192,14 +192,14 @@ public partial class OptionsWindow : Window
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
                 .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == importedSet.Id);
 
-            OptionsStore.SaveCustomPalettes(ViewModel.CustomPalettes);
+            OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
         else
         {
-            ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.FamilyPaletteChoice);
+            ViewModel.FamilyPaletteChoice = new(ViewModel.BackingOptions.paletteChoice);
         }
 
-        OptionsStore.Save(ViewModel.BackingOptions);
+        OptionsStorage.Save(ViewModel.BackingOptions);
     }
 }
 
@@ -210,37 +210,37 @@ public class OptionsViewModel : INotifyPropertyChanged
 
     public double FamilyDiversity 
     {
-        get => BackingOptions.FamilyDiversity;
+        get => BackingOptions.diversity;
         set 
         {
-            BackingOptions.FamilyDiversity = value;
+            BackingOptions.diversity = value;
             OnPropertyChanged(nameof(FamilyDiversity));
         }
     }
 
     public double FamilySize
     {
-        get => BackingOptions.FamilySize;
+        get => BackingOptions.familySize;
         set 
         {
-            BackingOptions.FamilySize = value;
+            BackingOptions.familySize = value;
             OnPropertyChanged(nameof(FamilySize));
         }
     }
 
     public double FamilyImpostorDensity
     {
-        get => BackingOptions.FamilyImpostorDensity;
+        get => BackingOptions.impostorDensity;
         set
         {
-            BackingOptions.FamilyImpostorDensity = value;
+            BackingOptions.impostorDensity = value;
             OnPropertyChanged(nameof(FamilyImpostorDensity));
         }
     }
 
     public PaletteChoiceEntry FamilyPaletteChoice 
     {
-        get => new(BackingOptions.FamilyPaletteChoice);
+        get => new(BackingOptions.paletteChoice);
         set 
         {
             if (value?.Choice is null)
@@ -248,7 +248,7 @@ public class OptionsViewModel : INotifyPropertyChanged
                 return;
             }
 
-            BackingOptions.FamilyPaletteChoice = value.Choice;
+            BackingOptions.paletteChoice = value.Choice;
             OnPropertyChanged(nameof(FamilyPaletteChoice));
             OnPropertyChanged(nameof(PaletteCustomizeVisibility));
         }
@@ -256,60 +256,60 @@ public class OptionsViewModel : INotifyPropertyChanged
 
     public double IndividualScale
     {
-        get => BackingOptions.IndividualScale;
+        get => BackingOptions.spriteScale;
         set 
         {
-            BackingOptions.IndividualScale = value;
+            BackingOptions.spriteScale = value;
             OnPropertyChanged(nameof(IndividualScale));
         }
     }
 
     public double IndividualEmotionScale
     {
-        get => BackingOptions.IndividualEmotionScale;
+        get => BackingOptions.emotionScale;
         set 
         {
-            BackingOptions.IndividualEmotionScale = value;
+            BackingOptions.emotionScale = value;
             OnPropertyChanged(nameof(IndividualEmotionScale));
         }
     }
 
     public bool IndividualTrailsEnabled
     {
-        get => BackingOptions.IndividualTrailsEnabled;
+        get => BackingOptions.trailsEnabled;
         set 
         {
-            BackingOptions.IndividualTrailsEnabled = value;
+            BackingOptions.trailsEnabled = value;
             OnPropertyChanged(nameof(IndividualTrailsEnabled));
         }
     }
 
     public double IndividualTrailLength
     {
-        get => BackingOptions.IndividualTrailLength;
+        get => BackingOptions.trailLength;
         set 
         {
-            BackingOptions.IndividualTrailLength = value;
+            BackingOptions.trailLength = value;
             OnPropertyChanged(nameof(IndividualTrailLength));
         }
     }
 
     public double AnimationSpeed
     {
-        get => BackingOptions.AnimationSpeed;
+        get => BackingOptions.animationSpeed;
         set 
         {
-            BackingOptions.AnimationSpeed = value;
+            BackingOptions.animationSpeed = value;
             OnPropertyChanged(nameof(AnimationSpeed));
         }
     }
 
     public List<Pattern> AnimationPossiblePatterns
     {
-        get => BackingOptions.AnimationPossiblePatterns;
+        get => BackingOptions.possiblePatterns;
         set 
         {
-            BackingOptions.AnimationPossiblePatterns = value;
+            BackingOptions.possiblePatterns = value;
             OnPropertyChanged(nameof(AnimationPossiblePatterns));
             OnPropertyChanged(nameof(PatternChoices));
         }
@@ -317,40 +317,40 @@ public class OptionsViewModel : INotifyPropertyChanged
 
     public PatternChoice AnimationStartingPattern
     {
-        get => BackingOptions.AnimationStartingPattern;
+        get => BackingOptions.startingPattern;
         set 
         {
-            BackingOptions.AnimationStartingPattern = value;
+            BackingOptions.startingPattern = value;
             OnPropertyChanged(nameof(AnimationStartingPattern));
         }
     }
 
     public bool AnimationPatternDoesChange
     {
-        get => BackingOptions.AnimationPatternDoesChange;
+        get => BackingOptions.patternDoesChange;
         set 
         {
-            BackingOptions.AnimationPatternDoesChange = value;
+            BackingOptions.patternDoesChange = value;
             OnPropertyChanged(nameof(AnimationPatternDoesChange));
         }
     }
 
     public double AnimationPatternChangeFrequency
     {
-        get => BackingOptions.AnimationPatternChangeFrequency;
+        get => BackingOptions.patternChangeFrequency;
         set 
         {
-            BackingOptions.AnimationPatternChangeFrequency = value;
+            BackingOptions.patternChangeFrequency = value;
             OnPropertyChanged(nameof(AnimationPatternChangeFrequency));
         }
     }
 
     public List<CustomPaletteSet> CustomPalettes
     {
-        get => BackingOptions.CustomPalettes;
+        get => BackingOptions.customPalettes;
         set
         {
-            BackingOptions.CustomPalettes = value;
+            BackingOptions.customPalettes = value;
             OnPropertyChanged(nameof(CustomPalettes));
             OnPropertyChanged(nameof(PaletteChoices));
         }

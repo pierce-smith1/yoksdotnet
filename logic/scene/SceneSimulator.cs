@@ -3,31 +3,25 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.logic.scene;
 
-public class SceneSimulator(Scene scene, ScrOptions options, Random rng)
+public static class SceneSimulation
 {
-    private readonly SpriteChoregrapher _choreographer = new(scene, options, rng);
-
-    public void TickSimulation()
+    public static void HandleFrame(AnimationContext ctx)
     {
         var now = DateTimeOffset.Now;
         
-        if (scene.lastTick is { } lastTick)
+        if (ctx.scene.lastTick is { } lastTick)
         {
             var dt = now - lastTick;
 
-            scene.lastDtMs = dt.TotalMilliseconds * DerivedSpeedScale();
-            scene.seconds += dt.TotalSeconds * DerivedSpeedScale();
+            var speedScale = Interp.Square(ctx.options.animationSpeed, 0.0, 1.0, 0.05, 0.5);
+
+            ctx.scene.lastDtMs = dt.TotalMilliseconds * speedScale;
+            ctx.scene.seconds += dt.TotalSeconds * speedScale;
         }
 
-        scene.lastTick = now;
-        scene.frame++;
+        ctx.scene.lastTick = now;
+        ctx.scene.frame++;
 
-        _choreographer.HandleFrame();
-    }
-
-    private double DerivedSpeedScale()
-    {
-        var scale = Interp.Square(options.AnimationSpeed, 0.0, 1.0, 0.05, 0.5);
-        return scale;
+        SpriteChoreography.HandleFrame(ctx);
     }
 }

@@ -15,6 +15,10 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
     private readonly Sprite _previewSprite = new()
     {
         palette = Palette.DefaultPalette,
+        addons = new()
+        {
+            fixedBitmap = bitmap
+        },
     };
 
     public PaletteIndex? HoveredIndex { get; private set; } = null;
@@ -35,15 +39,15 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
         SpritePainter.Draw(canvas, _previewSprite);
     }
 
-    public void UpdateHoveredIndex(float x, float y, float width, float height)
+    public void UpdateHoveredIndex(int x, int y, int width, int height)
     {
         var hoverPos = new Point(x, y);
 
         foreach (var (index, points) in _paletteIndexRegions)
         {
             var offsetPoints = points.Select(p => new Point(
-                p.X + width / 2.0 - Bitmap.BitmapSize() / 2.0,
-                p.Y + height / 2.0 - Bitmap.BitmapSize() / 2.0
+                p.X + width / 2 - Bitmap.BitmapSize() / 2,
+                p.Y + height / 2 - Bitmap.BitmapSize() / 2
             ));
 
             if (offsetPoints.Contains(hoverPos))
@@ -58,7 +62,7 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
 
     private static Palette WithIndexHighlighted(Palette palette, PaletteIndex index)
     {
-        var newPalette = PaletteConverter.Copy(palette);
+        var newPalette = PaletteConversion.Copy(palette);
 
         var prevColor = newPalette[index];
 

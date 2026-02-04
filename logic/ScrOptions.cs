@@ -10,48 +10,28 @@ namespace yoksdotnet.logic;
 
 public class ScrOptions
 {
-    public int ConfigVersion = 1;
+    public int version = 1;
 
-    public double FamilyDiversity = 0.2;
-    public double FamilySize = 0.5;
-    public double FamilyImpostorDensity = 0.1;
-    public PaletteChoice FamilyPaletteChoice = new PaletteChoice.SingleGroup(PaletteGroup.XpInspired);
+    public double diversity = 0.2;
+    public double familySize = 0.5;
+    public double impostorDensity = 0.1;
+    public PaletteChoice paletteChoice = new PaletteChoice.SingleGroup(PaletteGroup.XpInspired);
 
-    public double IndividualScale = 0.5;
-    public double IndividualEmotionScale = 0.5;
-    public bool IndividualTrailsEnabled = false;
-    public double IndividualTrailLength = 0.1;
+    public double spriteScale = 0.5;
+    public double emotionScale = 0.5;
+    public bool trailsEnabled = false;
+    public double trailLength = 0.1;
 
-    public double AnimationSpeed = 0.2;
-    public List<Pattern> AnimationPossiblePatterns = [.. SfEnums.GetAll<Pattern>()];
-    public PatternChoice AnimationStartingPattern = new RandomPatternChoice();
-    public bool AnimationPatternDoesChange = true;
-    public double AnimationPatternChangeFrequency = 0.5;
+    public double animationSpeed = 0.2;
+    public List<Pattern> possiblePatterns = [.. SfEnums.GetAll<Pattern>()];
+    public PatternChoice startingPattern = new RandomPatternChoice();
+    public bool patternDoesChange = true;
+    public double patternChangeFrequency = 0.5;
 
     // Custom palettes are serialized and de-serialized separately. See OptionsStore.
     [JsonIgnore]
-    public List<CustomPaletteSet> CustomPalettes { get; set; } = [];
-
-    // This is used by the runtime debug options window to know whether or not to
-    // refresh the entire animation when the option changes.
-    // This is necessary for options that affect initial starting conditions such as
-    // the amount or color of sprites.
-    public static bool PropertyRequiresSceneRefresh(string propertyName)
-    {
-        List<string> propertiesRequiringRefresh = [
-            nameof(FamilyDiversity),
-            nameof(FamilySize),
-            nameof(FamilyImpostorDensity),
-            nameof(FamilyPaletteChoice),
-            nameof(IndividualScale),
-            nameof(IndividualEmotionScale),
-            nameof(AnimationStartingPattern),
-        ];
-
-        return propertiesRequiringRefresh.Contains(propertyName);
-    }
+    public List<CustomPaletteSet> customPalettes = [];
 }
-
 
 public record CustomPaletteSet(string Id, string Name, List<CustomPaletteEntry> Entries);
 public record CustomPaletteEntry(string Name, Palette Palette);

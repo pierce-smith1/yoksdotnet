@@ -10,8 +10,6 @@ namespace yoksdotnet.windows;
 
 public partial class PaletteImportDialog : Window
 {
-    private readonly PaletteExporter _exporter = new();
-
     public CustomPaletteSet? ImportedPaletteSet { get; set; }
 
     public PaletteImportDialog()
@@ -26,7 +24,7 @@ public partial class PaletteImportDialog : Window
 
     public void OnImport(object _sender, RoutedEventArgs _e)
     {
-        var paletteSet = _exporter.Import(ViewModel.ImportCode);
+        var paletteSet = PaletteExporting.Import(ViewModel.ImportCode);
 
         if (paletteSet is null)
         {

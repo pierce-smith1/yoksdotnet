@@ -31,7 +31,7 @@ public class Sprite
         }
     }
 
-    public Bitmap CurrentBitmap => SpriteBitmapResolver.GetBitmap(this);
+    public Bitmap CurrentBitmap => SpriteBitmaps.GetBitmap(this);
 }
 
 public record struct Point(double X, double Y);

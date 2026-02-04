@@ -6,13 +6,11 @@ namespace yoksdotnet.windows;
 
 public partial class PaletteExportDialog : Window
 {
-    private readonly PaletteExporter _exporter = new();
-
     public PaletteExportDialog(CustomPaletteSet group)
     {
         InitializeComponent();
 
-        ViewModel.ExportCode = _exporter.Export(group);
+        ViewModel.ExportCode = PaletteExporting.Export(group);
     }
 
     private void OnClose(object sender, RoutedEventArgs e)

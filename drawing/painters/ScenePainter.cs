@@ -4,7 +4,7 @@ using yoksdotnet.windows;
 
 namespace yoksdotnet.drawing.painters;
 
-public class ScenePainter(Scene scene, DisplayMode displayMode)
+public class ScenePainter(AnimationContext ctx, DisplayMode displayMode)
 {
     public Sprite? DebuggedSprite { get; set; } = null;
 
@@ -12,7 +12,7 @@ public class ScenePainter(Scene scene, DisplayMode displayMode)
     {
         canvas.Clear(new SKColor(0x11, 0x11, 0x11));
 
-        foreach (var sprite in scene.sprites)
+        foreach (var sprite in ctx.scene.sprites)
         {
             SpritePainter.Draw(canvas, sprite);
         }

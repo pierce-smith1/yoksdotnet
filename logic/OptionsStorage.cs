@@ -7,18 +7,18 @@ using yoksdotnet.common;
 
 namespace yoksdotnet.logic;
 
-public static class OptionsStore
+public static class OptionsStorage
 {
     public readonly static string OptionsDirName = "yoksdotnet";
 
     public readonly static string OptionsFileName = "ydn-options.json";
     public readonly static string PaletteDataFileName = "ydn-custom-palettes.json";
 
-    private static readonly string _appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private readonly static string _appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-    private static readonly string _optionsDirPath;
-    private static readonly string _optionsPath;
-    private static readonly string _paletteDataPath;
+    private readonly static string _optionsDirPath;
+    private readonly static string _optionsPath;
+    private readonly static string _paletteDataPath;
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -31,7 +31,7 @@ public static class OptionsStore
         },
     };
 
-    static OptionsStore()
+    static OptionsStorage()
     {
         _optionsDirPath = Path.Combine(_appDataPath, OptionsDirName);
 
@@ -72,7 +72,7 @@ public static class OptionsStore
 
             if (loadedCustomPalettes is not null)
             {
-                loadedOptions.CustomPalettes = loadedCustomPalettes;
+                loadedOptions.customPalettes = loadedCustomPalettes;
             }
 
             return loadedOptions;

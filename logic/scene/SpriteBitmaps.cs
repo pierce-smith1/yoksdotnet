@@ -2,7 +2,7 @@
 
 namespace yoksdotnet.logic.scene;
 
-public static class SpriteBitmapResolver
+public static class SpriteBitmaps
 {
     public static Bitmap GetBitmap(Sprite sprite)
     {

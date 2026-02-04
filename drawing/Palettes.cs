@@ -30,7 +30,7 @@ public class Palette
     public required RgbColor whites;
     public required RgbColor hornsShadow;
 
-    public static readonly Palette DefaultPalette = PaletteConverter.FromHexStrings(
+    public static readonly Palette DefaultPalette = PaletteConversion.FromHexStrings(
         "#aaaaaa",
         "#aaaaaa",
         "#aaaaaa",
@@ -65,7 +65,7 @@ public class Palette
 
 public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEnum
 {
-    public static readonly PredefinedPalette Ascent = PaletteConverter.FromHexStrings(
+    public static readonly PredefinedPalette Ascent = PaletteConversion.FromHexStrings(
         "Ascent",
         PaletteGroup.XpInspired,
         "#1963c4",
@@ -77,7 +77,7 @@ public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEn
         "#506bbc"
     );
 
-    public static readonly PredefinedPalette Autumn = PaletteConverter.FromHexStrings(
+    public static readonly PredefinedPalette Autumn = PaletteConversion.FromHexStrings(
         "Autumn",
         PaletteGroup.XpInspired,
         "#db8313",
@@ -89,7 +89,7 @@ public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEn
         "#000000"
     );
 
-    public static readonly PredefinedPalette Azul = PaletteConverter.FromHexStrings(
+    public static readonly PredefinedPalette Azul = PaletteConversion.FromHexStrings(
         "Azul",
         PaletteGroup.XpInspired,
         "#1aadd9",
@@ -101,7 +101,7 @@ public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEn
         "#103050"
     );
 
-    public static readonly PredefinedPalette Bliss = PaletteConverter.FromHexStrings(
+    public static readonly PredefinedPalette Bliss = PaletteConversion.FromHexStrings(
         "Bliss",
         PaletteGroup.XpInspired,
         "#73981e",
@@ -113,7 +113,7 @@ public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEn
         "#3b73ee"
     );
 
-    public static readonly PredefinedPalette Crystal = PaletteConverter.FromHexStrings(
+    public static readonly PredefinedPalette Crystal = PaletteConversion.FromHexStrings(
         "Crystal",
         PaletteGroup.XpInspired,
         "#38399e",
@@ -126,7 +126,7 @@ public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEn
     );
 
 
-    public static readonly PredefinedPalette Aemil = PaletteConverter.FromHexStrings(
+    public static readonly PredefinedPalette Aemil = PaletteConversion.FromHexStrings(
         "Aemil",
         PaletteGroup.Fractalthorns,
         "#56eb8e",
@@ -138,7 +138,7 @@ public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEn
         "#966336"
     );
 
-    public static readonly PredefinedPalette Loxxe = PaletteConverter.FromHexStrings(
+    public static readonly PredefinedPalette Loxxe = PaletteConversion.FromHexStrings(
         "Loxxe",
         PaletteGroup.Fractalthorns,
         "#243966",

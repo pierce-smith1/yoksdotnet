@@ -139,7 +139,7 @@ public partial class PaletteCustomizer : Window
         }
 
         var thisPaletteEntry = ViewModel.PaletteEntries.Single(e => e.Id == paletteId);
-        var paletteCopy = PaletteConverter.Copy(thisPaletteEntry.Palette);
+        var paletteCopy = PaletteConversion.Copy(thisPaletteEntry.Palette);
 
         var newEntry = ViewModel.AddPaletteView(thisPaletteEntry.Name, new(paletteCopy));
         ViewModel.SelectedEntry = newEntry;
@@ -348,7 +348,7 @@ public partial class PaletteCustomizer : Window
         var hex = textBox.Text;
         ViewModel.CurrentHex = hex;
 
-        var inputColor = ColorConverter.FromHex(hex);
+        var inputColor = ColorConversion.FromHex(hex);
         if (inputColor is null)
         {
             return;
@@ -481,7 +481,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
         }
     }
 
-    public bool IsValidHex => ColorConverter.FromHex(CurrentHex) is not null;
+    public bool IsValidHex => ColorConversion.FromHex(CurrentHex) is not null;
 
     public void UpdateHsl()
     {
@@ -490,7 +490,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
             return;
         }
 
-        var (h, s, l) = ColorConverter.ToHsl(SelectedEntry.PaletteView[SelectedIndex]);
+        var (h, s, l) = ColorConversion.ToHsl(SelectedEntry.PaletteView[SelectedIndex]);
 
         Hue = (float)h;
         Saturation = (float)s;
@@ -499,14 +499,14 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
 
     public void UpdateHex()
     {
-        CurrentHex = ColorConverter.ToHex(ColorConverter.FromHsl(new(Hue, Saturation, Lightness)));
+        CurrentHex = ColorConversion.ToHex(ColorConversion.FromHsl(new(Hue, Saturation, Lightness)));
     }
 
     public void UpdatePalette()
     {
         if (SelectedEntry is { } selectedEntry)
         {
-            selectedEntry.PaletteView[SelectedIndex] = ColorConverter.FromHsl(new(Hue, Saturation, Lightness));
+            selectedEntry.PaletteView[SelectedIndex] = ColorConversion.FromHsl(new(Hue, Saturation, Lightness));
             OnPropertyChanged(nameof(PaletteEntries));
         }
     }

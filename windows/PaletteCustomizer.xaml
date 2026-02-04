@@ -126,7 +126,7 @@
             <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom">
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <Label FontWeight="Bold">Currently editing:</Label>
-                    <Label Content="{Binding SelectedIndex.Name}" />
+                    <Label Content="{Binding SelectedIndex.DisplayName}" />
                 </StackPanel>
 
                 <Slider Margin="0,4,0,4"
