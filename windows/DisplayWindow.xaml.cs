@@ -46,7 +46,7 @@ public partial class DisplayWindow : Window
                 InitForScreensaver();
                 break;
 
-            case DisplayMode.Preview(var parentHandle):
+            case DisplayMode.Preview(var _parentHandle):
                 // Doesn't work and I don't know why. Ignoring for now but we should come back to this.
                 break;
 

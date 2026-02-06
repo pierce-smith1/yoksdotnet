@@ -182,7 +182,7 @@
                     SelectedValue="{Binding AnimationStartingPattern}"
                     Height="25"
                 />
-                <Button Grid.Row="0" Grid.Column="3">Customize</Button>
+                <Button Grid.Row="0" Grid.Column="3" Click="OnCustomizePatternAvailability">Customize</Button>
 
                 <!-- Speed -->
                 <Label Grid.Row="1" Grid.Column="0" FontWeight="SemiBold">Speed:</Label>

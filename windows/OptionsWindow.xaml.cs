@@ -9,6 +9,7 @@ using yoksdotnet.common;
 using yoksdotnet.drawing;
 using yoksdotnet.logic;
 using yoksdotnet.logic.scene.patterns;
+using yoksdotnet.windows.common;
 
 namespace yoksdotnet.windows;
 
@@ -52,7 +53,7 @@ public partial class OptionsWindow : Window
 
         ViewModel.AnimationSpeed = options.animationSpeed;
         ViewModel.AnimationPossiblePatterns = options.possiblePatterns;
-        ViewModel.AnimationStartingPattern = options.startingPattern;
+        ViewModel.AnimationStartingPattern = new(options.startingPattern);
         ViewModel.AnimationPatternChangeFrequency = options.patternChangeFrequency;
         ViewModel.AnimationPatternDoesChange = options.patternDoesChange;
 
@@ -67,7 +68,7 @@ public partial class OptionsWindow : Window
 
     private void OnEditPaletteSet(object? _sender, RoutedEventArgs _e)
     {
-        if (ViewModel.FamilyPaletteChoice.Choice is not PaletteChoice.UserDefined groupChoice)
+        if (ViewModel.FamilyPaletteChoice.Choice is not UserDefinedPalettes groupChoice)
         {
             return;
         }
@@ -84,7 +85,7 @@ public partial class OptionsWindow : Window
             ];
 
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
-                .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == set.Id);
+                .First(c => c.Choice is UserDefinedPalettes ud && ud.SetId == set.Id);
 
             OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
             OptionsStorage.Save(ViewModel.BackingOptions);
@@ -93,7 +94,7 @@ public partial class OptionsWindow : Window
 
     private void OnDeletePaletteSet(object _sender, RoutedEventArgs _e)
     {
-        if (ViewModel.FamilyPaletteChoice.Choice is not PaletteChoice.UserDefined groupChoice)
+        if (ViewModel.FamilyPaletteChoice.Choice is not UserDefinedPalettes groupChoice)
         {
             return;
         }
@@ -131,11 +132,11 @@ public partial class OptionsWindow : Window
 
         if (e.AddedItems[0] is PaletteChoiceEntry entry)
         {
-            if (entry.SpecialEntry == SpecialPaletteEntry.NewSet)
+            if (entry.SpecialEntry is NewSetEntry)
             {
                 CreateCustomPaletteSet();
             }
-            else if (entry.SpecialEntry == SpecialPaletteEntry.ImportPalette)
+            else if (entry.SpecialEntry is ImportPaletteEntry)
             {
                 ImportCustomPaletteSet();
             }
@@ -166,7 +167,7 @@ public partial class OptionsWindow : Window
             var newSetId = paletteCustomizeDialog.EditedPaletteGroup.Id;
 
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
-                .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == newSetId);
+                .First(c => c.Choice is UserDefinedPalettes ud && ud.SetId == newSetId);
 
             OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
@@ -190,7 +191,7 @@ public partial class OptionsWindow : Window
             ];
 
             ViewModel.FamilyPaletteChoice = ViewModel.PaletteChoices
-                .First(c => c.Choice is PaletteChoice.UserDefined ud && ud.SetId == importedSet.Id);
+                .First(c => c.Choice is UserDefinedPalettes ud && ud.SetId == importedSet.Id);
 
             OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
         }
@@ -201,17 +202,50 @@ public partial class OptionsWindow : Window
 
         OptionsStorage.Save(ViewModel.BackingOptions);
     }
+
+    private void OnCustomizePatternAvailability(object sender, RoutedEventArgs e)
+    {
+        var customizeDialog = new PatternAvailabilityCustomizer(ViewModel.AnimationPossiblePatterns);
+        if (customizeDialog.ShowDialog() is true)
+        {
+            var newPossiblePatterns = customizeDialog.ViewModel.Entries
+                .Where(e => e.Enabled)
+                .Select(e => e.Pattern)
+                .ToList();
+
+            var previousStartingPattern = ViewModel.AnimationStartingPattern;
+
+            ViewModel.AnimationPossiblePatterns = newPossiblePatterns;
+
+            if (previousStartingPattern.Choice is RandomPatternChoice && newPossiblePatterns.Count == 1)
+            {
+                ViewModel.AnimationStartingPattern = ViewModel.PatternChoices.First();
+            }
+
+            if (previousStartingPattern.Choice is SinglePatternChoice(var pattern) && !ViewModel.AnimationPossiblePatterns.Any(e => e == pattern))
+            {
+                if (ViewModel.AnimationPossiblePatterns.Count == 1)
+                {
+                    ViewModel.AnimationStartingPattern = new(new SinglePatternChoice(ViewModel.AnimationPossiblePatterns.First()));
+                }
+                else
+                {
+                    ViewModel.AnimationStartingPattern = new(new RandomPatternChoice());
+                }
+            }
+        }
+    }
 }
 
-public class OptionsViewModel : INotifyPropertyChanged
+public class OptionsViewModel : NotifiesPropertyChanged
 {
     public bool IsDebugWindow { get; set; } = false;
     public bool IsNotDebugWindow => !IsDebugWindow;
 
-    public double FamilyDiversity 
+    public double FamilyDiversity
     {
         get => BackingOptions.diversity;
-        set 
+        set
         {
             BackingOptions.diversity = value;
             OnPropertyChanged(nameof(FamilyDiversity));
@@ -221,7 +255,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public double FamilySize
     {
         get => BackingOptions.familySize;
-        set 
+        set
         {
             BackingOptions.familySize = value;
             OnPropertyChanged(nameof(FamilySize));
@@ -238,10 +272,10 @@ public class OptionsViewModel : INotifyPropertyChanged
         }
     }
 
-    public PaletteChoiceEntry FamilyPaletteChoice 
+    public PaletteChoiceEntry FamilyPaletteChoice
     {
         get => new(BackingOptions.paletteChoice);
-        set 
+        set
         {
             if (value?.Choice is null)
             {
@@ -257,7 +291,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public double IndividualScale
     {
         get => BackingOptions.spriteScale;
-        set 
+        set
         {
             BackingOptions.spriteScale = value;
             OnPropertyChanged(nameof(IndividualScale));
@@ -267,7 +301,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public double IndividualEmotionScale
     {
         get => BackingOptions.emotionScale;
-        set 
+        set
         {
             BackingOptions.emotionScale = value;
             OnPropertyChanged(nameof(IndividualEmotionScale));
@@ -277,7 +311,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public bool IndividualTrailsEnabled
     {
         get => BackingOptions.trailsEnabled;
-        set 
+        set
         {
             BackingOptions.trailsEnabled = value;
             OnPropertyChanged(nameof(IndividualTrailsEnabled));
@@ -287,7 +321,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public double IndividualTrailLength
     {
         get => BackingOptions.trailLength;
-        set 
+        set
         {
             BackingOptions.trailLength = value;
             OnPropertyChanged(nameof(IndividualTrailLength));
@@ -297,7 +331,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public double AnimationSpeed
     {
         get => BackingOptions.animationSpeed;
-        set 
+        set
         {
             BackingOptions.animationSpeed = value;
             OnPropertyChanged(nameof(AnimationSpeed));
@@ -307,7 +341,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public List<Pattern> AnimationPossiblePatterns
     {
         get => BackingOptions.possiblePatterns;
-        set 
+        set
         {
             BackingOptions.possiblePatterns = value;
             OnPropertyChanged(nameof(AnimationPossiblePatterns));
@@ -315,12 +349,17 @@ public class OptionsViewModel : INotifyPropertyChanged
         }
     }
 
-    public PatternChoice AnimationStartingPattern
+    public PatternChoiceEntry AnimationStartingPattern
     {
-        get => BackingOptions.startingPattern;
-        set 
+        get => PatternChoices.SingleOrDefault(e => e.Choice == BackingOptions.startingPattern)!;
+        set
         {
-            BackingOptions.startingPattern = value;
+            if (value is null)
+            {
+                return;
+            }
+
+            BackingOptions.startingPattern = value.Choice;
             OnPropertyChanged(nameof(AnimationStartingPattern));
         }
     }
@@ -328,7 +367,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public bool AnimationPatternDoesChange
     {
         get => BackingOptions.patternDoesChange;
-        set 
+        set
         {
             BackingOptions.patternDoesChange = value;
             OnPropertyChanged(nameof(AnimationPatternDoesChange));
@@ -338,7 +377,7 @@ public class OptionsViewModel : INotifyPropertyChanged
     public double AnimationPatternChangeFrequency
     {
         get => BackingOptions.patternChangeFrequency;
-        set 
+        set
         {
             BackingOptions.patternChangeFrequency = value;
             OnPropertyChanged(nameof(AnimationPatternChangeFrequency));
@@ -356,44 +395,47 @@ public class OptionsViewModel : INotifyPropertyChanged
         }
     }
 
-    public Visibility PaletteCustomizeVisibility => (FamilyPaletteChoice.Choice is PaletteChoice.UserDefined)
+    public List<PatternChoiceEntry> PatternChoices
+    {
+        get
+        {
+            var choices = AnimationPossiblePatterns
+                .Select(p => new PatternChoiceEntry(new SinglePatternChoice(p)))
+                .ToList();
+
+            if (AnimationPossiblePatterns.Count > 1)
+            {
+                choices.Add(new(new RandomPatternChoice()));
+            }
+
+            return choices;
+        }
+    }
+
+    public Visibility PaletteCustomizeVisibility => (FamilyPaletteChoice.Choice is UserDefinedPalettes)
         ? Visibility.Visible
         : Visibility.Hidden;
 
     public List<PaletteChoiceEntry> PaletteChoices => [
         ..SfEnums.GetAll<PaletteGroup>()
-            .Select(g => new PaletteChoiceEntry(new PaletteChoice.SingleGroup(g))),
+            .Select(g => new PaletteChoiceEntry(new SingleGroupPalettes(g))),
 
-        new(new PaletteChoice.AllGroups()),
-        new(new PaletteChoice.ImFeelingLucky()),
+        new(new AllPalettes()),
+        new(new GeneratedPalettes()),
 
         ..CustomPalettes
-            .Select(e => new PaletteChoiceEntry(new PaletteChoice.UserDefined(e.Id, e.Name))),
+            .Select(e => new PaletteChoiceEntry(new UserDefinedPalettes(e.Id, e.Name))),
 
-        new(SpecialPaletteEntry.NewSet),
-        new(SpecialPaletteEntry.ImportPalette),
-    ];
-
-    public List<PatternChoice> PatternChoices => [
-        ..AnimationPossiblePatterns.Select(p => new SinglePatternChoice(p)),
-        new RandomPatternChoice(),
+        new(new NewSetEntry()),
+        new(new ImportPaletteEntry()),
     ];
 
     public ScrOptions BackingOptions { get; set; } = new();
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    private void OnPropertyChanged(string name)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
 }
 
-public enum SpecialPaletteEntry
-{
-    NewSet,
-    ImportPalette,
-}
+public record SpecialPaletteEntry : Union<NewSetEntry, ImportPaletteEntry>;
+public record NewSetEntry : SpecialPaletteEntry;
+public record ImportPaletteEntry : SpecialPaletteEntry;
 
 public record PaletteChoiceEntry
 {
@@ -412,7 +454,7 @@ public record PaletteChoiceEntry
     }
 
     public string Name => ToString();
-    public bool IsCustom => Choice is PaletteChoice.UserDefined;
+    public bool IsCustom => Choice is UserDefinedPalettes;
     public bool IsSpecial => Choice is null;
     public FontStyle Style => IsSpecial ? FontStyles.Italic : FontStyles.Normal;
     public string? TextPrefix => IsCustom 
@@ -421,21 +463,23 @@ public record PaletteChoiceEntry
         ? "+"
         : null;
 
-    public override string ToString() => Choice switch
-    {
-        PaletteChoice.SingleGroup(var group) => group.Name,
-        PaletteChoice.AllGroups => "Everything",
-        PaletteChoice.UserDefined(_, var name) => name,
-        PaletteChoice.ImFeelingLucky => "I'm Feeling Llucky",
-        
-        null => SpecialEntry switch 
-        { 
-            SpecialPaletteEntry.NewSet => "New custom palette...",
-            SpecialPaletteEntry.ImportPalette => "Import palette...",
+    public override string ToString() => Choice?.Match(
+        singleGroup => singleGroup.Group.Name,
+        _all => "Everything",
+        userDefined => userDefined.Name,
+        _generated => "I'm Feeling Llucky"
+    ) ?? SpecialEntry?.Match(
+        _newSet => "New custom palette set...",
+        _importPalette => "Import palette set..."
+    ) ?? throw new NotSupportedException();
+}
 
-            _ => throw new InvalidOperationException(),
-        },
+public record PatternChoiceEntry(PatternChoice Choice)
+{
+    public string Name => Choice.Match(
+        _random => "Random",
+        single => single.Pattern.Name
+    );
 
-        _ => throw new InvalidOperationException(),
-    };
+    public override string ToString() => Name;
 }

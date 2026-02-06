@@ -25,40 +25,10 @@ public static class SpriteMovement
     public static void MoveByCurrentPattern(AnimationContext ctx)
     {
         var pattern = ctx.scene.currentPattern ?? Pattern.Lattice;
-
-        if (pattern == Pattern.Roamers) 
-        {
-            MoveRoamers(ctx);
-        }
-        else if (pattern == Pattern.Waves)
-        {
-            MoveWaves(ctx);
-        }
+        pattern.MoveFunction(ctx);
     }
 
-    public static void MoveRoamers(AnimationContext ctx)
-    {
-        foreach (var sprite in ctx.scene.sprites)
-        {
-            sprite.home.X += sprite.brand * ctx.scene.lastDtMs;
-            sprite.home.Y += Math.Sin(ctx.scene.seconds * sprite.brand) * ctx.scene.lastDtMs;
-
-            WrapSprite(ctx, sprite);
-        }
-    }
-
-    public static void MoveWaves(AnimationContext ctx)
-    {
-        foreach (var sprite in ctx.scene.sprites)
-        {
-            sprite.home.X += Math.Sin(ctx.scene.seconds * sprite.brand) * ctx.scene.lastDtMs;
-            sprite.home.Y += Math.Cos(ctx.scene.seconds * sprite.brand) * ctx.scene.lastDtMs;
-
-            WrapSprite(ctx, sprite);
-        }
-    }
-
-    private static void WrapSprite(AnimationContext ctx, Sprite sprite)
+    public static void WrapSprite(AnimationContext ctx, Sprite sprite)
     {
         var bounds = sprite.Bounds;
 
@@ -84,7 +54,7 @@ public static class SpriteMovement
         }
     }
 
-    private static void ClampSprite(AnimationContext ctx, Sprite sprite)
+    public static void ClampSprite(AnimationContext ctx, Sprite sprite)
     {
         sprite.home.X = Math.Clamp(sprite.home.X, sprite.offset.X, ctx.scene.width + sprite.offset.X);
         sprite.home.Y = Math.Clamp(sprite.home.Y, sprite.offset.Y, ctx.scene.height + sprite.offset.Y);

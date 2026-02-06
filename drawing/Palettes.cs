@@ -164,14 +164,3 @@ public record PaletteGroup(string Name) : ISfEnum
     public override string ToString() => Name;
 }
 
-[JsonDerivedType(typeof(SingleGroup), nameof(SingleGroup))]
-[JsonDerivedType(typeof(AllGroups), nameof(AllGroups))]
-[JsonDerivedType(typeof(UserDefined), nameof(UserDefined))]
-[JsonDerivedType(typeof(ImFeelingLucky), nameof(ImFeelingLucky))]
-public record PaletteChoice
-{
-    public record SingleGroup(PaletteGroup Group) : PaletteChoice;
-    public record AllGroups : PaletteChoice;
-    public record UserDefined(string SetId, string Name) : PaletteChoice;
-    public record ImFeelingLucky : PaletteChoice;
-}

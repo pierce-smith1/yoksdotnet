@@ -50,16 +50,16 @@ public class SpriteGenerator(Random rng, ScrOptions options)
     {
         IEnumerable<Palette> possiblePalettes = options.paletteChoice switch
         {
-            PaletteChoice.SingleGroup choice =>
+            SingleGroupPalettes choice =>
                 SfEnums.GetAll<PredefinedPalette>().Where(pair => pair.Group == choice.Group),
 
-            PaletteChoice.AllGroups =>
+            AllPalettes =>
                 SfEnums.GetAll<PredefinedPalette>(),
 
-            PaletteChoice.UserDefined(var setId, _) =>
+            UserDefinedPalettes(var setId, _) =>
                 options.customPalettes.FirstOrDefault(s => s.Id == setId)?.Entries.Select(e => e.Palette),
 
-            PaletteChoice.ImFeelingLucky =>
+            GeneratedPalettes =>
                 new RandomPaletteGenerator(rng).Generate(GetColorCount()),
 
             _ => throw new NotImplementedException(),
@@ -91,13 +91,13 @@ public class SpriteGenerator(Random rng, ScrOptions options)
     {
         var maxColorCount = options.paletteChoice switch
         {
-            PaletteChoice.SingleGroup(PaletteGroup g) =>
+            SingleGroupPalettes(PaletteGroup g) =>
                 SfEnums.GetAll<PredefinedPalette>().Where(p => p.Group == g).Count(),
 
-            PaletteChoice.AllGroups => SfEnums.GetAll<PredefinedPalette>().Count(),
-            PaletteChoice.ImFeelingLucky => 30,
+            AllPalettes => SfEnums.GetAll<PredefinedPalette>().Count(),
+            GeneratedPalettes => 30,
 
-            PaletteChoice.UserDefined(var setId, _) =>
+            UserDefinedPalettes(var setId, _) =>
                 options.customPalettes.FirstOrDefault(s => s.Id == setId)?.Entries.Count ?? 1,
 
             _ => throw new NotImplementedException(),
