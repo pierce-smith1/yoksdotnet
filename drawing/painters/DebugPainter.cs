@@ -36,7 +36,7 @@ public static class DebugPainter
                 X = spriteRect.Location.X,
                 Y = spriteRect.Location.Y + spriteRect.Height + yOffset,
             };
-            canvas.DrawText(line, textPos, textPaint);
+            canvas.DrawText(line, textPos, SKTextAlign.Left, new SKFont(), textPaint);
         }
     }
 

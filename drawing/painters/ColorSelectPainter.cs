@@ -10,7 +10,7 @@ public static class ColorSelectPainter
 
     static ColorSelectPainter()
     {
-        _shader = SKRuntimeEffect.Create(@"
+        _shader = SKRuntimeEffect.CreateShader(@"
             uniform half2 resolution;
             uniform half hue;
 
@@ -60,7 +60,7 @@ public static class ColorSelectPainter
 
         var selectPaint = new SKPaint()
         {
-            Shader = _shader.ToShader(isOpaque: true, uniforms: _shaderUniforms),
+            Shader = _shader.ToShader(uniforms: _shaderUniforms),
         };
 
         canvas.DrawRect(0, 0, canvasBounds.Width, canvasBounds.Height, selectPaint);

@@ -60,7 +60,6 @@ public partial class DisplayWindow : Window
     [DllImport("user32.dll")]
     static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
 
-    private readonly int _animationFps = 60;
     private readonly AnimationContext _ctx;
     private readonly int _debugRngSeed = new Random().Next();
 
@@ -118,14 +117,17 @@ public partial class DisplayWindow : Window
         // Windows forms repeatedly fires MouseMove events even if you aren't doing shit.
         // I'm forced to manually check that the position of the mouse hasn't changed.
         (int X, int Y)? lastMouseLocation = null;
-        MainCanvas.Child.MouseMove += (s, e) =>
+        MainCanvas.MouseMove += (s, e) =>
         {
-            if (lastMouseLocation is not null && lastMouseLocation != (e.X, e.Y))
+            var x = (int)e.GetPosition(MainCanvas).X;
+            var y = (int)e.GetPosition(MainCanvas).Y;
+
+            if (lastMouseLocation is not null && lastMouseLocation != (x, y))
             {
                 Shutdown();
             }
 
-            lastMouseLocation = (e.X, e.Y);
+            lastMouseLocation = (x, y);
         };
 
         KeyDown += (s, e) => Shutdown();
@@ -133,14 +135,17 @@ public partial class DisplayWindow : Window
 
     private void InitForDebug(OptionsWindow? debugOptionsWindow)
     {
-        MainCanvas.Child.MouseUp += (s, e) =>
+        MainCanvas.MouseUp += (s, e) =>
         {
+            var x = e.GetPosition(MainCanvas).X;
+            var y = e.GetPosition(MainCanvas).Y;
+
             var clickedSprite = _ctx.scene.sprites.FirstOrDefault(sprite =>
             {
                 var bounds = sprite.Bounds;
 
-                var mouseXIntersects = e.X > bounds.topLeft.X && e.X < bounds.bottomRight.X;
-                var mouseYIntersects = e.Y > bounds.topLeft.Y && e.Y < bounds.bottomRight.Y;
+                var mouseXIntersects = x > bounds.topLeft.X && x < bounds.bottomRight.X;
+                var mouseYIntersects = y > bounds.topLeft.Y && y < bounds.bottomRight.Y;
 
                 return mouseXIntersects && mouseYIntersects;
             });
@@ -217,35 +222,15 @@ public partial class DisplayWindow : Window
 
     private void StartLoop()
     {
-        var loopTimer = new System.Timers.Timer(1000 / _animationFps);
-        loopTimer.Elapsed += OnTick;
-        loopTimer.Start();
+        MainCanvas.Start(new()
+        {
+            RenderContinuously = true,
+        });
     }
     
-    private void OnTick(object? _sender, ElapsedEventArgs _e)
+    private void OnPaintSurface(TimeSpan _delta)
     {
         SceneSimulation.HandleFrame(_ctx);
-        RefreshSurface();
-    }
-
-    private void RefreshSurface()
-    {
-        MainCanvas.Child?.Invalidate();
-    }
-
-    private void OnPaintSurface(object? sender, SKPaintGLSurfaceEventArgs e)
-    {
-        _scenePainter.Draw(e.Surface.Canvas);
-    }
-
-    private void CreateGlContext(object? sender, EventArgs e)
-    {
-        var glControl = new SKGLControl();
-        glControl.PaintSurface += OnPaintSurface;
-        glControl.Dock = DockStyle.Fill;
-
-        var host = (WindowsFormsHost)sender!;
-        host.Child = glControl;
     }
 
     private static void Shutdown()

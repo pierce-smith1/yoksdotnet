@@ -23,6 +23,7 @@ namespace yoksdotnet.windows;
 
 public partial class PaletteCustomizer : Window
 {
+    /*
     private readonly RandomPaletteGenerator _randomPaletteGenerator = new(new());
     private readonly SpriteEditPreviewPainter _previewPainter = new(Bitmap.LkThumbsup); 
 
@@ -357,6 +358,7 @@ public partial class PaletteCustomizer : Window
         entry.Palette[ViewModel.SelectedIndex] = inputColor.Value;
         ViewModel.UpdateHsl();
     }
+    */
 }
 
 public class PaletteCustomizerViewModel : INotifyPropertyChanged

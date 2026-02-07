@@ -66,6 +66,7 @@ public partial class OptionsWindow : Window
 
     private void OnEditPaletteSet(object? _sender, RoutedEventArgs _e)
     {
+        /*
         if (ViewModel.FamilyPaletteChoice.Set?.CustomSet is not { } setToEdit)
         {
             return;
@@ -89,6 +90,7 @@ public partial class OptionsWindow : Window
             OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
             OptionsStorage.Save(ViewModel.BackingOptions);
         }
+        */
     }
 
     private void OnDeletePaletteSet(object _sender, RoutedEventArgs _e)
@@ -148,6 +150,7 @@ public partial class OptionsWindow : Window
 
     private void CreateCustomPaletteSet()
     {
+        /*
         var paletteCustomizeDialog = new PaletteCustomizer(new CustomPaletteSet
         (
             Guid.NewGuid().ToString(),
@@ -180,6 +183,7 @@ public partial class OptionsWindow : Window
 
         OptionsStorage.SaveCustomPalettes(ViewModel.CustomPalettes);
         OptionsStorage.Save(ViewModel.BackingOptions);
+        */
     }
 
     private void ImportCustomPaletteSet()
