@@ -13,15 +13,11 @@ public static class SceneCreation
             width = width,
             height = height,
             sprites = [..new SpriteGenerator(rng, options).Make(width, height)],
-            currentPattern = options.startingPattern switch
-            {
-                RandomPatternChoice => 
+            currentPattern = options.startingPattern.Match(
+                whenRandom: () => 
                     rng.SampleOrDefault(options.possiblePatterns) ?? Pattern.Lattice,
-
-                SinglePatternChoice(var pattern) => pattern,
-
-                _ => throw new NotImplementedException()
-            },
+                whenSingle: pattern => pattern
+            ),
         };
 
         return scene;

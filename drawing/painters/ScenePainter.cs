@@ -17,7 +17,7 @@ public class ScenePainter(AnimationContext ctx, DisplayMode displayMode)
             SpritePainter.Draw(canvas, sprite);
         }
 
-        if (displayMode is DisplayMode.Debug && DebuggedSprite is not null)
+        if (displayMode.IsDebug && DebuggedSprite is not null)
         {
             DebugPainter.DrawDebugInfo(canvas, DebuggedSprite);
         }

@@ -7,11 +7,43 @@ using yoksdotnet.windows;
 
 namespace yoksdotnet;
 
-public record RunType;
-public record RunAsConfigure : RunType;
-public record RunAsScreensaver : RunType;
-public record RunAsPreview(nint WindowHandle) : RunType;
-public record RunAsDebug(bool WithOptions) : RunType;
+public record RunType
+{
+    public bool Configure { get; init; } = default;
+    public bool Screensaver { get; init; } = default;
+    public nint? PreviewHwnd { get; init; } = default;
+    public bool? DebugWithOptions { get; init; } = default;
+
+    public static RunType RunAsConfigure() => new()
+    {
+        Configure = true,
+    };
+
+    public static RunType RunAsScreensaver() => new()
+    {
+        Screensaver = true,
+    };
+
+    public static RunType RunAsPreview(nint hwnd) => new()
+    {
+        PreviewHwnd = hwnd,
+    };
+
+    public static RunType RunAsDebug(bool withOptions) => new()
+    {
+        DebugWithOptions = withOptions,
+    };
+
+    public T Match<T>(Func<T> whenConfigure, Func<T> whenScreensaver, Func<nint, T> whenPreview, Func<bool, T> whenDebug)
+    {
+        if (Configure) return whenConfigure();
+        if (Screensaver) return whenScreensaver();
+        if (PreviewHwnd is not null) return whenPreview(PreviewHwnd.Value);
+        if (DebugWithOptions is not null) return whenDebug(DebugWithOptions.Value);
+
+        throw new NotImplementedException();
+    }
+}
 
 public partial class App : Application
 {
@@ -23,24 +55,17 @@ public partial class App : Application
     {
         var runType = DetermineRunType(e);
 
-        switch (runType)
+        if (runType == null)
         {
-            case RunAsConfigure:
-            {
-                MainWindow = new OptionsWindow();
-                break;
-            }
-            case RunAsScreensaver:
-            {
-                MainWindow = new DisplayWindow(new DisplayMode.Screensaver());
-                break;
-            }
-            case RunAsPreview(var parentHandle):
-            {
-                MainWindow = new DisplayWindow(new DisplayMode.Preview(parentHandle));
-                break;
-            }
-            case RunAsDebug(bool withOptions):
+            Shutdown();
+            return;
+        }
+
+        MainWindow = runType.Match<Window>(
+            whenConfigure: () => new OptionsWindow(),
+            whenScreensaver: () => new DisplayWindow(DisplayMode.Screensaver()),
+            whenPreview: hwnd => new DisplayWindow(DisplayMode.Preview(hwnd)),
+            whenDebug: withOptions =>
             {
                 if (withOptions)
                 {
@@ -48,21 +73,14 @@ public partial class App : Application
                     _debugOptionsWindow.Show();
                 }
 
-                MainWindow = new DisplayWindow(new DisplayMode.Debug(_debugOptionsWindow));
-
-                break;
+                return new DisplayWindow(DisplayMode.Debug(_debugOptionsWindow));
             }
-            case null:
-            {
-                Shutdown();
-                break;
-            }
-        }
+        );
 
         MainWindow.Show();
     }
 
-    private RunType? DetermineRunType(StartupEventArgs e)
+    private static RunType? DetermineRunType(StartupEventArgs e)
     {
         var normalizedArgs = e.Args
             .Select(arg => arg.ToLower().Trim())
@@ -71,22 +89,22 @@ public partial class App : Application
 
         RunType? runType = normalizedArgs switch
         {
-            [] => new RunAsConfigure(),
-            ["/c"] => new RunAsConfigure(),
-            ["/d"] => new RunAsDebug(WithOptions: false),
-            ["/dd"] => new RunAsDebug(WithOptions: true),
-            ["/s"] => new RunAsScreensaver(),
-            ["/s", var handle] => new RunAsScreensaver(),
-            ["/p", var handle] => new RunAsPreview(nint.Parse(handle)),
+            [] => RunType.RunAsConfigure(),
+            ["/c"] => RunType.RunAsConfigure(),
+            ["/d"] => RunType.RunAsDebug(withOptions: false),
+            ["/dd"] => RunType.RunAsDebug(withOptions: true),
+            ["/s"] => RunType.RunAsScreensaver(),
+            ["/s", var handle] => RunType.RunAsScreensaver(),
+            ["/p", var handle] => RunType.RunAsPreview(nint.Parse(handle)),
 
-            [var flag] when flag.StartsWith("/s") && flag.Contains(':') => 
-                new RunAsScreensaver(),
+            [var flag] when flag.StartsWith("/s") && flag.Contains(':') 
+                => RunType.RunAsScreensaver(),
 
-            [var flag] when flag.StartsWith("/p") && flag.Contains(':') =>
-                new RunAsPreview(nint.Parse(flag.Split(':')[1])),
+            [var flag] when flag.StartsWith("/p") && flag.Contains(':')
+                => RunType.RunAsPreview(nint.Parse(flag.Split(':')[1])),
 
             _ => null,
-        };
+        }; 
 
         return runType;
     }

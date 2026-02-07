@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
 using yoksdotnet.common;
 using yoksdotnet.drawing;
@@ -15,7 +14,7 @@ public class ScrOptions
     public double diversity = 0.2;
     public double familySize = 0.5;
     public double impostorDensity = 0.1;
-    public PaletteChoice paletteChoice = new SingleGroupPalettes(PaletteGroup.XpInspired);
+    public PaletteChoice paletteChoice = PaletteChoice.SingleGroup(PaletteGroup.XpInspired);
 
     public double spriteScale = 0.5;
     public double emotionScale = 0.5;
@@ -24,7 +23,7 @@ public class ScrOptions
 
     public double animationSpeed = 0.2;
     public List<Pattern> possiblePatterns = [..SfEnums.GetAll<Pattern>()];
-    public PatternChoice startingPattern = new RandomPatternChoice();
+    public PatternChoice startingPattern = PatternChoice.Random();
     public bool patternDoesChange = true;
     public double patternChangeFrequency = 0.5;
 
@@ -33,22 +32,72 @@ public class ScrOptions
     public List<CustomPaletteSet> customPalettes = [];
 }
 
-[JsonDerivedType(typeof(RandomPatternChoice), nameof(RandomPatternChoice))]
-[JsonDerivedType(typeof(SinglePatternChoice), nameof(SinglePatternChoice))]
-public abstract record PatternChoice : Union<RandomPatternChoice, SinglePatternChoice>;
-public record RandomPatternChoice : PatternChoice;
-public record SinglePatternChoice(Pattern Pattern) : PatternChoice;
+public record PatternChoice
+{
+    public bool IsRandom { get; init; } = default;
+    public Pattern? SinglePattern { get; init; } = default;
 
+    public static PatternChoice Random() => new()
+    {
+        IsRandom = true,
+    };
 
-[JsonDerivedType(typeof(SingleGroupPalettes), nameof(SingleGroupPalettes))]
-[JsonDerivedType(typeof(AllPalettes), nameof(AllPalettes))]
-[JsonDerivedType(typeof(UserDefinedPalettes), nameof(UserDefinedPalettes))]
-[JsonDerivedType(typeof(GeneratedPalettes), nameof(GeneratedPalettes))]
-public abstract record PaletteChoice : Union<SingleGroupPalettes, AllPalettes, UserDefinedPalettes, GeneratedPalettes>;
-public record SingleGroupPalettes(PaletteGroup Group) : PaletteChoice;
-public record AllPalettes : PaletteChoice;
-public record UserDefinedPalettes(string SetId, string Name) : PaletteChoice;
-public record GeneratedPalettes : PaletteChoice;
+    public static PatternChoice Single(Pattern pattern) => new()
+    {
+        SinglePattern = pattern,
+    };
 
+    public T Match<T>(Func<T> whenRandom, Func<Pattern, T> whenSingle)
+    {
+        if (IsRandom) return whenRandom();
+        if (SinglePattern is not null) return whenSingle(SinglePattern);
+
+        throw new NotImplementedException();
+    }
+}
+
+public record PaletteChoice
+{
+    public bool IsAllGroups { get; init; } = default;
+    public bool IsRandomlyGenerated { get; init; } = default;
+    public PaletteGroup? Group { get; init; } = default;
+    public CustomPaletteSetEntry? CustomSet { get; init; } = default;
+
+    public static PaletteChoice SingleGroup(PaletteGroup group) => new()
+    {
+        Group = group,
+    };
+
+    public static PaletteChoice All() => new()
+    {
+        IsAllGroups = true,
+    };
+
+    public static PaletteChoice UserDefined(string id, string name) => new()
+    {
+        CustomSet = new(id, name),
+    };
+
+    public static PaletteChoice RandomlyGenerated() => new()
+    {
+        IsRandomlyGenerated = true,
+    };
+
+    public T Match<T>(
+        Func<PaletteGroup, T> whenSingleGroup,
+        Func<T> whenAll,
+        Func<CustomPaletteSetEntry, T> whenUserDefined,
+        Func<T> whenGenerated
+    ) {
+        if (Group is not null) return whenSingleGroup(Group);
+        if (IsAllGroups) return whenAll();
+        if (CustomSet is not null) return whenUserDefined(CustomSet);
+        if (IsRandomlyGenerated) return whenGenerated();
+
+        throw new NotImplementedException();
+    }
+}
+
+public record CustomPaletteSetEntry(string Id, string Name);
 public record CustomPaletteSet(string Id, string Name, List<CustomPaletteEntry> Entries);
 public record CustomPaletteEntry(string Name, Palette Palette);

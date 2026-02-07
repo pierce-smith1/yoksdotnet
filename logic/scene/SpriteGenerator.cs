@@ -48,24 +48,20 @@ public class SpriteGenerator(Random rng, ScrOptions options)
 
     private (List<Palette> Palettes, int TotalPossibleCount) SelectPalettes()
     {
-        IEnumerable<Palette> possiblePalettes = options.paletteChoice switch
-        {
-            SingleGroupPalettes choice =>
-                SfEnums.GetAll<PredefinedPalette>().Where(pair => pair.Group == choice.Group),
+        IEnumerable<Palette> possiblePalettes = options.paletteChoice.Match(
+            whenSingleGroup: group =>
+                SfEnums.GetAll<PredefinedPalette>().Where(pair => pair.Group == group),
 
-            AllPalettes =>
-                SfEnums.GetAll<PredefinedPalette>(),
+            whenAll: SfEnums.GetAll<PredefinedPalette>,
 
-            UserDefinedPalettes(var setId, _) =>
-                options.customPalettes.FirstOrDefault(s => s.Id == setId)?.Entries.Select(e => e.Palette),
+            whenUserDefined: customSet =>
+                options.customPalettes.FirstOrDefault(s => s.Id == customSet.Id)?.Entries.Select(e => e.Palette),
 
-            GeneratedPalettes =>
-                new RandomPaletteGenerator(rng).Generate(GetColorCount()),
+            whenGenerated: () =>
+                new RandomPaletteGenerator(rng).Generate(GetColorCount())
+        ) ?? [Palette.DefaultPalette];
 
-            _ => throw new NotImplementedException(),
-        } ?? [Palette.DefaultPalette];
-
-        if (possiblePalettes.Count() == 0)
+        if (!possiblePalettes.Any())
         {
             possiblePalettes = [Palette.DefaultPalette];
         }
@@ -89,19 +85,18 @@ public class SpriteGenerator(Random rng, ScrOptions options)
 
     private int GetColorCount()
     {
-        var maxColorCount = options.paletteChoice switch
-        {
-            SingleGroupPalettes(PaletteGroup g) =>
-                SfEnums.GetAll<PredefinedPalette>().Where(p => p.Group == g).Count(),
+        var maxColorCount = options.paletteChoice.Match(
+            whenSingleGroup: group =>
+                SfEnums.GetAll<PredefinedPalette>().Where(p => p.Group == group).Count(),
 
-            AllPalettes => SfEnums.GetAll<PredefinedPalette>().Count(),
-            GeneratedPalettes => 30,
+            whenAll: () =>
+                SfEnums.GetAll<PredefinedPalette>().Count(),
 
-            UserDefinedPalettes(var setId, _) =>
-                options.customPalettes.FirstOrDefault(s => s.Id == setId)?.Entries.Count ?? 1,
+            whenUserDefined: customSet
+                => options.customPalettes.FirstOrDefault(s => s.Id == customSet.Id)?.Entries.Count ?? 1,
 
-            _ => throw new NotImplementedException(),
-        };
+            whenGenerated: () => 30
+        );
 
         var count = Math.Max(2, (int)Math.Round(options.diversity * maxColorCount));
         return count;

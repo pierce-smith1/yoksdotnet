@@ -15,6 +15,37 @@ using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.windows;
 
+public record DisplayMode
+{
+    public bool IsDebug { get; init; } = default;
+    public OptionsWindow? DebugOptionsWindow { get; init; } = default;
+    public bool IsScreensaver { get; init; } = default;
+    public nint? PreviewHwnd { get; init; } = default;
+
+    public static DisplayMode Debug(OptionsWindow? optionsWindow) => new()
+    {
+        IsDebug = true,
+        DebugOptionsWindow = optionsWindow,
+    };
+
+    public static DisplayMode Screensaver() => new()
+    {
+        IsScreensaver = true,
+    };
+
+    public static DisplayMode Preview(nint hwnd) => new()
+    {
+        PreviewHwnd = hwnd,
+    };
+
+    public void Match(Action<OptionsWindow?> whenDebug, Action whenScreensaver, Action<nint> whenPreview)
+    {
+        if (IsDebug) whenDebug(DebugOptionsWindow);
+        if (IsScreensaver) whenScreensaver();
+        if (PreviewHwnd is not null) whenPreview(PreviewHwnd.Value);
+    }
+}
+
 public partial class DisplayWindow : Window
 {
     [DllImport("user32.dll")]
@@ -31,6 +62,7 @@ public partial class DisplayWindow : Window
 
     private readonly int _animationFps = 60;
     private readonly AnimationContext _ctx;
+    private readonly int _debugRngSeed = new Random().Next();
 
     private readonly DisplayMode _displayMode;
     private readonly ScenePainter _scenePainter;
@@ -40,20 +72,12 @@ public partial class DisplayWindow : Window
         InitializeComponent();
 
         _displayMode = mode;
-        switch (_displayMode)
-        {
-            case DisplayMode.Screensaver:
-                InitForScreensaver();
-                break;
 
-            case DisplayMode.Preview(var _parentHandle):
-                // Doesn't work and I don't know why. Ignoring for now but we should come back to this.
-                break;
-
-            case DisplayMode.Debug(OptionsWindow optionsWindow):
-                InitForDebug(optionsWindow);
-                break;
-        }
+        mode.Match(
+            whenScreensaver: InitForScreensaver,
+            whenDebug: InitForDebug,
+            whenPreview: hwnd => { /* TODO */ }
+        );
 
         var rng = GetRng();
         var options = GetOptions();
@@ -157,9 +181,9 @@ public partial class DisplayWindow : Window
 
     private ScrOptions GetOptions()
     { 
-        if (_displayMode is DisplayMode.Debug debugMode && debugMode.DebugOptionsWindow is not null)
+        if (_displayMode.IsDebug && _displayMode.DebugOptionsWindow is not null)
         {
-            return debugMode.DebugOptionsWindow.ViewModel.BackingOptions;
+            return _displayMode.DebugOptionsWindow.ViewModel.BackingOptions;
         }
 
         var savedOptions = OptionsStorage.Load();
@@ -177,9 +201,9 @@ public partial class DisplayWindow : Window
 
     private Random GetRng()
     {
-        if (_displayMode is DisplayMode.Debug debugMode && debugMode.DebugOptionsWindow is not null)
+        if (_displayMode.IsDebug && _displayMode.DebugOptionsWindow is not null)
         {
-            return new Random(2270);
+            return new Random(_debugRngSeed);
         }
 
         return new Random();
@@ -222,12 +246,5 @@ public partial class DisplayWindow : Window
     {
         System.Windows.Application.Current.Shutdown();
     }
-}
-
-public record DisplayMode()
-{
-    public record Debug(OptionsWindow? DebugOptionsWindow) : DisplayMode();
-    public record Screensaver() : DisplayMode();
-    public record Preview(nint parentHandle) : DisplayMode();
 }
 

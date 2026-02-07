@@ -85,7 +85,7 @@
                 <!-- Palette -->
                 <Label Grid.Row="3" Grid.Column="0" FontWeight="SemiBold">Palette set:</Label>
                 <ComboBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" 
-                    ItemsSource="{Binding PaletteChoices}"
+                    ItemsSource="{Binding PaletteSelections}"
                     SelectedValue="{Binding FamilyPaletteChoice}"
                     Height="25"
                     SelectionChanged="OnPaletteSetSelected"
