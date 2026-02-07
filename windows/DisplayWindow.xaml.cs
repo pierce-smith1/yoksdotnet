@@ -87,6 +87,12 @@ public partial class DisplayWindow : Window
 
         _scenePainter = new(_ctx, mode);
 
+        SizeChanged += (s, e) =>
+        {
+            _ctx.scene.width = (int)e.NewSize.Width;
+            _ctx.scene.height = (int)e.NewSize.Height;
+        };
+
         StartLoop();
     }
 
@@ -242,7 +248,7 @@ public partial class DisplayWindow : Window
         host.Child = glControl;
     }
 
-    private void Shutdown()
+    private static void Shutdown()
     {
         System.Windows.Application.Current.Shutdown();
     }
