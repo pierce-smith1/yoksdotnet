@@ -18,6 +18,7 @@ public class ScrOptions
 
     public double spriteScale = 0.5;
     public double emotionScale = 0.5;
+
     public bool trailsEnabled = false;
     public double trailLength = 0.1;
 

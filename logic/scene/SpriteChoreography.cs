@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 
 using yoksdotnet.common;
+using yoksdotnet.logic.scene.patterns;
 
 namespace yoksdotnet.logic.scene;
 
@@ -14,9 +15,20 @@ public static class SpriteChoreography
             ChangePattern(ctx);
         }
 
-        SpriteMovement.MoveByCurrentPattern(ctx);
-        SpriteMovement.ApplyEmotionShake(ctx);
-        YokinEmotions.UpdateEmotions(ctx);
+        foreach (var entity in ctx.scene.entities)
+        {
+            var currentPattern = ctx.scene.currentPattern ?? Pattern.Lattice;
+
+            PatternMovement.MoveByPattern(ctx, currentPattern, entity);
+
+            if (entity.emotion is not null)
+            {
+                SpriteMovement.ApplyEmotionShake(ctx, entity.emotion, entity.basis);
+                YokinEmotions.UpdateEmotions(ctx, entity.emotion, entity.basis);
+            }
+
+            SpriteTrails.UpdateTrails(ctx, entity);
+        }
     }
 
     public static bool ShouldChangePattern(AnimationContext ctx)

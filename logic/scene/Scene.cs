@@ -13,7 +13,7 @@ public class Scene
     public Pattern? currentPattern = null;
     public DateTimeOffset? patternLastChangedAt = null;
 
-    public List<Sprite> sprites = [];
+    public List<Entity> entities = [];
 
     public required int width;
     public required int height;

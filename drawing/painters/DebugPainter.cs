@@ -1,15 +1,15 @@
 ﻿using SkiaSharp;
 
 using System.Collections.Generic;
-using yoksdotnet.logic.scene;
+using yoksdotnet.logic;
 
 namespace yoksdotnet.drawing.painters;
 
 public static class DebugPainter
 {
-    public static void DrawDebugInfo(SKCanvas canvas, Sprite sprite)
+    public static void DrawDebugInfo(SKCanvas canvas, Entity entity)
     {
-        var spriteRect = SpritePainter.GetRect(sprite);
+        var spriteRect = SpritePainter.GetRect(entity);
 
         var borderRectPaint = new SKPaint
         {
@@ -19,7 +19,7 @@ public static class DebugPainter
 
         canvas.DrawRect(spriteRect, borderRectPaint);
 
-        var infoLines = InfoToReport(sprite);
+        var infoLines = InfoToReport(entity);
         for (var i = 0; i < infoLines.Count; i++)
         {
             var line = infoLines[i];
@@ -40,12 +40,12 @@ public static class DebugPainter
         }
     }
 
-    private static List<string> InfoToReport(Sprite sprite)
+    private static List<string> InfoToReport(Entity entity)
     {
         return [
-            $"A: {sprite.addons.emotions?.ambition}",
-            $"E: {sprite.addons.emotions?.empathy}",
-            $"O: {sprite.addons.emotions?.optimism}",
+            $"A: {entity.emotion?.ambition}",
+            $"E: {entity.emotion?.empathy}",
+            $"O: {entity.emotion?.optimism}",
         ];
     }
 }

@@ -135,9 +135,9 @@ public partial class DisplayWindow : Window
     {
         MainCanvas.Child.MouseUp += (s, e) =>
         {
-            var clickedSprite = _ctx.scene.sprites.FirstOrDefault(sprite =>
+            var clickedSprite = _ctx.scene.entities.FirstOrDefault(entity =>
             {
-                var bounds = sprite.Bounds;
+                var bounds = entity.basis.Bounds;
 
                 var mouseXIntersects = e.X > bounds.topLeft.X && e.X < bounds.bottomRight.X;
                 var mouseYIntersects = e.Y > bounds.topLeft.Y && e.Y < bounds.bottomRight.Y;
@@ -145,7 +145,7 @@ public partial class DisplayWindow : Window
                 return mouseXIntersects && mouseYIntersects;
             });
 
-            _scenePainter.DebuggedSprite = clickedSprite;
+            _scenePainter.DebuggedEntity = clickedSprite;
         };
 
         if (debugOptionsWindow is not null)
@@ -180,6 +180,8 @@ public partial class DisplayWindow : Window
             nameof(OptionsViewModel.IndividualScale),
             nameof(OptionsViewModel.IndividualEmotionScale),
             nameof(OptionsViewModel.AnimationStartingPattern),
+            nameof(OptionsViewModel.IndividualTrailsEnabled),
+            nameof(OptionsViewModel.IndividualTrailLength),
         ];
 
         return propertiesRequiringRefresh.Contains(propertyName);
@@ -224,7 +226,6 @@ public partial class DisplayWindow : Window
     
     private void OnTick(object? _sender, ElapsedEventArgs _e)
     {
-        SceneSimulation.HandleFrame(_ctx);
         RefreshSurface();
     }
 
@@ -235,6 +236,7 @@ public partial class DisplayWindow : Window
 
     private void OnPaintSurface(object? sender, SKPaintGLSurfaceEventArgs e)
     {
+        SceneSimulation.HandleFrame(_ctx);
         _scenePainter.Draw(e.Surface.Canvas);
     }
 

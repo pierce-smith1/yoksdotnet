@@ -4,21 +4,21 @@ namespace yoksdotnet.logic.scene;
 
 public static class SpriteBitmaps
 {
-    public static Bitmap GetBitmap(Sprite sprite)
+    public static Bitmap GetBitmap(Skin skin, Emotion? emotion)
     {
-        if (sprite.addons.fixedBitmap is not null)
+        if (skin.fixedBitmap is not null)
         {
-            return sprite.addons.fixedBitmap;
+            return skin.fixedBitmap;
         }
 
-        if (sprite.addons.emotions is not { } emotions)
+        if (emotion is null)
         {
             return Bitmap.Lk;
         }
 
-        var ambitionRanking = GetEmotionRanking(emotions.ambition);
-        var empathyRanking = GetEmotionRanking(emotions.empathy);
-        var optimismRanking = GetEmotionRanking(emotions.optimism);
+        var ambitionRanking = GetEmotionRanking(emotion.ambition);
+        var empathyRanking = GetEmotionRanking(emotion.empathy);
+        var optimismRanking = GetEmotionRanking(emotion.optimism);
 
         Bitmap[][][] emotionMap =
         [

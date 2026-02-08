@@ -9,41 +9,34 @@ namespace yoksdotnet.logic.scene;
 
 public class SpriteGenerator(Random rng, ScrOptions options)
 {
-    private static int _runningId = 0;
-
-    public IEnumerable<Sprite> Make(double spreadX, double spreadY)
+    public IEnumerable<Entity> Make(double spreadX, double spreadY)
     {
-        var sprites = new List<Sprite>();
+        var entities = new List<Entity>();
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
         for (var i = 0; i < GetSpriteCount(spreadX, spreadY); i++)
         {
+            var home = new Point(rng.NextDouble() * spreadX, rng.NextDouble() * spreadY);
+            var brand = rng.NextDouble();
             var palette = rng.SampleExponential(selectedPalettes, 1.0 - (double)selectedPalettes.Count / totalPossibleCount);
-            palette ??= Palette.DefaultPalette;
 
-            var newSprite = new Sprite
+            int? trailLength = options.trailsEnabled
+                ? (int)Interp.Linear(options.trailLength, 0.0, 1.0, 5.0, 15.0)
+                : null;
+
+            var newEntity = CreatureCreation.MakeYokin(new()
             {
-                id = _runningId++,
-                brand = rng.NextDouble(),
-                palette = palette,
-                home = new(rng.NextDouble() * spreadX, rng.NextDouble() * spreadY),
-                offset = new(0, 0),
+                home = home,
                 scale = options.spriteScale,
-                width = Bitmap.BitmapSize(),
-                height = Bitmap.BitmapSize(),
-                angleRadians = 0.0,
+                brand = brand,
+                palette = palette,
+                trailLength = trailLength,
+            });
 
-                addons = new SpriteAddons
-                {
-                    emotions = new(0.0, 0.0, 0.0),
-                    cachedPaint = PaletteConversion.ToSkPaint(palette),
-                }
-            };
-
-            sprites.Add(newSprite);
+            entities.Add(newEntity);
         }
 
-        return sprites;
+        return entities;
     }
 
     private (List<Palette> Palettes, int TotalPossibleCount) SelectPalettes()

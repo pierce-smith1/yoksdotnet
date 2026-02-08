@@ -22,14 +22,9 @@ public class ImageExporter(string _exportPath)
             var canvas = recorder.BeginRecording(SKRect.Create(size, size));
 
             canvas.Clear();
-            SpritePainter.Draw(canvas, new Sprite()
-            {
-                palette = palette,
-                addons = new()
-                {
-                    fixedBitmap = bitmap,
-                },
-            });
+
+            var subject = CreatureCreation.MakePreviewYokin(bitmap);
+            SpritePainter.Draw(canvas, subject);
 
             var picture = recorder.EndRecording();
             var image = SKImage.FromPicture(picture, new SKSizeI(size, size));

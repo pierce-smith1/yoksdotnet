@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using yoksdotnet.common;
+using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.drawing.painters;
@@ -12,23 +13,16 @@ using PaletteIndexRegions = Dictionary<PaletteIndex, List<Point>>;
 public class SpriteEditPreviewPainter(Bitmap bitmap)
 {
     private readonly PaletteIndexRegions _paletteIndexRegions = ComputeIndexRegions(bitmap.Resource);
-    private readonly Sprite _previewSprite = new()
-    {
-        palette = Palette.DefaultPalette,
-        addons = new()
-        {
-            fixedBitmap = bitmap
-        },
-    };
+    private readonly Entity _previewEntity = CreatureCreation.MakePreviewYokin(bitmap);
 
     public PaletteIndex? HoveredIndex { get; private set; } = null;
 
     public void Draw(SKCanvas canvas, Palette? palette)
     {
-        _previewSprite.home.X = (canvas.LocalClipBounds.Width / 2) - (Bitmap.BitmapSize() / 2);
-        _previewSprite.home.Y = (canvas.LocalClipBounds.Height / 2) - (Bitmap.BitmapSize() / 2);
+        _previewEntity.basis.home.X = (canvas.LocalClipBounds.Width / 2) - (Bitmap.BitmapSize() / 2);
+        _previewEntity.basis.home.Y = (canvas.LocalClipBounds.Height / 2) - (Bitmap.BitmapSize() / 2);
 
-        _previewSprite.palette = palette is not null
+        _previewEntity.skin!.palette = palette is not null
             ? HoveredIndex is not null
                 ? WithIndexHighlighted(palette, HoveredIndex)
                 : palette
@@ -36,7 +30,7 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
 
         canvas.Clear(new SKColor(0x11, 0x11, 0x11));
 
-        SpritePainter.Draw(canvas, _previewSprite);
+        SpritePainter.Draw(canvas, _previewEntity);
     }
 
     public void UpdateHoveredIndex(int x, int y, int width, int height)
