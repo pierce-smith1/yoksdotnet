@@ -17,6 +17,11 @@ public record Pattern(string Name, string Description) : ISfEnum
         "Drift from left to right, softly bobbing up and down"
     );
 
+    public readonly static Pattern Bouncy = new(
+        "Bouncy",
+        "DVD screensaver style"
+    );
+
     public readonly static Pattern Waves = new(
         "Waves", 
         "Move in large, random circles"
@@ -48,55 +53,27 @@ public static class PatternMovement
 
         if (pattern == Pattern.Roamers)
         {
-            MoveRoamers(ctx, entity.basis, brand);
+            SimpleMovement.MoveRoamers(ctx, entity.basis, brand);
+        }
+        else if (pattern == Pattern.Bouncy)
+        {
+            BouncyPattern.Move(ctx, entity);
         }
         else if (pattern == Pattern.Waves)
         {
-            MoveWaves(ctx, entity.basis, brand);
+            SimpleMovement.MoveWaves(ctx, entity.basis, brand);
         }
         else if (pattern == Pattern.Lissajous)
         {
-            MoveLissajous(ctx, entity.basis, brand);
+            SimpleMovement.MoveLissajous(ctx, entity.basis, brand);
         }
     }
 
-    public static void MoveRoamers(AnimationContext ctx, PhysicalBasis basis, Brand brand)
+    public static void EndPattern(AnimationContext ctx, Pattern pattern, Entity entity)
     {
-        basis.home.X += brand.value * ctx.scene.lastDtMs;
-        basis.home.Y += Math.Sin(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
-
-        SpriteMovement.WrapScreen(ctx, basis);
-    }
-
-    public static void MoveWaves(AnimationContext ctx, PhysicalBasis basis, Brand brand)
-    {
-        basis.home.X += Math.Sin(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
-        basis.home.Y += Math.Cos(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
-
-        SpriteMovement.WrapScreen(ctx, basis);
-    }
-
-    public static void MoveLissajous(AnimationContext ctx, PhysicalBasis basis, Brand brand)
-    {
-        var minX = Math.Max((ctx.scene.width - ctx.scene.height) / 2.0, 0.0);
-        var maxX = ctx.scene.width - minX;
-
-        var minY = Math.Max((ctx.scene.height - ctx.scene.width) / 2.0, 0.0);
-        var maxY = ctx.scene.height - minY;
-
-        var targetX = Interp.Linear(
-            Math.Sin(ctx.scene.seconds * 4.0 - brand.value * 17.0),
-            -1.0, 1.0,
-            minX, maxX - Bitmap.BitmapSize()
-        );
-
-        var targetY = Interp.Linear(
-            Math.Cos(ctx.scene.seconds * 4.0 - brand.value * 11.0),
-            -1.0, 1.0,
-            minY, maxY - Bitmap.BitmapSize()
-        );
-
-        basis.home.X = targetX + (basis.home.X - targetX) * 0.9;
-        basis.home.Y = targetY + (basis.home.Y - targetY) * 0.9;
+        if (pattern == Pattern.Bouncy)
+        {
+            BouncyPattern.OnEnd(ctx, entity);
+        }
     }
 }

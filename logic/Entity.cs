@@ -8,6 +8,9 @@ public class Entity
 
     public Brand? brand;
     public Skin? skin;
+    public Physics? physics;
+    public PhysicsMeasurements? physicsMeasurements;
+
     public Emotion? emotion;
     public Trail? trail;
 }

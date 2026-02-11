@@ -27,6 +27,12 @@ public class PhysicalBasis : EntityComponent
     }
 }
 
+public class Physics : EntityComponent
+{
+    public required Point velocity;
+    public required Point acceleration;
+}
+
 public class Brand : EntityComponent
 {
     public required double value;
@@ -37,6 +43,11 @@ public class Skin : EntityComponent
     public required Palette palette;
     public Bitmap? fixedBitmap = null;
     public SKPaint? cachedPaint = null;
+}
+
+public class PhysicsMeasurements : EntityComponent
+{
+    public required Point lastVelocity;
 }
 
 public record struct Point(double X, double Y);
