@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using yoksdotnet.common;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
 
 public class Trail : EntityComponent
 {
-    public required DateTimeOffset lastCycleAt;
-    public required List<Entity> snapshots;
+    public required CircularBuffer<Entity?> snapshots;
 }
 
 public static class SpriteTrails
@@ -19,18 +17,11 @@ public static class SpriteTrails
             return;
         }
 
-        var trailRefreshSeconds = 0.2;
+        var cycledSnapshot = entity.trail.snapshots.First() ?? CreatureCreation.NewDefault();
+        RefreshSnapshot(cycledSnapshot, entity);
+        entity.trail.snapshots.Last() = cycledSnapshot;
 
-        if (entity.trail.lastCycleAt.AddSeconds(trailRefreshSeconds) < DateTimeOffset.Now)
-        {
-            var cycledSnapshot = entity.trail.snapshots[0];
-            entity.trail.snapshots.RemoveAt(0);
-
-            RefreshSnapshot(cycledSnapshot, entity);
-            entity.trail.snapshots.Add(cycledSnapshot);
-
-            entity.trail.lastCycleAt = DateTimeOffset.Now;
-        }
+        entity.trail.snapshots.Shift();
     }
 
     private static void RefreshSnapshot(Entity ghost, Entity entity)
@@ -55,5 +46,7 @@ public static class SpriteTrails
         ghost.skin.palette = entity.skin.palette;
         ghost.skin.fixedBitmap = entity.skin.fixedBitmap;
         ghost.skin.cachedPaint = entity.skin.cachedPaint;
+
+        ghost.emotion = entity.emotion;
     }
 }

@@ -15,9 +15,13 @@ public static class SpritePainter
 
         if (entity.trail is not null)
         {
-            foreach (var snapshot in entity.trail.snapshots)
+            for (var i = 0; i < entity.trail.snapshots.Count; i += 10)
             {
-                Draw(canvas, snapshot);
+                var snapshot = entity.trail.snapshots[i];
+                if (snapshot is not null)
+                {
+                    Draw(canvas, snapshot);
+                }
             }
         }
 

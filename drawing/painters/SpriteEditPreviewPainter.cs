@@ -13,7 +13,7 @@ using PaletteIndexRegions = Dictionary<PaletteIndex, List<Point>>;
 public class SpriteEditPreviewPainter(Bitmap bitmap)
 {
     private readonly PaletteIndexRegions _paletteIndexRegions = ComputeIndexRegions(bitmap.Resource);
-    private readonly Entity _previewEntity = CreatureCreation.MakePreviewYokin(bitmap);
+    private readonly Entity _previewEntity = CreatureCreation.NewPreviewYokin(bitmap);
 
     public PaletteIndex? HoveredIndex { get; private set; } = null;
 

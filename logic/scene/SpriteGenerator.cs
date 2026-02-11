@@ -24,7 +24,7 @@ public class SpriteGenerator(Random rng, ScrOptions options)
                 ? (int)Interp.Linear(options.trailLength, 0.0, 1.0, 5.0, 15.0)
                 : null;
 
-            var newEntity = CreatureCreation.MakeYokin(new()
+            var newEntity = CreatureCreation.NewYokin(new()
             {
                 home = home,
                 scale = options.spriteScale,

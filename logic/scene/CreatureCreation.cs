@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using yoksdotnet.common;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
@@ -15,7 +14,25 @@ public class YokinCreationParameters
 
 public static class CreatureCreation
 {
-    public static Entity MakeYokin(YokinCreationParameters parameters)
+    public static Entity NewDefault()
+    {
+        var entity = new Entity
+        {
+            basis = new()
+            {
+                home = new(0.0, 0.0),
+                offset = new(0.0, 0.0),
+                scale = 1.0,
+                width = Bitmap.BitmapSize(),
+                height = Bitmap.BitmapSize(),
+                angleRadians = 0.0,
+            }
+        };
+
+        return entity;
+    }
+
+    public static Entity NewYokin(YokinCreationParameters parameters)
     {
         var yokin = new Entity
         {
@@ -50,29 +67,16 @@ public static class CreatureCreation
 
         if (parameters.trailLength is not null)
         {
-            var paramsWithoutTrail = new YokinCreationParameters
-            {
-                home = parameters.home,
-                scale = parameters.scale,
-                brand = parameters.brand,
-                palette = parameters.palette,
-            };
-
-            var snapshots = new Entity[parameters.trailLength.Value]
-                .Select(_ => MakeYokin(paramsWithoutTrail))
-                .ToList();
-
             yokin.trail = new()
             {
-                lastCycleAt = DateTimeOffset.Now,
-                snapshots = snapshots,
+                snapshots = new CircularBuffer<Entity?>(parameters.trailLength.Value * 10),
             };
         }
 
         return yokin;
     }
 
-    public static Entity MakePreviewYokin(Bitmap bitmap)
+    public static Entity NewPreviewYokin(Bitmap bitmap)
     {
         var yokinnequin = new Entity
         {
