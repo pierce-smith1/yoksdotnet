@@ -39,9 +39,15 @@ public static class SpriteMovement
         }
     }
 
-    public static void ClampToScreen(AnimationContext ctx, PhysicalBasis point)
+    public static void ClampToScreen(AnimationContext ctx, PhysicalBasis basis)
     {
-        point.home.X = Math.Clamp(point.home.X, point.offset.X, ctx.scene.width + point.offset.X);
-        point.home.Y = Math.Clamp(point.home.Y, point.offset.Y, ctx.scene.height + point.offset.Y);
+        basis.home.X = Math.Clamp(basis.home.X, basis.offset.X, ctx.scene.width + basis.offset.X);
+        basis.home.Y = Math.Clamp(basis.home.Y, basis.offset.Y, ctx.scene.height + basis.offset.Y);
+    }
+
+    public static void SimulatePhysics(AnimationContext ctx, PhysicalBasis basis, Physics physics)
+    {
+        basis.home.X += physics.velocity.X * ctx.scene.lastDtMs;
+        basis.home.Y += physics.velocity.Y * ctx.scene.lastDtMs;
     }
 }

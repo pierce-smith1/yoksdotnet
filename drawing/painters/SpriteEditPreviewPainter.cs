@@ -8,7 +8,7 @@ using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.drawing.painters;
 
-using PaletteIndexRegions = Dictionary<PaletteIndex, List<Point>>;
+using PaletteIndexRegions = Dictionary<PaletteIndex, List<Vector>>;
 
 public class SpriteEditPreviewPainter(Bitmap bitmap)
 {
@@ -22,7 +22,7 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
         _previewEntity.basis.home.X = (canvas.LocalClipBounds.Width / 2) - (Bitmap.BitmapSize() / 2);
         _previewEntity.basis.home.Y = (canvas.LocalClipBounds.Height / 2) - (Bitmap.BitmapSize() / 2);
 
-        _previewEntity.skin!.palette = palette is not null
+        _previewEntity.Get<Skin>()!.palette = palette is not null
             ? HoveredIndex is not null
                 ? WithIndexHighlighted(palette, HoveredIndex)
                 : palette
@@ -35,16 +35,16 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
 
     public void UpdateHoveredIndex(int x, int y, int width, int height)
     {
-        var hoverPos = new Point(x, y);
+        var hoverPos = new Vector(x, y);
 
         foreach (var (index, points) in _paletteIndexRegions)
         {
-            var offsetPoints = points.Select(p => new Point(
+            var offsetVectors = points.Select(p => new Vector(
                 p.X + width / 2 - Bitmap.BitmapSize() / 2,
                 p.Y + height / 2 - Bitmap.BitmapSize() / 2
             ));
 
-            if (offsetPoints.Contains(hoverPos))
+            if (offsetVectors.Contains(hoverPos))
             {
                 HoveredIndex = index;
                 return;

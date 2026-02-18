@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using yoksdotnet.logic;
+using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.drawing.painters;
 
@@ -43,9 +44,9 @@ public static class DebugPainter
     private static List<string> InfoToReport(Entity entity)
     {
         return [
-            $"A: {entity.emotion?.ambition}",
-            $"E: {entity.emotion?.empathy}",
-            $"O: {entity.emotion?.optimism}",
+            $"A: {entity.Get<Emotion>()?.ambition}",
+            $"E: {entity.Get<Emotion>()?.empathy}",
+            $"O: {entity.Get<Emotion>()?.optimism}",
         ];
     }
 }

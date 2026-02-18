@@ -1,4 +1,5 @@
 ﻿using SkiaSharp;
+using yoksdotnet.common;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic;
@@ -7,20 +8,24 @@ public abstract class EntityComponent;
 
 public class PhysicalBasis : EntityComponent
 {
-    public required Point home;
-    public required Point offset;
+    public required Vector home;
+    public required Vector offset;
     public required double scale;
     public required double width;
     public required double height;
     public required double angleRadians;
 
-    public Point Final => new(home.X + offset.X, home.Y + offset.Y);
-    public (Point topLeft, Point bottomRight) Bounds
+    public Vector Final => new(home.X + offset.X, home.Y + offset.Y);
+
+    public double ApothemX => width * scale / 2;
+    public double ApothemY => height * scale / 2;
+
+    public (Vector topLeft, Vector bottomRight) Bounds
     {
         get
         {
-            var topLeft = Final;
-            var botRight = new Point(Final.X + (width * scale), Final.Y + (height * scale));
+            var topLeft = new Vector(Final.X - ApothemX, Final.Y - ApothemY);
+            var botRight = new Vector(Final.X + ApothemX, Final.Y + ApothemY);
 
             return (topLeft, botRight);
         }
@@ -29,8 +34,8 @@ public class PhysicalBasis : EntityComponent
 
 public class Physics : EntityComponent
 {
-    public required Point velocity;
-    public required Point acceleration;
+    public required Vector velocity;
+    public required double mass;
 }
 
 public class Brand : EntityComponent
@@ -47,7 +52,5 @@ public class Skin : EntityComponent
 
 public class PhysicsMeasurements : EntityComponent
 {
-    public required Point lastVelocity;
+    public required Vector lastVelocity;
 }
-
-public record struct Point(double X, double Y);

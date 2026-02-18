@@ -8,22 +8,41 @@ namespace yoksdotnet.logic.scene;
 
 public static class SpriteChoreography
 {
-    public static void HandleFrame(AnimationContext ctx)
+    private static Brand _genericBrand = new() 
     {
-        var endedPattern = CheckPatternChange(ctx);
+        value = 0.0,
+    };
 
-        foreach (var entity in ctx.scene.entities)
+    public static void HandleSceneStart(AnimationContext ctx)
+    {
+        if (ctx.scene.currentPattern is { } firstPattern)
         {
-            MoveSprite(ctx, entity);
-
-            if (endedPattern is not null)
+            foreach (var entity in ctx.scene.entities)
             {
-                PatternMovement.EndPattern(ctx, endedPattern, entity);
+                firstPattern.StartAction(ctx, entity, entity.Get<Brand>() ?? _genericBrand);
             }
         }
     }
 
-    public static Pattern? CheckPatternChange(AnimationContext ctx)
+    public static void HandleFrame(AnimationContext ctx)
+    {
+        var (endingPattern, startingPattern) = CheckPatternChange(ctx);
+
+        if (startingPattern is not null)
+        {
+            foreach (var entity in ctx.scene.entities)
+            {
+                startingPattern.StartAction(ctx, entity, entity.Get<Brand>() ?? _genericBrand);
+            }
+        }
+
+        foreach (var entity in ctx.scene.entities)
+        {
+            MoveSprite(ctx, entity);
+        }
+    }
+
+    public static (Pattern? OldPattern, Pattern? NewPattern) CheckPatternChange(AnimationContext ctx)
     {
         var patternChanged = false;
         var oldPattern = ctx.scene.currentPattern;
@@ -33,7 +52,12 @@ public static class SpriteChoreography
             patternChanged = ChangePattern(ctx);
         }
 
-        return patternChanged ? oldPattern : null;
+        if (patternChanged && ctx.scene.currentPattern is not null)
+        {
+            return (oldPattern, ctx.scene.currentPattern);
+        }
+
+        return (null, null);
     }
 
     public static bool ShouldChangePattern(AnimationContext ctx)
@@ -73,28 +97,28 @@ public static class SpriteChoreography
 
         var oldHome = entity.basis.home;
 
-        PatternMovement.MoveByPattern(ctx, currentPattern, entity);
+        currentPattern.MoveAction(ctx, entity, entity.Get<Brand>() ?? _genericBrand);
 
-        if (entity.emotion is not null)
+        if (entity.Get<Emotion>() is { } emotion)
         {
-            SpriteMovement.ApplyEmotionShake(ctx, entity.emotion, entity.basis);
-            YokinEmotions.UpdateEmotions(ctx, entity.emotion, entity.basis);
+            SpriteMovement.ApplyEmotionShake(ctx, emotion, entity.basis);
+            YokinEmotions.UpdateEmotions(ctx, emotion, entity.basis);
         }
 
         if (currentPattern != Pattern.Lattice)
         {
             var newHome = entity.basis.home;
-            var measuredVelocity = new Point(
+            var measuredVelocity = new Vector(
                 (newHome.X - oldHome.X) / ctx.scene.lastDtMs, 
                 (newHome.Y - oldHome.Y) / ctx.scene.lastDtMs
             );
 
-            entity.physicsMeasurements ??= new()
+            var physicsMeasurements = entity.EnsureHas<PhysicsMeasurements>(() => new()
             {
-                lastVelocity = new(),
-            };
+                lastVelocity = new(0.0, 0.0),
+            });
 
-            entity.physicsMeasurements.lastVelocity = measuredVelocity;
+            physicsMeasurements.lastVelocity = measuredVelocity;
         }
 
         SpriteTrails.UpdateTrails(ctx, entity);

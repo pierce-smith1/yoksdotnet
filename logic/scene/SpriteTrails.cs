@@ -12,16 +12,16 @@ public static class SpriteTrails
 {
     public static void UpdateTrails(AnimationContext ctx, Entity entity)
     {
-        if (entity.trail is null)
+        if (entity.Get<Trail>() is not { } trail)
         {
             return;
         }
 
-        var cycledSnapshot = entity.trail.snapshots.First() ?? CreatureCreation.NewDefault();
+        var cycledSnapshot = trail.snapshots.First() ?? CreatureCreation.NewDefault();
         RefreshSnapshot(cycledSnapshot, entity);
-        entity.trail.snapshots.Last() = cycledSnapshot;
+        trail.snapshots.Last() = cycledSnapshot;
 
-        entity.trail.snapshots.Shift();
+        trail.snapshots.Shift();
     }
 
     private static void RefreshSnapshot(Entity ghost, Entity entity)
@@ -33,20 +33,21 @@ public static class SpriteTrails
         ghost.basis.height = entity.basis.height;
         ghost.basis.angleRadians = entity.basis.angleRadians;
 
-        if (entity.skin is null)
+        if (entity.Get<Skin>() is { } skin)
         {
-            return;
+            var ghostSkin = ghost.EnsureHas<Skin>(() => new()
+            {
+                palette = Palette.DefaultPalette,
+            });
+            
+            ghostSkin.palette = skin.palette;
+            ghostSkin.fixedBitmap = skin.fixedBitmap;
+            ghostSkin.cachedPaint = skin.cachedPaint;
         }
 
-        ghost.skin ??= new()
+        if (entity.Get<Emotion>() is { } emotion)
         {
-            palette = Palette.DefaultPalette,
-        };
-        
-        ghost.skin.palette = entity.skin.palette;
-        ghost.skin.fixedBitmap = entity.skin.fixedBitmap;
-        ghost.skin.cachedPaint = entity.skin.cachedPaint;
-
-        ghost.emotion = entity.emotion;
+            ghost.Attach(emotion);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Linq;
 
 namespace yoksdotnet.drawing;
@@ -79,6 +80,7 @@ public static class ColorConversion
 
         return new(h, s * 100, l * 100);
     }
+
     public static RgbColor FromHsl(HslColor color)
     {
         var (h, s, l) = color;
@@ -110,5 +112,15 @@ public static class ColorConversion
         var b = (byte)Math.Round(bc * 255);
 
         return new(r, g, b);
+    }
+
+    public static SKColor ToSkColor(RgbColor color)
+    {
+        return new SKColor(color.R, color.G, color.B);
+    }
+
+    public static float[] ToFloatArray(RgbColor color)
+    {
+        return [color.R / 255.0f, color.G / 255.0f, color.B / 255.0f];
     }
 }

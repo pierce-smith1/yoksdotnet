@@ -19,6 +19,11 @@ public static class SceneSimulation
             ctx.scene.seconds += dt.TotalSeconds * speedScale;
         }
 
+        if (ctx.scene.frame == 0)
+        {
+            SpriteChoreography.HandleSceneStart(ctx);
+        }
+
         ctx.scene.lastTick = now;
         ctx.scene.frame++;
 

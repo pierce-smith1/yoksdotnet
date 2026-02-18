@@ -6,21 +6,23 @@ namespace yoksdotnet.logic.scene.patterns;
 
 public class SimpleMovement
 {
-    public static void MoveRoamers(AnimationContext ctx, PhysicalBasis basis, Brand brand)
-    {
-        basis.home.X += brand.value * ctx.scene.lastDtMs;
-        basis.home.Y += Math.Sin(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
+    public static void Noop(AnimationContext _ctx, Entity _entity, Brand _brand) {}
 
-        SpriteMovement.WrapScreen(ctx, basis);
-    }
-    public static void MoveWaves(AnimationContext ctx, PhysicalBasis basis, Brand brand)
+    public static void MoveRoamers(AnimationContext ctx, Entity entity, Brand brand)
     {
-        basis.home.X += Math.Sin(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
-        basis.home.Y += Math.Cos(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
+        entity.basis.home.X += brand.value * ctx.scene.lastDtMs;
+        entity.basis.home.Y += Math.Sin(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
 
-        SpriteMovement.WrapScreen(ctx, basis);
+        SpriteMovement.WrapScreen(ctx, entity.basis);
     }
-    public static void MoveLissajous(AnimationContext ctx, PhysicalBasis basis, Brand brand)
+    public static void MoveWaves(AnimationContext ctx, Entity entity, Brand brand)
+    {
+        entity.basis.home.X += Math.Sin(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
+        entity.basis.home.Y += Math.Cos(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
+
+        SpriteMovement.WrapScreen(ctx, entity.basis);
+    }
+    public static void MoveLissajous(AnimationContext ctx, Entity entity, Brand brand)
     {
         var minX = Math.Max((ctx.scene.width - ctx.scene.height) / 2.0, 0.0);
         var maxX = ctx.scene.width - minX;
@@ -40,7 +42,7 @@ public class SimpleMovement
             minY, maxY - Bitmap.BitmapSize()
         );
 
-        basis.home.X = targetX + (basis.home.X - targetX) * 0.9;
-        basis.home.Y = targetY + (basis.home.Y - targetY) * 0.9;
+        entity.basis.home.X = targetX + (entity.basis.home.X - targetX) * 0.9;
+        entity.basis.home.Y = targetY + (entity.basis.home.Y - targetY) * 0.9;
     }
 }

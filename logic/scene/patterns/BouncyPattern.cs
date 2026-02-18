@@ -1,57 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using yoksdotnet.common;
 
 namespace yoksdotnet.logic.scene.patterns;
 
 public static class BouncyPattern
 {
-    public static void Move(AnimationContext ctx, Entity entity)
+    public static void Start(AnimationContext ctx, Entity entity, Brand _brand)
     {
-        var velocity = entity.physics?.velocity
-            ?? entity.physicsMeasurements?.lastVelocity
-            ?? new(ctx.rng.NextDouble(), ctx.rng.NextDouble());
+        var lastVelocity = entity.Get<PhysicsMeasurements>()?.lastVelocity;
 
-        entity.basis.home.X += velocity.X * ctx.scene.lastDtMs;
-        entity.basis.home.Y += velocity.Y * ctx.scene.lastDtMs;
-
-        if (entity.basis.home.X < 0)
+        entity.EnsureHas<Physics>(() => new()
         {
-            entity.basis.home.X = 0;
-            velocity.X = -velocity.X;
-        }
-
-        if (entity.basis.home.Y < 0)
-        {
-            entity.basis.home.Y = 0;
-            velocity.Y = -velocity.Y;
-        }
-
-        if (entity.basis.home.X + (entity.basis.width * entity.basis.scale) > ctx.scene.width)
-        {
-            entity.basis.home.X = ctx.scene.width - (entity.basis.width * entity.basis.scale);
-            velocity.X = -velocity.X;
-        }
-
-        if (entity.basis.home.Y + (entity.basis.height * entity.basis.scale) > ctx.scene.height)
-        {
-            entity.basis.home.Y = ctx.scene.height - (entity.basis.height * entity.basis.scale);
-            velocity.Y = -velocity.Y;
-        }
-
-        entity.physics ??= new()
-        {
-            velocity = new(0.0, 0.0),
-            acceleration = new(0.0, 0.0),
-        };
-
-        entity.physics.velocity = velocity;
+            velocity = lastVelocity ?? Vector.RandomScaled(ctx.rng, 5.0, 5.0),
+            mass = Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, 0.5, 1.5),
+        });
     }
 
-    public static void OnEnd(AnimationContext ctx, Entity entity)
+    public static void Move(AnimationContext ctx, Entity entity, Brand _brand)
     {
-        entity.physics = null;
+        if (entity.Get<Physics>() is not { } physics)
+        {
+            return;
+        }
+
+        SpriteMovement.SimulatePhysics(ctx, entity.basis, physics);
+        BounceOffScreen(ctx, entity.basis, physics);
+    }
+
+    public static void BounceOffScreen(AnimationContext ctx, PhysicalBasis basis, Physics physics)
+    {
+        var bounds = basis.Bounds;
+
+        if (bounds.topLeft.X < 0)
+        {
+            basis.home.X = basis.ApothemX;
+            physics.velocity.X = -physics.velocity.X;
+        }
+
+        if (bounds.topLeft.Y < 0)
+        {
+            basis.home.Y = basis.ApothemY;
+            physics.velocity.Y = -physics.velocity.Y;
+        }
+
+        if (bounds.bottomRight.X > ctx.scene.width)
+        {
+            basis.home.X = ctx.scene.width - basis.ApothemX;
+            physics.velocity.X = -physics.velocity.X;
+        }
+
+        if (bounds.bottomRight.Y > ctx.scene.height)
+        {
+            basis.home.Y = ctx.scene.height - basis.ApothemY;
+            physics.velocity.Y = -physics.velocity.Y;
+        }
     }
 }

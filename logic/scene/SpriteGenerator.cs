@@ -16,7 +16,7 @@ public class SpriteGenerator(Random rng, ScrOptions options)
 
         for (var i = 0; i < GetSpriteCount(spreadX, spreadY); i++)
         {
-            var home = new Point(rng.NextDouble() * spreadX, rng.NextDouble() * spreadY);
+            var home = new Vector(rng.NextDouble() * spreadX, rng.NextDouble() * spreadY);
             var brand = rng.NextDouble();
             var palette = rng.SampleExponential(selectedPalettes, 1.0 - (double)selectedPalettes.Count / totalPossibleCount);
 

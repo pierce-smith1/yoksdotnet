@@ -5,7 +5,7 @@ namespace yoksdotnet.logic.scene;
 
 public class YokinCreationParameters
 {
-    public required Point home;
+    public required Vector home;
     public required double scale;
     public required double brand;
     public required Palette palette;
@@ -45,32 +45,32 @@ public static class CreatureCreation
                 height = Bitmap.BitmapSize(),
                 angleRadians = 0.0,
             },
-
-            brand = new()
-            {
-                value = parameters.brand,
-            },
-
-            skin = new()
-            {
-                palette = parameters.palette,
-                cachedPaint = PaletteConversion.ToSkPaint(parameters.palette),
-            },
-
-            emotion = new()
-            {
-                ambition = 0.0,
-                empathy = 0.0,
-                optimism = 0.0,
-            },
         };
+
+        yokin.Attach(new Brand
+        {
+            value = parameters.brand,
+        });
+
+        yokin.Attach(new Skin
+        {
+            palette = parameters.palette,
+            cachedPaint = PaletteConversion.ToSkPaint(parameters.palette),
+        });
+
+        yokin.Attach(new Emotion
+        {
+            ambition = 0.0,
+            empathy = 0.0,
+            optimism = 0.0,
+        });
 
         if (parameters.trailLength is not null)
         {
-            yokin.trail = new()
+            yokin.Attach(new Trail()
             {
                 snapshots = new CircularBuffer<Entity?>(parameters.trailLength.Value * 10),
-            };
+            });
         }
 
         return yokin;
@@ -89,13 +89,13 @@ public static class CreatureCreation
                 height = Bitmap.BitmapSize(),
                 angleRadians = 0.0,
             },
-
-            skin = new()
-            {
-                palette = Palette.DefaultPalette,
-                fixedBitmap = bitmap,
-            }
         };
+
+        yokinnequin.Attach(new Skin
+        {
+            palette = Palette.DefaultPalette,
+            fixedBitmap = bitmap,
+        });
 
         return yokinnequin;
     }
