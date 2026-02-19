@@ -58,8 +58,19 @@ public static class BubblesPattern
             bubble.isFree = true;
         }
 
+        ApplyDrift(ctx, physics, brand);
+
         SpriteMovement.SimulatePhysics(ctx, entity.basis, physics);
         BouncyPattern.BounceOffScreen(ctx, entity.basis, physics);
+    }
+
+    private static void ApplyDrift(AnimationContext ctx, Physics physics, Brand brand)
+    {
+        var driftX = Math.Sin(ctx.scene.seconds * 2.0 + brand.value * 10.0) / 200.0;
+        var driftY = Math.Cos(ctx.scene.seconds * 3.0 + brand.value * 10.0) / 200.0;
+
+        physics.velocity.X += driftX;
+        physics.velocity.Y += driftY;
     }
 
     private static bool AreColliding(Entity e1, Entity e2)
@@ -85,6 +96,8 @@ public static class BubblesPattern
 
     private static void SimulateCollision(PhysicalBasis b1, Physics p1, PhysicalBasis b2, Physics p2)
     {
+        const double energyRetention = 0.95;
+
         var v1 = p1.velocity;
         var v2 = p2.velocity;
 
@@ -100,8 +113,8 @@ public static class BubblesPattern
         var vPrime1 = v1.Sub(x1.Sub(x2).Mult(massFactor1).Mult(vFactor1));
         var vPrime2 = v2.Sub(x2.Sub(x1).Mult(massFactor2).Mult(vFactor2));
 
-        p1.velocity = vPrime1.Mult(1.0);
-        p2.velocity = vPrime2.Mult(1.0);
+        p1.velocity = vPrime1.Mult(energyRetention);
+        p2.velocity = vPrime2.Mult(energyRetention);
     }
 
     private static void PushApart(PhysicalBasis basis1, Bubble bubble1, PhysicalBasis basis2, Bubble bubble2)
