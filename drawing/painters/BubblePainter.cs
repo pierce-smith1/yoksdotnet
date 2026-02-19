@@ -46,7 +46,7 @@ public static class BubblePainter
         _uniforms = new(_shader);
     }
 
-    public static void Draw(SKCanvas canvas, PhysicalBasis basis, Skin skin, Bubble bubble)
+    public static void Draw(SKCanvas canvas, Basis basis, Skin skin, Bubble bubble)
     {
         var radius = (float)bubble.radius;
         var originX = (float)basis.Final.X - radius;

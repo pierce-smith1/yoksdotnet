@@ -4,7 +4,7 @@ namespace yoksdotnet.logic.scene;
 
 public static class SpriteMovement
 {
-    public static void ApplyEmotionShake(AnimationContext ctx, Emotion emotion, PhysicalBasis point)
+    public static void ApplyEmotionShake(AnimationContext ctx, Emotion emotion, Basis point)
     {
         point.offset.X += (ctx.rng.NextDouble() * 2.0 - 1.0) * emotion.Magnitude * emotion.Magnitude;
         point.offset.Y += (ctx.rng.NextDouble() * 2.0 - 1.0) * emotion.Magnitude * emotion.Magnitude;
@@ -13,7 +13,7 @@ public static class SpriteMovement
         point.offset.Y = Math.Clamp(point.offset.Y, -20.0, 20.0);
     }
 
-    public static void WrapScreen(AnimationContext ctx, PhysicalBasis point)
+    public static void WrapScreen(AnimationContext ctx, Basis point)
     {
         var bounds = point.Bounds;
 
@@ -39,13 +39,13 @@ public static class SpriteMovement
         }
     }
 
-    public static void ClampToScreen(AnimationContext ctx, PhysicalBasis basis)
+    public static void ClampToScreen(AnimationContext ctx, Basis basis)
     {
         basis.home.X = Math.Clamp(basis.home.X, basis.offset.X, ctx.scene.width + basis.offset.X);
         basis.home.Y = Math.Clamp(basis.home.Y, basis.offset.Y, ctx.scene.height + basis.offset.Y);
     }
 
-    public static void SimulatePhysics(AnimationContext ctx, PhysicalBasis basis, Physics physics)
+    public static void SimulatePhysics(AnimationContext ctx, Basis basis, Physics physics)
     {
         basis.home.X += physics.velocity.X * ctx.scene.lastDtMs;
         basis.home.Y += physics.velocity.Y * ctx.scene.lastDtMs;

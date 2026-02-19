@@ -14,7 +14,7 @@ public class Emotion : EntityComponent
 
 public static class YokinEmotions
 {
-    public static void UpdateEmotions(AnimationContext ctx, Emotion emotion, PhysicalBasis basis)
+    public static void UpdateEmotions(AnimationContext ctx, Emotion emotion, Basis basis)
     {
         var noiseFactor = Interp.Linear(ctx.options.emotionScale, 0.0, 1.0, 0.0, 2.0);
 
@@ -23,7 +23,7 @@ public static class YokinEmotions
         emotion.optimism = GetNoiseValue(ctx, basis, 2000.0) * noiseFactor;
     }
 
-    private static double GetNoiseValue(AnimationContext ctx, PhysicalBasis physical, double zOffset)
+    private static double GetNoiseValue(AnimationContext ctx, Basis physical, double zOffset)
     {
         var noise = ctx.noiseGenerator.Get
         (

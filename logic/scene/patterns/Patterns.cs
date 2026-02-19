@@ -53,5 +53,12 @@ public record Pattern(
         StartAction: BubblesPattern.Start
     );
 
+    public readonly static Pattern Boids = new(
+        "Boids",
+        "Coalesce and flock",
+        MoveAction: BoidsPattern.Move,
+        StartAction: BoidsPattern.Start
+    );
+
     public override string ToString() => Name;
 }

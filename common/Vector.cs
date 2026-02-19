@@ -44,5 +44,24 @@ public record struct Vector(double X, double Y)
         var result = X * other.X + Y * other.Y;
         return result;
     }
+
+    public Vector Normalize()
+    {
+        var magnitude = Magnitude;
+        if (magnitude == 0.0)
+        {
+            return this;
+        }
+
+        X *= 1.0 / magnitude;
+        Y *= 1.0 / magnitude;
+        return this;
+    }
+
+    public Vector AsNormalized()
+    {
+        var result = new Vector(X, Y).Normalize();
+        return result;
+    }
 }
 

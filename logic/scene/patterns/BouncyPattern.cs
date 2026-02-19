@@ -26,7 +26,7 @@ public static class BouncyPattern
         BounceOffScreen(ctx, entity.basis, physics);
     }
 
-    public static void BounceOffScreen(AnimationContext ctx, PhysicalBasis basis, Physics physics)
+    public static void BounceOffScreen(AnimationContext ctx, Basis basis, Physics physics)
     {
         var bounds = basis.Bounds;
 

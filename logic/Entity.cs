@@ -5,7 +5,7 @@ namespace yoksdotnet.logic;
 
 public class Entity
 {
-    public required PhysicalBasis basis;
+    public required Basis basis;
 
     private readonly Dictionary<Type, EntityComponent> _components = [];
 

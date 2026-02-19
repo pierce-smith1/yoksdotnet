@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
+using yoksdotnet.logic.scene.patterns;
 
 namespace yoksdotnet.drawing.painters;
 
@@ -39,6 +40,24 @@ public static class DebugPainter
             };
             canvas.DrawText(line, textPos, textPaint);
         }
+
+        DebugBoid(canvas, entity);
+    }
+
+    private static void DebugBoid(SKCanvas canvas, Entity entity)
+    {
+        if (entity.Get<Boid>() is not { } boid)
+        {
+            return;
+        }
+
+        var avoidRadiusPaint = new SKPaint
+        {
+            Style = SKPaintStyle.Stroke,
+            Color = SKColors.Red,
+        };
+
+        canvas.DrawCircle((float)entity.basis.Final.X, (float)entity.basis.Final.Y, (float)boid.avoidRadius, avoidRadiusPaint);
     }
 
     private static List<string> InfoToReport(Entity entity)

@@ -18,12 +18,12 @@ public static class BubblesPattern
         var physics = entity.EnsureHas<Physics>(() => new()
         {
             velocity = Vector.RandomScaled(ctx.rng, 2.0, 2.0),
-            mass = Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, 0.5, 1.5),
+            mass = Interp.Linear(brand.value, 0.0, 1.0, 0.5, 1.5),
         });
 
         var bubble = entity.EnsureHas<Bubble>(() => new()
         {
-            radius = 20.0 + physics.mass * 10.0,
+            radius = Interp.Linear(ctx.options.spriteScale, 0.0, 1.0, 10.0, 50.0) + physics.mass * 10.0,
         });
 
         bubble.isFree = false;
@@ -94,7 +94,7 @@ public static class BubblesPattern
         return isColliding;
     }
 
-    private static void SimulateCollision(PhysicalBasis b1, Physics p1, PhysicalBasis b2, Physics p2)
+    private static void SimulateCollision(Basis b1, Physics p1, Basis b2, Physics p2)
     {
         const double energyRetention = 0.95;
 
@@ -117,7 +117,7 @@ public static class BubblesPattern
         p2.velocity = vPrime2.Mult(energyRetention);
     }
 
-    private static void PushApart(PhysicalBasis basis1, Bubble bubble1, PhysicalBasis basis2, Bubble bubble2)
+    private static void PushApart(Basis basis1, Bubble bubble1, Basis basis2, Bubble bubble2)
     {
         var overlap = (bubble1.radius + bubble2.radius) - basis1.Final.DistanceTo(basis2.Final);
         if (overlap < 0)

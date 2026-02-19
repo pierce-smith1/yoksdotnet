@@ -6,7 +6,7 @@ namespace yoksdotnet.logic;
 
 public abstract class EntityComponent;
 
-public class PhysicalBasis : EntityComponent
+public class Basis : EntityComponent
 {
     public required Vector home;
     public required Vector offset;
