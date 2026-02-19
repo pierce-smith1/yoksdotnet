@@ -32,26 +32,34 @@ public static class BouncyPattern
 
         if (bounds.topLeft.X < 0)
         {
-            basis.home.X = basis.ApothemX;
-            physics.velocity.X = -physics.velocity.X;
+            physics.velocity.X = EnsurePositive(physics.velocity.X);
         }
 
         if (bounds.topLeft.Y < 0)
         {
-            basis.home.Y = basis.ApothemY;
-            physics.velocity.Y = -physics.velocity.Y;
+            physics.velocity.Y = EnsurePositive(physics.velocity.Y);
         }
 
         if (bounds.bottomRight.X > ctx.scene.width)
         {
-            basis.home.X = ctx.scene.width - basis.ApothemX;
-            physics.velocity.X = -physics.velocity.X;
+            physics.velocity.X = EnsureNegative(physics.velocity.X);
         }
 
         if (bounds.bottomRight.Y > ctx.scene.height)
         {
-            basis.home.Y = ctx.scene.height - basis.ApothemY;
-            physics.velocity.Y = -physics.velocity.Y;
+            physics.velocity.Y = EnsureNegative(physics.velocity.Y);
         }
+    }
+
+    private static double EnsurePositive(double val)
+    {
+        var result = val < 0 ? -val : val;
+        return result;
+    }
+
+    private static double EnsureNegative(double val)
+    {
+        var result = val < 0 ? val : -val;
+        return result;
     }
 }

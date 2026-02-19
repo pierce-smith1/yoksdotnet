@@ -17,8 +17,8 @@ public class PhysicalBasis : EntityComponent
 
     public Vector Final => new(home.X + offset.X, home.Y + offset.Y);
 
-    public double ApothemX => width * scale / 2;
-    public double ApothemY => height * scale / 2;
+    public double ApothemX => width * scale / 2.0;
+    public double ApothemY => height * scale / 2.0;
 
     public (Vector topLeft, Vector bottomRight) Bounds
     {

@@ -100,8 +100,8 @@ public static class BubblesPattern
         var vPrime1 = v1.Sub(x1.Sub(x2).Mult(massFactor1).Mult(vFactor1));
         var vPrime2 = v2.Sub(x2.Sub(x1).Mult(massFactor2).Mult(vFactor2));
 
-        p1.velocity = vPrime1.Mult(0.9);
-        p2.velocity = vPrime2.Mult(0.9);
+        p1.velocity = vPrime1.Mult(1.0);
+        p2.velocity = vPrime2.Mult(1.0);
     }
 
     private static void PushApart(PhysicalBasis basis1, Bubble bubble1, PhysicalBasis basis2, Bubble bubble2)

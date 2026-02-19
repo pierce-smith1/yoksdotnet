@@ -44,9 +44,10 @@ public static class DebugPainter
     private static List<string> InfoToReport(Entity entity)
     {
         return [
-            $"A: {entity.Get<Emotion>()?.ambition}",
-            $"E: {entity.Get<Emotion>()?.empathy}",
-            $"O: {entity.Get<Emotion>()?.optimism}",
+            $"Ox: {entity.basis.offset.X}",
+            $"Oy: {entity.basis.offset.Y}",
+            $"Vx: {entity.Get<Physics>()?.velocity.X}",
+            $"Vy: {entity.Get<Physics>()?.velocity.Y}",
         ];
     }
 }
