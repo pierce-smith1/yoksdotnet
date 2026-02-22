@@ -15,6 +15,7 @@ public class ScrOptions
     public double familySize = 0.5;
     public double impostorDensity = 0.1;
     public PaletteChoice paletteChoice = PaletteChoice.SingleGroup(PaletteGroup.XpInspired);
+    public SpriteStyleChoice spriteStyle = SpriteStyleChoice.Refined();
 
     public double spriteScale = 0.5;
     public double emotionScale = 0.5;
@@ -31,6 +32,30 @@ public class ScrOptions
     // Custom palettes are serialized and de-serialized separately. See OptionsStore.
     [JsonIgnore]
     public List<CustomPaletteSet> customPalettes = [];
+}
+
+public record SpriteStyleChoice
+{
+    public bool IsClassic { get; init; } = default;
+    public bool IsRefined { get; init; } = default;
+
+    public static SpriteStyleChoice Classic() => new()
+    {
+        IsClassic = true,
+    };
+
+    public static SpriteStyleChoice Refined() => new()
+    {
+        IsRefined = true,
+    };
+
+    public T Match<T>(Func<T> whenClassic, Func<T> whenRefined)
+    {
+        if (IsClassic) return whenClassic();
+        if (IsRefined) return whenRefined();
+
+        throw new NotImplementedException();
+    }
 }
 
 public record PatternChoice

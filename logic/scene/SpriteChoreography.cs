@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 
 using yoksdotnet.common;
+using yoksdotnet.drawing;
 using yoksdotnet.logic.scene.patterns;
 
 namespace yoksdotnet.logic.scene;
@@ -39,6 +40,11 @@ public static class SpriteChoreography
         foreach (var entity in ctx.scene.entities)
         {
             MoveSprite(ctx, entity);
+
+            if (entity.Get<Skin>()?.style.IsRefined is true)
+            {
+                GazeSimulator.UpdateGaze(ctx, entity);
+            }
         }
     }
 

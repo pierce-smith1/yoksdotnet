@@ -10,7 +10,7 @@ namespace yoksdotnet.drawing.painters;
 
 using PaletteIndexRegions = Dictionary<PaletteIndex, List<Vector>>;
 
-public class SpriteEditPreviewPainter(Bitmap bitmap)
+public class SpriteEditPreviewPainter(ClassicBitmap bitmap)
 {
     private readonly PaletteIndexRegions _paletteIndexRegions = ComputeIndexRegions(bitmap.Resource);
     private readonly Entity _previewEntity = CreatureCreation.NewPreviewYokin(bitmap);
@@ -19,8 +19,8 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
 
     public void Draw(SKCanvas canvas, Palette? palette)
     {
-        _previewEntity.basis.home.X = (canvas.LocalClipBounds.Width / 2) - (Bitmap.BitmapSize() / 2);
-        _previewEntity.basis.home.Y = (canvas.LocalClipBounds.Height / 2) - (Bitmap.BitmapSize() / 2);
+        _previewEntity.basis.home.X = (canvas.LocalClipBounds.Width / 2) - (ClassicBitmap.Size / 2);
+        _previewEntity.basis.home.Y = (canvas.LocalClipBounds.Height / 2) - (ClassicBitmap.Size / 2);
 
         _previewEntity.Get<Skin>()!.palette = palette is not null
             ? HoveredIndex is not null
@@ -40,8 +40,8 @@ public class SpriteEditPreviewPainter(Bitmap bitmap)
         foreach (var (index, points) in _paletteIndexRegions)
         {
             var offsetVectors = points.Select(p => new Vector(
-                p.X + width / 2 - Bitmap.BitmapSize() / 2,
-                p.Y + height / 2 - Bitmap.BitmapSize() / 2
+                p.X + width / 2 - ClassicBitmap.Size / 2,
+                p.Y + height / 2 - ClassicBitmap.Size / 2
             ));
 
             if (offsetVectors.Contains(hoverPos))

@@ -2,13 +2,14 @@
 using System;
 using System.IO;
 using yoksdotnet.drawing.painters;
+using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.drawing;
 
 public class ImageExporter(string _exportPath)
 {
-    public ImageExportResult Export(Bitmap bitmap, Palette palette)
+    public ImageExportResult Export(ClassicBitmap bitmap, Palette palette)
     {
         try
         {
@@ -16,7 +17,7 @@ public class ImageExporter(string _exportPath)
 
             var imagePath = Path.Combine(_exportPath, $"{bitmap.Name}.png");
 
-            var size = Bitmap.BitmapSize();
+            var size = ClassicBitmap.Size;
 
             var recorder = new SKPictureRecorder();
             var canvas = recorder.BeginRecording(SKRect.Create(size, size));

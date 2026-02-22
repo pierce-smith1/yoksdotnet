@@ -1,4 +1,6 @@
-﻿using yoksdotnet.common;
+﻿using SkiaSharp;
+using System.Collections.Generic;
+using yoksdotnet.common;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
@@ -8,12 +10,17 @@ public class YokinCreationParameters
     public required Vector home;
     public required double scale;
     public required double brand;
+    public required SpriteStyleChoice style;
     public required Palette palette;
     public int? trailLength = null;
+
+    public required PaintCacheBuilder paintCache;
 }
 
 public static class CreatureCreation
 {
+    public static readonly double CreatureSize = 128;
+
     public static Entity NewDefault()
     {
         var entity = new Entity
@@ -23,8 +30,8 @@ public static class CreatureCreation
                 home = new(0.0, 0.0),
                 offset = new(0.0, 0.0),
                 scale = 1.0,
-                width = Bitmap.BitmapSize(),
-                height = Bitmap.BitmapSize(),
+                width = CreatureSize,
+                height = CreatureSize,
                 angleRadians = 0.0,
             }
         };
@@ -41,8 +48,8 @@ public static class CreatureCreation
                 home = parameters.home,
                 offset = new(0.0, 0.0),
                 scale = parameters.scale,
-                width = Bitmap.BitmapSize(),
-                height = Bitmap.BitmapSize(),
+                width = CreatureSize,
+                height = CreatureSize,
                 angleRadians = 0.0,
             },
         };
@@ -55,7 +62,13 @@ public static class CreatureCreation
         yokin.Attach(new Skin
         {
             palette = parameters.palette,
-            cachedPaint = PaletteConversion.ToSkPaint(parameters.palette),
+            style = parameters.style,
+
+            bodyPaintHandle = parameters.paintCache.GetBodyPaintHandle(parameters.palette),
+            whitePaintHandle = parameters.paintCache.GetSolidColorPaintHandle(parameters.palette.whites),
+            eyePaintHandle = parameters.paintCache.GetSolidColorPaintHandle(parameters.palette.eyes),
+
+            paintCache = parameters.paintCache.Cache,
         });
 
         yokin.Attach(new Emotion
@@ -76,7 +89,7 @@ public static class CreatureCreation
         return yokin;
     }
 
-    public static Entity NewPreviewYokin(Bitmap bitmap)
+    public static Entity NewPreviewYokin(ClassicBitmap bitmap)
     {
         var yokinnequin = new Entity
         {
@@ -85,8 +98,8 @@ public static class CreatureCreation
                 home = new(0.0, 0.0),
                 offset = new(0.0, 0.0),
                 scale = 1.0,
-                width = Bitmap.BitmapSize(),
-                height = Bitmap.BitmapSize(),
+                width = CreatureSize,
+                height = CreatureSize,
                 angleRadians = 0.0,
             },
         };
@@ -94,7 +107,8 @@ public static class CreatureCreation
         yokinnequin.Attach(new Skin
         {
             palette = Palette.DefaultPalette,
-            fixedBitmap = bitmap,
+            style = SpriteStyleChoice.Classic(),
+            fixedBitmap = Bitmap.Classic(bitmap),
         });
 
         return yokinnequin;

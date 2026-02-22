@@ -4,38 +4,38 @@ namespace yoksdotnet.logic.scene;
 
 public static class SpriteBitmaps
 {
-    public static Bitmap GetBitmap(Skin skin, Emotion? emotion)
+    public static ClassicBitmap GetClassicBitmap(Skin skin, Emotion? emotion)
     {
-        if (skin.fixedBitmap is not null)
+        if (skin.fixedBitmap?.ClassicBitmap is { } bitmap)
         {
-            return skin.fixedBitmap;
+            return bitmap;
         }
 
         if (emotion is null)
         {
-            return Bitmap.Lk;
+            return ClassicBitmap.Lk;
         }
 
         var ambitionRanking = GetEmotionRanking(emotion.ambition);
         var empathyRanking = GetEmotionRanking(emotion.empathy);
         var optimismRanking = GetEmotionRanking(emotion.optimism);
 
-        Bitmap[][][] emotionMap =
+        ClassicBitmap[][][] emotionMap =
         [
             [
-                [Bitmap.LkSix, Bitmap.LkHusk, Bitmap.LkHusk],
-                [Bitmap.LkUnamused, Bitmap.LkUnamused, Bitmap.LkSix],
-                [Bitmap.LkXd, Bitmap.LkXd, Bitmap.LkSix],
+                [ClassicBitmap.LkSix, ClassicBitmap.LkHusk, ClassicBitmap.LkHusk],
+                [ClassicBitmap.LkUnamused, ClassicBitmap.LkUnamused, ClassicBitmap.LkSix],
+                [ClassicBitmap.LkXd, ClassicBitmap.LkXd, ClassicBitmap.LkSix],
             ],
             [
-                [Bitmap.LkUnamused, Bitmap.LkUnamused, Bitmap.Lk],
-                [Bitmap.LkConcern, Bitmap.Lk, Bitmap.Lk],
-                [Bitmap.LkConcern, Bitmap.LkThumbsup, Bitmap.LkThumbsup],
+                [ClassicBitmap.LkUnamused, ClassicBitmap.LkUnamused, ClassicBitmap.Lk],
+                [ClassicBitmap.LkConcern, ClassicBitmap.Lk, ClassicBitmap.Lk],
+                [ClassicBitmap.LkConcern, ClassicBitmap.LkThumbsup, ClassicBitmap.LkThumbsup],
             ],
             [
-                [Bitmap.LkExhausted, Bitmap.LkExhausted, Bitmap.LkExhausted],
-                [Bitmap.LkThink, Bitmap.LkThink, Bitmap.LkJoy],
-                [Bitmap.LkJoy, Bitmap.LkCool, Bitmap.LkSix],
+                [ClassicBitmap.LkExhausted, ClassicBitmap.LkExhausted, ClassicBitmap.LkExhausted],
+                [ClassicBitmap.LkThink, ClassicBitmap.LkThink, ClassicBitmap.LkJoy],
+                [ClassicBitmap.LkJoy, ClassicBitmap.LkCool, ClassicBitmap.LkSix],
             ],
         ];
 
@@ -52,5 +52,20 @@ public static class SpriteBitmaps
             : 2;
 
         return rank;
+    }
+
+    public static RefinedBitmap GetRefinedBitmap(Skin skin, Emotion? emotion)
+    {
+        if (skin.fixedBitmap?.RefinedBitmap is { } bitmap)
+        {
+            return bitmap;
+        }
+
+        if (emotion is null)
+        {
+            return RefinedBitmap.Neutral;
+        }
+
+        return RefinedBitmap.Neutral;
     }
 }

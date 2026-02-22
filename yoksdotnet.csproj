@@ -31,6 +31,7 @@
     <None Remove="resources\lkunamused.png" />
     <None Remove="resources\lkxd.png" />
     <None Remove="resources\nx.png" />
+    <None Remove="resources\sprites\refined\neutral.png" />
     <None Remove="resources\ui\hue-strip.png" />
     <None Remove="resources\vx.png" />
   </ItemGroup>
@@ -43,23 +44,24 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Resource Include="resources\sprites\cvjoy.png" />
-    <Resource Include="resources\sprites\fn.png" />
-    <Resource Include="resources\sprites\fnplead.png" />
-    <Resource Include="resources\sprites\lk.png" />
-    <Resource Include="resources\sprites\lkconcern.png" />
-    <Resource Include="resources\sprites\lkcool.png" />
-    <Resource Include="resources\sprites\lkexhausted.png" />
-    <Resource Include="resources\sprites\lkhusk.png" />
-    <Resource Include="resources\sprites\lkjoy.png" />
-    <Resource Include="resources\sprites\lkmoyai.png" />
-    <Resource Include="resources\sprites\lksix.png" />
-    <Resource Include="resources\sprites\lkthink.png" />
-    <Resource Include="resources\sprites\lkthumbsup.png" />
-    <Resource Include="resources\sprites\lkunamused.png" />
-    <Resource Include="resources\sprites\lkxd.png" />
-    <Resource Include="resources\sprites\nx.png" />
-    <Resource Include="resources\sprites\vx.png" />
+    <Resource Include="resources\sprites\classic\cvjoy.png" />
+    <Resource Include="resources\sprites\classic\fn.png" />
+    <Resource Include="resources\sprites\classic\fnplead.png" />
+    <Resource Include="resources\sprites\classic\lk.png" />
+    <Resource Include="resources\sprites\classic\lkconcern.png" />
+    <Resource Include="resources\sprites\classic\lkcool.png" />
+    <Resource Include="resources\sprites\classic\lkexhausted.png" />
+    <Resource Include="resources\sprites\classic\lkhusk.png" />
+    <Resource Include="resources\sprites\classic\lkjoy.png" />
+    <Resource Include="resources\sprites\classic\lkmoyai.png" />
+    <Resource Include="resources\sprites\classic\lksix.png" />
+    <Resource Include="resources\sprites\classic\lkthink.png" />
+    <Resource Include="resources\sprites\classic\lkthumbsup.png" />
+    <Resource Include="resources\sprites\classic\lkunamused.png" />
+    <Resource Include="resources\sprites\classic\lkxd.png" />
+    <Resource Include="resources\sprites\classic\nx.png" />
+    <Resource Include="resources\sprites\classic\vx.png" />
+    <Resource Include="resources\sprites\refined\neutral.png" />
     <Resource Include="resources\ui\hue-strip.png" />
   </ItemGroup>
 

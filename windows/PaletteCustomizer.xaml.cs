@@ -24,7 +24,7 @@ namespace yoksdotnet.windows;
 public partial class PaletteCustomizer : Window
 {
     private readonly RandomPaletteGenerator _randomPaletteGenerator = new(new());
-    private readonly SpriteEditPreviewPainter _previewPainter = new(Bitmap.LkThumbsup); 
+    private readonly SpriteEditPreviewPainter _previewPainter = new(ClassicBitmap.LkThumbsup); 
 
     public PaletteCustomizer(CustomPaletteSet set)
     {
@@ -298,7 +298,7 @@ public partial class PaletteCustomizer : Window
         var exportPath = Path.Combine(folderDialog.FolderName, entry.Name);
 
         var imageExporter = new ImageExporter(exportPath);
-        var exportResults = SfEnums.GetAll<Bitmap>()
+        var exportResults = SfEnums.GetAll<ClassicBitmap>()
             .Select(b => imageExporter.Export(b, entry.Palette));
 
         if (exportResults.All(r => r == ImageExportResult.Ok))

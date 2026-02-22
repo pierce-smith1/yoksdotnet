@@ -33,13 +33,13 @@ public class SimpleMovement
         var targetX = Interp.Linear(
             Math.Sin(ctx.scene.seconds * 4.0 - brand.value * 17.0),
             -1.0, 1.0,
-            minX, maxX - Bitmap.BitmapSize()
+            minX, maxX - ClassicBitmap.Size
         );
 
         var targetY = Interp.Linear(
             Math.Cos(ctx.scene.seconds * 4.0 - brand.value * 11.0),
             -1.0, 1.0,
-            minY, maxY - Bitmap.BitmapSize()
+            minY, maxY - ClassicBitmap.Size
         );
 
         entity.basis.home.X = targetX + (entity.basis.home.X - targetX) * 0.9;

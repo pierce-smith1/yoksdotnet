@@ -63,10 +63,8 @@ public static class DebugPainter
     private static List<string> InfoToReport(Entity entity)
     {
         return [
-            $"Ox: {entity.basis.offset.X}",
-            $"Oy: {entity.basis.offset.Y}",
-            $"Vx: {entity.Get<Physics>()?.velocity.X}",
-            $"Vy: {entity.Get<Physics>()?.velocity.Y}",
+            $"Gcx: {entity.Get<Gaze>()?.currentGazePoint.X}",
+            $"Gcy: {entity.Get<Gaze>()?.currentGazePoint.Y}",
         ];
     }
 }

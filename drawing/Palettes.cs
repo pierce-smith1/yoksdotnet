@@ -20,7 +20,7 @@ public record PaletteIndex(string Name, string DisplayName, int Luminance) : ISf
 public record struct RgbColor(byte R, byte G, byte B);
 public record struct HslColor(double H, double S, double L);
 
-public class Palette
+public class Palette : IEquatable<Palette>
 {
     public required RgbColor scales;
     public required RgbColor scalesHighlight;
@@ -42,14 +42,18 @@ public class Palette
 
     public RgbColor this[PaletteIndex index]
     {
-        get => index == PaletteIndex.Scales ? scales
-            : index == PaletteIndex.ScalesHighlight ? scalesHighlight
-            : index == PaletteIndex.ScalesShadow ? scalesShadow
-            : index == PaletteIndex.Horns ? horns
-            : index == PaletteIndex.HornsShadow ? hornsShadow
-            : index == PaletteIndex.Eyes ? eyes
-            : index == PaletteIndex.Whites ? whites
-            : throw new InvalidOperationException();
+        get
+        {
+            if (index == PaletteIndex.Scales) return scales;
+            if (index == PaletteIndex.ScalesHighlight) return scalesHighlight;
+            if (index == PaletteIndex.ScalesShadow) return scalesShadow;
+            if (index == PaletteIndex.Horns) return horns;
+            if (index == PaletteIndex.HornsShadow) return hornsShadow;
+            if (index == PaletteIndex.Eyes) return eyes;
+            if (index == PaletteIndex.Whites) return whites;
+
+            throw new NotSupportedException();
+        }
         set
         {
             if (index == PaletteIndex.Scales) scales = value;
@@ -61,6 +65,39 @@ public class Palette
             if (index == PaletteIndex.Whites) whites = value;
         }
     }
+
+    public bool Equals(Palette? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        var equal = scales == other.scales
+            && scalesHighlight == other.scalesHighlight
+            && scalesShadow == other.scalesHighlight
+            && horns == other.horns
+            && hornsShadow == other.hornsShadow
+            && eyes == other.eyes
+            && whites == other.whites;
+
+        return equal;
+    }
+
+    public override int GetHashCode()
+    {
+        var code = scales.GetHashCode()
+            ^ scalesHighlight.GetHashCode()
+            ^ scalesShadow.GetHashCode()
+            ^ horns.GetHashCode()
+            ^ hornsShadow.GetHashCode()
+            ^ eyes.GetHashCode()
+            ^ whites.GetHashCode();
+
+        return code;
+    }
+
+    public override bool Equals(object? other) => Equals(other as Palette);
 }
 
 public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEnum

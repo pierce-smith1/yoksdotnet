@@ -1,4 +1,6 @@
 ﻿using SkiaSharp;
+using System;
+using yoksdotnet.common;
 using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
 using yoksdotnet.logic.scene.patterns;
@@ -19,15 +21,65 @@ public static class SpritePainter
             DrawTrail(canvas, trail);
         }
 
-        var skBitmap = SpriteBitmaps.GetBitmap(skin, entity.Get<Emotion>()).Resource;
-        var skPaint = skin.cachedPaint ?? PaletteConversion.ToSkPaint(skin.palette);
-
-        canvas.DrawBitmap(skBitmap, GetRect(entity), skPaint);
+        if (skin.style.IsClassic)
+        {
+            DrawClassic(canvas, entity, skin);
+        }
+        else if (skin.style.IsRefined)
+        {
+            DrawRefined(canvas, entity, skin);
+        }
 
         if (entity.Get<Bubble>() is { } bubble)
         {
             BubblePainter.Draw(canvas, entity.basis, skin, bubble);
         }
+    }
+
+    private static void DrawClassic(SKCanvas canvas, Entity entity, Skin skin)
+    {
+        var skBitmap = SpriteBitmaps.GetClassicBitmap(skin, entity.Get<Emotion>()).Resource;
+        canvas.DrawBitmap(skBitmap, GetRect(entity), skin.BodyPaint);
+    }
+
+    private static void DrawRefined(SKCanvas canvas, Entity entity, Skin skin)
+    {
+        var refinedBitmap = SpriteBitmaps.GetRefinedBitmap(skin, entity.Get<Emotion>());
+
+        var bounds = entity.basis.Bounds;
+
+        var eyeX = (float)(bounds.topLeft.X + (refinedBitmap.PupilCenter.X * entity.basis.scale));
+        var eyeY = (float)(bounds.topLeft.Y + (refinedBitmap.PupilCenter.Y * entity.basis.scale));
+        var eyeSize = (float)(refinedBitmap.PupilRange * 1.5 * entity.basis.scale);
+
+        var pupilX = eyeX;
+        var pupilY = eyeY;
+
+        var isBlind = skin.palette == PredefinedPalette.Loxxe;
+
+        if (entity.Get<Gaze>() is { } gaze && !isBlind)
+        {
+            var eyeOrigin = new Vector(eyeX, eyeY);
+            var eyeline = gaze.currentGazePoint.Sub(eyeOrigin);
+
+            var offsetCoefficient = Interp.Linear(
+                Math.Atan(eyeline.Magnitude), 
+                -Math.PI / 2.0, 
+                Math.PI / 2.0, 
+                0.0, 
+                refinedBitmap.PupilRange * entity.basis.scale
+            );
+            var pupilOffset = eyeline.AsNormalized().Mult(offsetCoefficient);
+
+            pupilX += (float)pupilOffset.X;
+            pupilY += (float)pupilOffset.Y;
+        }
+
+        var skBitmap = refinedBitmap.Resource;
+
+        canvas.DrawCircle(eyeX, eyeY, eyeSize, skin.WhitesPaint);
+        canvas.DrawOval(pupilX, pupilY, eyeSize / 5.0f, eyeSize / 2.0f, skin.EyePaint);
+        canvas.DrawBitmap(skBitmap, GetRect(entity), skin.BodyPaint);
     }
 
     private static void DrawTrail(SKCanvas canvas, Trail trail)

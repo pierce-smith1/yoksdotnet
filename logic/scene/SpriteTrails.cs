@@ -37,12 +37,17 @@ public static class SpriteTrails
         {
             var ghostSkin = ghost.EnsureHas<Skin>(() => new()
             {
-                palette = Palette.DefaultPalette,
+                style = skin.style,
+                palette = skin.palette,
             });
-            
+
+            ghostSkin.style = skin.style;
             ghostSkin.palette = skin.palette;
             ghostSkin.fixedBitmap = skin.fixedBitmap;
-            ghostSkin.cachedPaint = skin.cachedPaint;
+            ghostSkin.paintCache = skin.paintCache;
+            ghostSkin.bodyPaintHandle = skin.bodyPaintHandle;
+            ghostSkin.eyePaintHandle = skin.eyePaintHandle;
+            ghostSkin.whitePaintHandle = skin.whitePaintHandle;
         }
 
         if (entity.Get<Emotion>() is { } emotion)

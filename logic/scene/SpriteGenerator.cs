@@ -1,3 +1,4 @@
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ public class SpriteGenerator(Random rng, ScrOptions options)
 {
     public IEnumerable<Entity> Make(double spreadX, double spreadY)
     {
+        var paintCache = new PaintCacheBuilder(new());
+
         var entities = new List<Entity>();
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
@@ -29,8 +32,10 @@ public class SpriteGenerator(Random rng, ScrOptions options)
                 home = home,
                 scale = options.spriteScale,
                 brand = brand,
+                style = options.spriteStyle,
                 palette = palette,
                 trailLength = trailLength,
+                paintCache = paintCache,
             });
 
             entities.Add(newEntity);
