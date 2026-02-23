@@ -63,7 +63,7 @@ public static class SpritePainter
             var eyeline = gaze.currentGazePoint.Sub(eyeOrigin);
 
             var offsetCoefficient = Interp.Linear(
-                Math.Atan(eyeline.Magnitude / 1000), 
+                Math.Atan(eyeline.Magnitude / 100.0), 
                 -Math.PI / 2.0, 
                 Math.PI / 2.0, 
                 0.0, 

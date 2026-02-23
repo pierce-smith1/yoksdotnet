@@ -435,6 +435,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
 
     public Dictionary<string, PaletteView> PredefinedPalettes { get; init; } = SfEnums.GetAll<PredefinedPalette>()
         .Select(p => (p.Name, new PaletteView(p)))
+        .Prepend(("Template", new PaletteView(PaletteConversion.Copy(Palette.ExamplePalette))))
         .ToDictionary();
 
     private KeyValuePair<string, PaletteView> _paletteToAdd;

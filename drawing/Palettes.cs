@@ -40,6 +40,16 @@ public class Palette : IEquatable<Palette>
         "#aaaaaa"
     );
 
+    public static readonly Palette ExamplePalette = PaletteConversion.FromHexStrings(
+        "#b0b0b0",
+        "#f2f2f2",
+        "#525252",
+        "#606060",
+        "#494949",
+        "#ffffff",
+        "#383838"
+    );
+
     public RgbColor this[PaletteIndex index]
     {
         get
