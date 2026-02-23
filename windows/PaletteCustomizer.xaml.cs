@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
@@ -24,7 +25,7 @@ namespace yoksdotnet.windows;
 public partial class PaletteCustomizer : Window
 {
     private readonly RandomPaletteGenerator _randomPaletteGenerator = new(new());
-    private readonly SpriteEditPreviewPainter _previewPainter = new(ClassicBitmap.LkThumbsup); 
+    private readonly SpriteEditPreviewPainter _previewPainter = new(RefinedBitmap.Neutral); 
 
     public PaletteCustomizer(CustomPaletteSet set)
     {
@@ -55,7 +56,7 @@ public partial class PaletteCustomizer : Window
 
         ViewModel.SelectedEntry = ViewModel.PaletteEntries.FirstOrDefault();
 
-        RefreshSurfaces();
+        StartLoop();
     }
 
     public CustomPaletteSet EditedPaletteGroup 
@@ -70,6 +71,13 @@ public partial class PaletteCustomizer : Window
         } 
     }
 
+    protected void StartLoop()
+    {
+        var loopTimer = new System.Timers.Timer(1000.0 / 60.0);
+        loopTimer.Elapsed += (s, e) => PreviewCanvas.Child?.Invalidate();
+        loopTimer.Start();
+    }
+
     protected void OnSave(object _sender, RoutedEventArgs _e)
     {
         DialogResult = true;
@@ -82,10 +90,11 @@ public partial class PaletteCustomizer : Window
 
     protected void OnAddPalette(object _sender, RoutedEventArgs _e)
     {
-        var name = ViewModel.PaletteToAdd.Key;
+        var name = WithDuplicateSuffix(ViewModel.PaletteToAdd.Key);
         var palette = ViewModel.PaletteToAdd.Value;
 
-        var newEntry = ViewModel.AddPaletteView(name, new(palette.BackingPalette));
+        var paletteCopy = PaletteConversion.Copy(palette.BackingPalette);
+        var newEntry = ViewModel.AddPaletteView(name, new(paletteCopy));
         ViewModel.SelectedEntry = newEntry;
     }
 
@@ -111,15 +120,25 @@ public partial class PaletteCustomizer : Window
 
         var paletteName = ViewModel.GetEntryWithId(paletteId).Name;
 
-        var result = System.Windows.MessageBox.Show
-        (
-            $"Are you sure you want to delete '{paletteName}'?", 
-            "Confirm deletion", 
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning
-        );
+        var shouldSkipPrompt = System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift)
+            || System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.RightShift);
 
-        if (result == MessageBoxResult.Yes)
+        var shouldDoDelete = shouldSkipPrompt;
+
+        if (!shouldSkipPrompt)
+        {
+            var result = System.Windows.MessageBox.Show
+            (
+                $"Are you sure you want to delete '{paletteName}'?\n\n(Hint: hold Shift while deleting to avoid this message)", 
+                "Confirm deletion", 
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning
+            );
+
+            shouldDoDelete = result == MessageBoxResult.Yes;
+        }
+
+        if (shouldDoDelete)
         {
             ViewModel.PaletteEntries.Remove(ViewModel.PaletteEntries.Single(e => e.Id == paletteId));
             ViewModel.SelectedEntry = ViewModel.PaletteEntries.FirstOrDefault();
@@ -141,7 +160,8 @@ public partial class PaletteCustomizer : Window
         var thisPaletteEntry = ViewModel.PaletteEntries.Single(e => e.Id == paletteId);
         var paletteCopy = PaletteConversion.Copy(thisPaletteEntry.Palette);
 
-        var newEntry = ViewModel.AddPaletteView(thisPaletteEntry.Name, new(paletteCopy));
+        var newName = WithDuplicateSuffix(thisPaletteEntry.Name);
+        var newEntry = ViewModel.AddPaletteView(newName, new(paletteCopy));
         ViewModel.SelectedEntry = newEntry;
     }
 
@@ -159,6 +179,16 @@ public partial class PaletteCustomizer : Window
 
     private void OnPaintPreview(object? sender, SKPaintGLSurfaceEventArgs e)
     {
+        var doMouseUpdate = ViewModel.SelectedEntry?.Name != "Loxxe";
+
+        if (doMouseUpdate)
+        {
+            var screenMouse = Control.MousePosition;
+            var mouse = PreviewCanvas.PointFromScreen(new(screenMouse.X, screenMouse.Y));
+
+            _previewPainter.MousePos = new(mouse.X, mouse.Y);
+        }
+
         _previewPainter.Draw(e.Surface.Canvas, ViewModel.SelectedEntry?.Palette);
     }
 
@@ -356,6 +386,35 @@ public partial class PaletteCustomizer : Window
 
         entry.Palette[ViewModel.SelectedIndex] = inputColor.Value;
         ViewModel.UpdateHsl();
+    }
+
+    private string WithDuplicateSuffix(string name)
+    {
+        var needsSuffix = ViewModel.PaletteEntries
+            .Select(e => e.Name)
+            .Contains(name);
+
+        if (!needsSuffix)
+        {
+            return name;
+        }
+
+        return WithDuplicateSuffix(NextDuplicateName(name));
+    }
+
+    private string NextDuplicateName(string name)
+    {
+        var matchResult = Regex.Match(name, @"^(.+?)\s*\((\d+)\)$");
+
+        var baseName = matchResult.Success
+            ? matchResult.Groups[1].Value
+            : name;
+
+        var number = matchResult.Success
+            ? int.Parse(matchResult.Groups[2].Value)
+            : 1;
+
+        return $"{baseName} ({number + 1})";
     }
 }
 

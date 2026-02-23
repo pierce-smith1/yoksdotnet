@@ -24,7 +24,7 @@ public class ImageExporter(string _exportPath)
 
             canvas.Clear();
 
-            var subject = CreatureCreation.NewPreviewYokin(bitmap);
+            var subject = CreatureCreation.NewPreviewYokin(Bitmap.Classic(bitmap));
             SpritePainter.Draw(canvas, subject);
 
             var picture = recorder.EndRecording();

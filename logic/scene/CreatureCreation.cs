@@ -89,7 +89,7 @@ public static class CreatureCreation
         return yokin;
     }
 
-    public static Entity NewPreviewYokin(ClassicBitmap bitmap)
+    public static Entity NewPreviewYokin(Bitmap bitmap)
     {
         var yokinnequin = new Entity
         {
@@ -107,8 +107,15 @@ public static class CreatureCreation
         yokinnequin.Attach(new Skin
         {
             palette = Palette.DefaultPalette,
-            style = SpriteStyleChoice.Classic(),
-            fixedBitmap = Bitmap.Classic(bitmap),
+            style = bitmap.ClassicBitmap is not null ? SpriteStyleChoice.Classic() : SpriteStyleChoice.Refined(),
+            fixedBitmap = bitmap,
+        });
+
+        yokinnequin.Attach(new Gaze
+        {
+            currentGazePoint = new(0.0, 0.0),
+            targetGazePoint = new(0.0, 0.0),
+            targetChangeCooldownSeconds = 0.0,
         });
 
         return yokinnequin;

@@ -10,25 +10,31 @@ namespace yoksdotnet.drawing.painters;
 
 using PaletteIndexRegions = Dictionary<PaletteIndex, List<Vector>>;
 
-public class SpriteEditPreviewPainter(ClassicBitmap bitmap)
+public class SpriteEditPreviewPainter(RefinedBitmap bitmap)
 {
     private readonly PaletteIndexRegions _paletteIndexRegions = ComputeIndexRegions(bitmap.Resource);
-    private readonly Entity _previewEntity = CreatureCreation.NewPreviewYokin(bitmap);
+    private readonly Entity _previewEntity = CreatureCreation.NewPreviewYokin(Bitmap.Refined(bitmap));
 
     public PaletteIndex? HoveredIndex { get; private set; } = null;
+    public Vector MousePos { get; set; } = new(0.0, 0.0);
 
     public void Draw(SKCanvas canvas, Palette? palette)
     {
-        _previewEntity.basis.home.X = (canvas.LocalClipBounds.Width / 2) - (ClassicBitmap.Size / 2);
-        _previewEntity.basis.home.Y = (canvas.LocalClipBounds.Height / 2) - (ClassicBitmap.Size / 2);
+        _previewEntity.basis.home.X = canvas.LocalClipBounds.Width / 2;
+        _previewEntity.basis.home.Y = canvas.LocalClipBounds.Height / 2;
 
-        _previewEntity.Get<Skin>()!.palette = palette is not null
+        var skin = _previewEntity.Get<Skin>()!;
+
+        skin.palette = palette is not null
             ? HoveredIndex is not null
                 ? WithIndexHighlighted(palette, HoveredIndex)
                 : palette
             : Palette.DefaultPalette;
 
         canvas.Clear(new SKColor(0x11, 0x11, 0x11));
+
+        var gaze = _previewEntity.Get<Gaze>()!;
+        gaze.currentGazePoint = MousePos;
 
         SpritePainter.Draw(canvas, _previewEntity);
     }
@@ -84,6 +90,13 @@ public class SpriteEditPreviewPainter(ClassicBitmap bitmap)
             for (var x = 0; x < bitmap.Width; x++)
             {
                 var color = bitmap.GetPixel(x, y);
+                if (color.Alpha == 1)
+                {
+                    regions.TryAdd(PaletteIndex.Eyes, []);
+                    regions[PaletteIndex.Eyes].Add(new(x, y));
+                    continue;
+                }
+
                 if (color.Alpha != 255)
                 {
                     continue;
