@@ -78,21 +78,74 @@ public class RefinedBitmap : ISfEnum
     public readonly static RefinedBitmap Neutral = new(
         "neutral",
         pupilCenter: new(58.0, 67.0),
-        pupilRange: 10.0
+        pupilRange: 8.0
+    );
+
+    public readonly static RefinedBitmap Joy = new(
+        "joy",
+        pupilCenter: new(62.0, 58.0),
+        pupilRange: 8.0
+    );
+
+    public readonly static RefinedBitmap Scream = new(
+        "scream",
+        pupilCenter: new(61.0, 54.0),
+        pupilRange: 8.0,
+        pupilScale: 0.5
+    );
+
+    public readonly static RefinedBitmap Angery = new(
+        "angery",
+        pupilCenter: new(64.0, 67.0),
+        pupilRange: 8.0
+    );
+
+    public readonly static RefinedBitmap Unamused = new(
+        "unamused",
+        pupilCenter: new(60.0, 64.0),
+        pupilRange: 8.0
+    );
+
+    public readonly static RefinedBitmap Cry = new(
+        "cry",
+        pupilCenter: new(68.0, 58.0),
+        pupilRange: 8.0,
+        eyeScale: 0.9,
+        pupilScale: 1.2
+    );
+
+    public readonly static RefinedBitmap Evil = new(
+        "evil",
+        pupilCenter: new(67.0, 72.0),
+        pupilRange: 5.0,
+        eyeScale: 1.5,
+        pupilScale: 0.8
     );
 
     public string Name { get; init; }
     public SKBitmap Resource { get; init; }
     public Vector PupilCenter { get; init; }
     public double PupilRange { get; init; }
+    public double EyeScale { get; init; } = 1.0;
+    public double PupilScale { get; init; } = 1.0;
 
-    private RefinedBitmap(string name, Vector pupilCenter, double pupilRange)
+    private RefinedBitmap(string name, Vector pupilCenter, double pupilRange, double? eyeScale = null, double? pupilScale = null)
     {
         Name = name;
         Resource = Bitmaps.LoadResource($"/resources/sprites/refined/{name}.png");
 
         PupilCenter = pupilCenter;
         PupilRange = pupilRange;
+        
+        if (eyeScale is not null)
+        {
+            EyeScale = eyeScale.Value;
+        }
+
+        if (pupilScale is not null)
+        {
+            PupilScale = pupilScale.Value;
+        }
     }
 
     public override string ToString() => Name;

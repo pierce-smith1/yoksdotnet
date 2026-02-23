@@ -31,7 +31,13 @@
     <None Remove="resources\lkunamused.png" />
     <None Remove="resources\lkxd.png" />
     <None Remove="resources\nx.png" />
+    <None Remove="resources\sprites\refined\angery.png" />
+    <None Remove="resources\sprites\refined\cry.png" />
+    <None Remove="resources\sprites\refined\evil.png" />
+    <None Remove="resources\sprites\refined\joy.png" />
     <None Remove="resources\sprites\refined\neutral.png" />
+    <None Remove="resources\sprites\refined\scream.png" />
+    <None Remove="resources\sprites\refined\unamused.png" />
     <None Remove="resources\ui\hue-strip.png" />
     <None Remove="resources\vx.png" />
   </ItemGroup>
@@ -61,7 +67,13 @@
     <Resource Include="resources\sprites\classic\lkxd.png" />
     <Resource Include="resources\sprites\classic\nx.png" />
     <Resource Include="resources\sprites\classic\vx.png" />
+    <Resource Include="resources\sprites\refined\angery.png" />
+    <Resource Include="resources\sprites\refined\cry.png" />
+    <Resource Include="resources\sprites\refined\evil.png" />
+    <Resource Include="resources\sprites\refined\joy.png" />
     <Resource Include="resources\sprites\refined\neutral.png" />
+    <Resource Include="resources\sprites\refined\scream.png" />
+    <Resource Include="resources\sprites\refined\unamused.png" />
     <Resource Include="resources\ui\hue-strip.png" />
   </ItemGroup>
 

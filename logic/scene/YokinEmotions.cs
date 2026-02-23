@@ -16,7 +16,7 @@ public static class YokinEmotions
 {
     public static void UpdateEmotions(AnimationContext ctx, Emotion emotion, Basis basis)
     {
-        var noiseFactor = Interp.Linear(ctx.options.emotionScale, 0.0, 1.0, 0.0, 2.0);
+        var noiseFactor = Interp.Sqrt(ctx.options.emotionScale, 0.0, 1.0, 0.0, 3.0);
 
         emotion.ambition = GetNoiseValue(ctx, basis, 0.0) * noiseFactor;
         emotion.empathy = GetNoiseValue(ctx, basis, 1000.0) * noiseFactor;
@@ -29,7 +29,7 @@ public static class YokinEmotions
         (
             physical.home.X / 1000.0, 
             physical.home.Y / 1000.0, 
-            (ctx.scene.seconds + zOffset) / 50.0
+            (ctx.scene.seconds + zOffset) / 2.0
         );
 
         var result = Interp.Linear(noise, 0.0, 1.0, -1.0, 1.0);

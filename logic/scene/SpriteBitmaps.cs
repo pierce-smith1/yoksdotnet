@@ -66,6 +66,30 @@ public static class SpriteBitmaps
             return RefinedBitmap.Neutral;
         }
 
-        return RefinedBitmap.Neutral;
+        var ambitionRanking = GetEmotionRanking(emotion.ambition);
+        var empathyRanking = GetEmotionRanking(emotion.empathy);
+        var optimismRanking = GetEmotionRanking(emotion.optimism);
+
+        RefinedBitmap[][][] emotionMap =
+        [
+            [
+                [RefinedBitmap.Unamused, RefinedBitmap.Unamused, RefinedBitmap.Cry],
+                [RefinedBitmap.Unamused, RefinedBitmap.Neutral, RefinedBitmap.Cry],
+                [RefinedBitmap.Angery, RefinedBitmap.Angery, RefinedBitmap.Cry],
+            ],
+            [
+                [RefinedBitmap.Unamused, RefinedBitmap.Neutral, RefinedBitmap.Joy],
+                [RefinedBitmap.Neutral, RefinedBitmap.Neutral, RefinedBitmap.Neutral],
+                [RefinedBitmap.Angery, RefinedBitmap.Neutral, RefinedBitmap.Cry],
+            ],
+            [
+                [RefinedBitmap.Evil, RefinedBitmap.Joy, RefinedBitmap.Joy],
+                [RefinedBitmap.Evil, RefinedBitmap.Neutral, RefinedBitmap.Scream],
+                [RefinedBitmap.Evil, RefinedBitmap.Scream, RefinedBitmap.Scream],
+            ],
+        ];
+
+        var result = emotionMap[empathyRanking][optimismRanking][ambitionRanking];
+        return result;
     }
 }

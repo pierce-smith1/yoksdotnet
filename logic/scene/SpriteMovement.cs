@@ -1,4 +1,5 @@
 ﻿using System;
+using yoksdotnet.common;
 
 namespace yoksdotnet.logic.scene;
 
@@ -6,8 +7,8 @@ public static class SpriteMovement
 {
     public static void ApplyEmotionShake(AnimationContext ctx, Emotion emotion, Basis point)
     {
-        point.offset.X += (ctx.rng.NextDouble() * 2.0 - 1.0) * emotion.Magnitude * emotion.Magnitude;
-        point.offset.Y += (ctx.rng.NextDouble() * 2.0 - 1.0) * emotion.Magnitude * emotion.Magnitude;
+        point.offset.X += Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, -0.5, 0.5) * emotion.Magnitude * emotion.Magnitude;
+        point.offset.Y += Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, -0.5, 0.5) * emotion.Magnitude * emotion.Magnitude;
 
         point.offset.X = Math.Clamp(point.offset.X, -20.0, 20.0);
         point.offset.Y = Math.Clamp(point.offset.Y, -20.0, 20.0);

@@ -50,7 +50,7 @@ public static class SpritePainter
 
         var eyeX = (float)(bounds.topLeft.X + (refinedBitmap.PupilCenter.X * entity.basis.scale));
         var eyeY = (float)(bounds.topLeft.Y + (refinedBitmap.PupilCenter.Y * entity.basis.scale));
-        var eyeSize = (float)(refinedBitmap.PupilRange * 1.5 * entity.basis.scale);
+        var eyeSize = (float)(refinedBitmap.PupilRange * 2.5 * entity.basis.scale * refinedBitmap.EyeScale);
 
         var pupilX = eyeX;
         var pupilY = eyeY;
@@ -77,8 +77,11 @@ public static class SpritePainter
 
         var skBitmap = refinedBitmap.Resource;
 
+        var pupilScaleX = 1.0f / 5.0f * (float)refinedBitmap.PupilScale;
+        var pupilScaleY = 1.0f / 2.0f * (float)refinedBitmap.PupilScale;
+
         canvas.DrawCircle(eyeX, eyeY, eyeSize, skin.WhitesPaint);
-        canvas.DrawOval(pupilX, pupilY, eyeSize / 5.0f, eyeSize / 2.0f, skin.EyePaint);
+        canvas.DrawOval(pupilX, pupilY, eyeSize * pupilScaleX, eyeSize * pupilScaleY, skin.EyePaint);
         canvas.DrawBitmap(skBitmap, GetRect(entity), skin.BodyPaint);
     }
 
