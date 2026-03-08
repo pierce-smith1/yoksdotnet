@@ -183,6 +183,7 @@ public partial class DisplayWindow : Window
             nameof(OptionsViewModel.AnimationStartingPattern),
             nameof(OptionsViewModel.IndividualTrailsEnabled),
             nameof(OptionsViewModel.IndividualTrailLength),
+            nameof(OptionsViewModel.IndividualUseRefinedStyle)
         ];
 
         return propertiesRequiringRefresh.Contains(propertyName);

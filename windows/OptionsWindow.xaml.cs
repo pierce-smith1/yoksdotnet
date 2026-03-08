@@ -49,6 +49,7 @@ public partial class OptionsWindow : Window
         ViewModel.IndividualEmotionScale = options.emotionScale;
         ViewModel.IndividualTrailsEnabled = options.trailsEnabled;
         ViewModel.IndividualTrailLength = options.trailLength;
+        ViewModel.IndividualUseRefinedStyle = options.spriteStyle.IsRefined;
 
         ViewModel.AnimationSpeed = options.animationSpeed;
         ViewModel.AnimationPossiblePatterns = options.possiblePatterns;
@@ -340,6 +341,18 @@ public class OptionsViewModel : NotifiesPropertyChanged
         {
             BackingOptions.trailLength = value;
             OnPropertyChanged(nameof(IndividualTrailLength));
+        }
+    }
+
+    public bool IndividualUseRefinedStyle
+    {
+        get => BackingOptions.spriteStyle.IsRefined;
+        set
+        {
+            BackingOptions.spriteStyle = value
+                ? SpriteStyleChoice.Refined()
+                : SpriteStyleChoice.Classic();
+            OnPropertyChanged(nameof(IndividualUseRefinedStyle));
         }
     }
 

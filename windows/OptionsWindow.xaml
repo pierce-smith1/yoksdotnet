@@ -130,6 +130,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 
                 <!-- Size -->
@@ -156,6 +157,14 @@
                 <Label Grid.Row="3" Grid.Column="1" FontWeight="Normal" IsEnabled="{Binding IndividualTrailsEnabled}">Stubby</Label>
                 <Slider Grid.Row="3" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding IndividualTrailLength}" IsEnabled="{Binding IndividualTrailsEnabled}" />
                 <Label Grid.Row="3" Grid.Column="3" FontWeight="Normal" IsEnabled="{Binding IndividualTrailsEnabled}">Long</Label>
+                
+                <!-- Sprite style -->
+                <CheckBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
+                    Margin="0,10,0,0"
+                    IsChecked="{Binding IndividualUseRefinedStyle}"
+                >
+                    Use new sprites
+                </CheckBox>
             </Grid>
         </GroupBox>
         

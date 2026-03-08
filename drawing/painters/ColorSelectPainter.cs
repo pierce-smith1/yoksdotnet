@@ -13,10 +13,6 @@ public static class ColorSelectPainter
             uniform half2 resolution;
             uniform half hue;
 
-            half mod(half a, half b) {
-                return a - b * floor(a / b);
-            }
-
             half4 coord_to_rgb(vec2 coord) {
                 half h = hue;
                 half l = coord.x;
