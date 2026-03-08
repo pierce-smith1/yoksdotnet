@@ -1,4 +1,5 @@
-﻿using yoksdotnet.common;
+﻿using System.Linq;
+using yoksdotnet.common;
 using yoksdotnet.data;
 using yoksdotnet.data.entities;
 using yoksdotnet.drawing;
@@ -13,6 +14,7 @@ public class YokinCreationParameters
     public required SpriteStyleChoice style;
     public required Palette palette;
     public int? trailLength = null;
+    public ClassicBitmap? makeImpostor;
 
     public required PaintCacheBuilder paintCache;
 }
@@ -68,14 +70,25 @@ public static class CreatureCreation
 
                 paintCache = parameters.paintCache.Cache,
             },
+        };
 
-            emotion = new()
+        if (parameters.makeImpostor is null)
+        {
+            yokin.emotion = new()
             {
                 ambition = 0.0,
                 empathy = 0.0,
                 optimism = 0.0,
-            },
-        };
+            };
+        }
+
+        if (parameters.makeImpostor is not null)
+        {
+            yokin.skin.fixedBitmap = Bitmap.Classic(parameters.makeImpostor);
+            yokin.skin.style = SpriteStyleChoice.Classic();
+
+            yokin.basis.scale *= 0.75;
+        }
 
         if (parameters.trailLength is not null)
         {

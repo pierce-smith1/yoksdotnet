@@ -61,19 +61,20 @@ public class ClassicBitmap : ISfEnum
     public readonly static ClassicBitmap LkUnamused = new("lkunamused");
     public readonly static ClassicBitmap LkXd = new("lkxd");
 
-    public readonly static ClassicBitmap CvJoy = new("cvjoy");
-    public readonly static ClassicBitmap Fn = new("fn");
-    public readonly static ClassicBitmap FnPlead = new("fnplead");
-    public readonly static ClassicBitmap Nx = new("nx");
-    public readonly static ClassicBitmap Vx = new("vx");
+    public readonly static ClassicBitmap CvJoy = new("cvjoy", isImpostor: true);
+    public readonly static ClassicBitmap Fn = new("fn", isImpostor: true);
+    public readonly static ClassicBitmap Nx = new("nx", isImpostor: true);
+    public readonly static ClassicBitmap Vx = new("vx", isImpostor: true);
 
     public string Name { get; init; }
     public SKBitmap Resource { get; init; }
+    public bool IsImpostor { get; init; }
 
-    private ClassicBitmap(string name)
+    private ClassicBitmap(string name, bool isImpostor = false)
     {
         Name = name;
         Resource = Bitmaps.LoadResource($"/resources/sprites/classic/{name}.png");
+        IsImpostor = isImpostor;
     }
 
     public override string ToString() => Name;

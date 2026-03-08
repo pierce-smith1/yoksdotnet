@@ -74,11 +74,11 @@ public partial class App : System.Windows.Application
             whenPreview: hwnd => [new DisplayWindow(DisplayMode.Preview(hwnd))],
             whenDebug: withOptions =>
             {
+                _debugOptionsWindow = new OptionsWindow(options);
                 var displayWindow = new DisplayWindow(DisplayMode.Debug(_debugOptionsWindow));
 
                 if (withOptions)
                 {
-                    _debugOptionsWindow = new OptionsWindow(options);
                     return [displayWindow, _debugOptionsWindow];
                 }
 

@@ -19,6 +19,8 @@ public class SpriteGenerator(Random rng, ScrOptions options)
         var entities = new List<Entity>();
         var (selectedPalettes, totalPossibleCount) = SelectPalettes();
 
+        var impostorChance = Interp.Square(options.impostorDensity, 0.0, 1.0, 0.0, 1.0);
+
         for (var i = 0; i < GetSpriteCount(spreadX, spreadY); i++)
         {
             var home = new Vector(rng.NextDouble() * spreadX, rng.NextDouble() * spreadY);
@@ -27,6 +29,11 @@ public class SpriteGenerator(Random rng, ScrOptions options)
 
             int? trailLength = options.trailsEnabled
                 ? (int)Interp.Linear(options.trailLength, 0.0, 1.0, 5.0, 15.0)
+                : null;
+
+            var isImpostor = rng.NextDouble() < impostorChance;
+            var impostorBitmap = isImpostor
+                ? rng.Sample(SfEnums.GetAll<ClassicBitmap>().Where(b => b.IsImpostor))
                 : null;
 
             var newEntity = CreatureCreation.NewYokin(new()
@@ -38,6 +45,7 @@ public class SpriteGenerator(Random rng, ScrOptions options)
                 palette = palette,
                 trailLength = trailLength,
                 paintCache = paintCache,
+                makeImpostor = impostorBitmap,
             });
 
             entities.Add(newEntity);
