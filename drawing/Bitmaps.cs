@@ -19,21 +19,21 @@ public static class Bitmaps
     }
 }
 
-public class Bitmap 
+public class Bitmap : Matchable<ClassicBitmap, RefinedBitmap>
 { 
     private Bitmap() {}
 
-    public ClassicBitmap? ClassicBitmap { get; init; }
-    public RefinedBitmap? RefinedBitmap { get; init; }
+    public ClassicBitmap? ClassicBitmap => VariantA;
+    public RefinedBitmap? RefinedBitmap => VariantB;
 
-    public static Bitmap Classic(ClassicBitmap bitmap) => new()
+    public static Bitmap From(ClassicBitmap bitmap) => new()
     {
-        ClassicBitmap = bitmap,
+        VariantA = bitmap,
     };
 
-    public static Bitmap Refined(RefinedBitmap bitmap) => new()
+    public static Bitmap From(RefinedBitmap bitmap) => new()
     {
-        RefinedBitmap = bitmap,
+        VariantB = bitmap,
     };
 }
 

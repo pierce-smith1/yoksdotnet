@@ -328,8 +328,11 @@ public partial class PaletteCustomizer : Window
         var exportPath = Path.Combine(folderDialog.FolderName, entry.Name);
 
         var imageExporter = new ImageExporter(exportPath);
-        var exportResults = SfEnums.GetAll<ClassicBitmap>()
-            .Select(b => imageExporter.Export(b, entry.Palette));
+        var exportBitmaps = (List<Bitmap>) [
+            ..SfEnums.GetAll<ClassicBitmap>().Select(Bitmap.From),
+            ..SfEnums.GetAll<RefinedBitmap>().Select(Bitmap.From)
+        ];
+        var exportResults = exportBitmaps.Select(b => imageExporter.Export(b, entry.Palette));
 
         if (exportResults.All(r => r == ImageExportResult.Ok))
         {

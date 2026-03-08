@@ -2,20 +2,23 @@
 using System;
 using System.IO;
 using yoksdotnet.drawing.painters;
-using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
 
 namespace yoksdotnet.drawing;
 
 public class ImageExporter(string _exportPath)
 {
-    public ImageExportResult Export(ClassicBitmap bitmap, Palette palette)
+    public ImageExportResult Export(Bitmap bitmap, Palette palette)
     {
         try
         {
             Directory.CreateDirectory(_exportPath);
 
-            var imagePath = Path.Combine(_exportPath, $"{bitmap.Name}.png");
+            var bitmapName = bitmap.Match(
+                classic => $"classic-{classic.Name}",
+                refined => $"new-{refined.Name}"
+            );
+            var imagePath = Path.Combine(_exportPath, $"{bitmapName}.png");
 
             var size = ClassicBitmap.Size;
 
@@ -24,7 +27,11 @@ public class ImageExporter(string _exportPath)
 
             canvas.Clear();
 
-            var subject = CreatureCreation.NewPreviewYokin(Bitmap.Classic(bitmap));
+            var subject = CreatureCreation.NewPreviewYokin(bitmap);
+            subject.basis.home.X += size / 2.0;
+            subject.basis.home.Y += size / 2.0;
+            subject.skin!.palette = palette;
+
             SpritePainter.Draw(canvas, subject);
 
             var picture = recorder.EndRecording();

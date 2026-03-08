@@ -14,7 +14,7 @@ using PaletteIndexRegions = Dictionary<PaletteIndex, List<Vector>>;
 public class SpriteEditPreviewPainter(RefinedBitmap bitmap)
 {
     private readonly PaletteIndexRegions _paletteIndexRegions = ComputeIndexRegions(bitmap.Resource);
-    private readonly Entity _previewEntity = CreatureCreation.NewPreviewYokin(Bitmap.Refined(bitmap));
+    private readonly Entity _previewEntity = CreatureCreation.NewPreviewYokin(Bitmap.From(bitmap));
 
     public PaletteIndex? HoveredIndex { get; private set; } = null;
     public Vector MousePos { get; set; } = new(0.0, 0.0);
