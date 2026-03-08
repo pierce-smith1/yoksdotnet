@@ -8,7 +8,7 @@ public class Bubble : EntityComponent
     public bool isFree = false;
 
     public bool IsVisible { get; private set; } = false;
-    public DateTimeOffset? LastVisibilityChange { get; private set; }
+    public DateTimeOffset LastVisibilityChange { get; private set; } = DateTimeOffset.Now;
 
     public void SetVisible(bool visible)
     {

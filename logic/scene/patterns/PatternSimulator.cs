@@ -32,6 +32,8 @@ public abstract class PatternSimulator<T> : IPatternSimulator
     {
         var data = (token as PatternDataToken)!.Data;
         End(ctx, entity, data);
+
+        entity.patternToken = null;
     }
 
     public abstract T Init(AnimationContext ctx, Entity entity);
@@ -50,7 +52,10 @@ public abstract class SimplePatternSimulator : IPatternSimulator
         Move(ctx, entity);
     }
 
-    public void EndSimulation(AnimationContext _ctx, Entity _entity, IPatternToken _token) {}
+    public void EndSimulation(AnimationContext _ctx, Entity entity, IPatternToken _token) 
+    {
+        entity.patternToken = null;
+    }
 
     public abstract void Move(AnimationContext ctx, Entity entity);
 }

@@ -1,4 +1,6 @@
 ﻿using SkiaSharp;
+using System;
+using yoksdotnet.common;
 using yoksdotnet.data.entities;
 
 namespace yoksdotnet.drawing.painters;
@@ -16,6 +18,8 @@ public static class BubblePainter
         StrokeCap = SKStrokeCap.Round,
     };
 
+    private static readonly TimeSpan _fadeTime = TimeSpan.FromMilliseconds(500.0);
+
     static BubblePainter()
     {
         _shader = SKRuntimeEffect.Create(@"
@@ -23,6 +27,7 @@ public static class BubblePainter
             uniform half2 origin;
             uniform half3 highlight_color;
             uniform half3 shadow_color;
+            uniform half final_opacity;
 
             half4 main(vec2 real_coord) {
                 half radius = size / 2;
@@ -32,7 +37,7 @@ public static class BubblePainter
 
                 half dist = sqrt(coord.x * coord.x + coord.y * coord.y);
                 half score = pow(dist, 8);
-                half opacity = score > 1 ? 0 : score;
+                half opacity = (score > 1 ? 0 : score) * final_opacity;
                 opacity = clamp(opacity, 0, 0.8);
 
                 half mix_t = (coord.x + coord.y) / 2;
@@ -49,6 +54,26 @@ public static class BubblePainter
     {
         var (basis, skin, bubble) = entity;
 
+        var fadeDelta = DateTimeOffset.Now - bubble.LastVisibilityChange;
+        var fadeProgress = fadeDelta.TotalMilliseconds / _fadeTime.TotalMilliseconds;
+
+        if (!bubble.IsVisible && fadeProgress > 1.0)
+        {
+            return;
+        }
+
+        var opacity = Interp.Sqrt(fadeProgress, 0.0, 1.0, 0.0, 1.0);
+
+        if (!bubble.IsVisible)
+        {
+            opacity = 1.0 - opacity;
+        }
+
+        if (opacity <= 0.0)
+        {
+            return;
+        }
+
         var radius = (float)bubble.radius;
         var originX = (float)basis.Final.X - radius;
         var originY = (float)basis.Final.Y - radius;
@@ -57,6 +82,7 @@ public static class BubblePainter
         _uniforms["origin"] = new float[] { originX, originY };
         _uniforms["highlight_color"] = ColorConversion.ToFloatArray(skin.palette.scales);
         _uniforms["shadow_color"] = ColorConversion.ToFloatArray(skin.palette.scalesShadow);
+        _uniforms["final_opacity"] = (float)opacity;
 
         var paint = new SKPaint()
         {
