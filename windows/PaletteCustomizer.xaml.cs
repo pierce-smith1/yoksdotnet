@@ -329,8 +329,8 @@ public partial class PaletteCustomizer : Window
 
         var imageExporter = new ImageExporter(exportPath);
         var exportBitmaps = (List<Bitmap>) [
-            ..SfEnums.GetAll<ClassicBitmap>().Select(Bitmap.From),
-            ..SfEnums.GetAll<RefinedBitmap>().Select(Bitmap.From)
+            ..SfEnums.GetAll<ClassicBitmap>().Select(Bitmap.Classic),
+            ..SfEnums.GetAll<RefinedBitmap>().Select(Bitmap.Refined)
         ];
         var exportResults = exportBitmaps.Select(b => imageExporter.Export(b, entry.Palette));
 

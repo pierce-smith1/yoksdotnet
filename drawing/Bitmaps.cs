@@ -19,22 +19,30 @@ public static class Bitmaps
     }
 }
 
-public class Bitmap : Matchable<ClassicBitmap, RefinedBitmap>
+public class Bitmap
 { 
     private Bitmap() {}
 
-    public ClassicBitmap? ClassicBitmap => VariantA;
-    public RefinedBitmap? RefinedBitmap => VariantB;
+    public ClassicBitmap? ClassicBitmap { get; init; }
+    public RefinedBitmap? RefinedBitmap { get; init; }
 
-    public static Bitmap From(ClassicBitmap bitmap) => new()
+    public static Bitmap Classic(ClassicBitmap bitmap) => new()
     {
-        VariantA = bitmap,
+        ClassicBitmap = bitmap,
     };
 
-    public static Bitmap From(RefinedBitmap bitmap) => new()
+    public static Bitmap Refined(RefinedBitmap bitmap) => new()
     {
-        VariantB = bitmap,
+        RefinedBitmap = bitmap,
     };
+
+    public T Match<T>(Func<ClassicBitmap, T> whenClassic, Func<RefinedBitmap, T> whenRefined)
+    {
+        if (ClassicBitmap is not null) return whenClassic(ClassicBitmap);
+        if (RefinedBitmap is not null) return whenRefined(RefinedBitmap);
+
+        throw new InvalidOperationException();
+    }
 }
 
 public class ClassicBitmap : ISfEnum

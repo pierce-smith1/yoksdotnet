@@ -33,7 +33,7 @@ public class ScrOptions
     public List<CustomPaletteSet> customPalettes = [];
 }
 
-public record SpriteStyleChoice
+public class SpriteStyleChoice
 {
     public bool IsClassic { get; init; } = default;
     public bool IsRefined { get; init; } = default;
@@ -47,14 +47,6 @@ public record SpriteStyleChoice
     {
         IsRefined = true,
     };
-
-    public T Match<T>(Func<T> whenClassic, Func<T> whenRefined)
-    {
-        if (IsClassic) return whenClassic();
-        if (IsRefined) return whenRefined();
-
-        throw new NotImplementedException();
-    }
 }
 
 public record PatternChoice
