@@ -2,26 +2,18 @@ using System;
 using System.Linq;
 
 using yoksdotnet.common;
-using yoksdotnet.drawing;
-using yoksdotnet.logic.scene.patterns;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene;
 
 public static class SpriteChoreography
 {
-    private static Brand _genericBrand = new() 
-    {
-        value = 0.0,
-    };
-
     public static void HandleSceneStart(AnimationContext ctx)
     {
-        if (ctx.scene.currentPattern is { } firstPattern)
+        foreach (var entity in ctx.scene.entities)
         {
-            foreach (var entity in ctx.scene.entities)
-            {
-                firstPattern.StartAction(ctx, entity, entity.Get<Brand>() ?? _genericBrand);
-            }
+            entity.patternToken ??= ctx.scene.currentPattern.Simulator.InitSimulation(ctx, entity);
         }
     }
 
@@ -29,11 +21,20 @@ public static class SpriteChoreography
     {
         var (endingPattern, startingPattern) = CheckPatternChange(ctx);
 
+        if (endingPattern is not null)
+        {
+            foreach (var entity in ctx.scene.entities)
+            {
+                entity.patternToken ??= endingPattern.Simulator.InitSimulation(ctx, entity);
+                endingPattern.Simulator.EndSimulation(ctx, entity, entity.patternToken);
+            }
+        }
+
         if (startingPattern is not null)
         {
             foreach (var entity in ctx.scene.entities)
             {
-                startingPattern.StartAction(ctx, entity, entity.Get<Brand>() ?? _genericBrand);
+                entity.patternToken ??= startingPattern.Simulator.InitSimulation(ctx, entity);
             }
         }
 
@@ -41,7 +42,7 @@ public static class SpriteChoreography
         {
             MoveSprite(ctx, entity);
 
-            if (entity.Get<Skin>()?.style.IsRefined is true)
+            if (entity.skin?.style.IsRefined is true)
             {
                 GazeSimulator.UpdateGaze(ctx, entity);
             }
@@ -103,12 +104,13 @@ public static class SpriteChoreography
 
         var oldHome = entity.basis.home;
 
-        currentPattern.MoveAction(ctx, entity, entity.Get<Brand>() ?? _genericBrand);
+        entity.patternToken ??= currentPattern.Simulator.InitSimulation(ctx, entity);
+        currentPattern.Simulator.Simulate(ctx, entity, entity.patternToken);
 
-        if (entity.Get<Emotion>() is { } emotion)
+        if (entity.emotion is { } emotion)
         {
-            SpriteMovement.ApplyEmotionShake(ctx, emotion, entity.basis);
-            YokinEmotions.UpdateEmotions(ctx, emotion, entity.basis);
+            SpriteMovement.ApplyEmotionShake(ctx, (entity.basis, emotion));
+            EmotionSimulator.UpdateEmotions(ctx, (entity.basis, emotion));
         }
 
         if (currentPattern != Pattern.Lattice)
@@ -119,14 +121,14 @@ public static class SpriteChoreography
                 (newHome.Y - oldHome.Y) / ctx.scene.lastDtMs
             );
 
-            var physicsMeasurements = entity.EnsureHas<PhysicsMeasurements>(() => new()
+            var physicsMeasurements = entity.physicsMeasurements ??= new()
             {
                 lastVelocity = new(0.0, 0.0),
-            });
+            };
 
             physicsMeasurements.lastVelocity = measuredVelocity;
         }
 
-        SpriteTrails.UpdateTrails(ctx, entity);
+        TrailSimulator.UpdateTrails(ctx, entity);
     }
 }

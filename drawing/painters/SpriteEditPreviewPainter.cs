@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using yoksdotnet.common;
+using yoksdotnet.data.entities;
 using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
 
@@ -23,7 +24,7 @@ public class SpriteEditPreviewPainter(RefinedBitmap bitmap)
         _previewEntity.basis.home.X = canvas.LocalClipBounds.Width / 2;
         _previewEntity.basis.home.Y = canvas.LocalClipBounds.Height / 2;
 
-        var skin = _previewEntity.Get<Skin>()!;
+        var skin = _previewEntity.skin!;
 
         skin.palette = palette is not null
             ? HoveredIndex is not null
@@ -33,7 +34,7 @@ public class SpriteEditPreviewPainter(RefinedBitmap bitmap)
 
         canvas.Clear(new SKColor(0x11, 0x11, 0x11));
 
-        var gaze = _previewEntity.Get<Gaze>()!;
+        var gaze = _previewEntity.gaze!;
         gaze.currentGazePoint = MousePos;
 
         SpritePainter.Draw(canvas, _previewEntity);

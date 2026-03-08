@@ -1,8 +1,8 @@
 ﻿using SkiaSharp;
 using yoksdotnet.common;
-using yoksdotnet.logic;
+using yoksdotnet.drawing;
 
-namespace yoksdotnet.drawing;
+namespace yoksdotnet.data.entities;
 
 public class Skin : EntityComponent
 {

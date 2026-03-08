@@ -1,9 +1,7 @@
 ﻿using SkiaSharp;
 
 using System.Collections.Generic;
-using yoksdotnet.logic;
-using yoksdotnet.logic.scene;
-using yoksdotnet.logic.scene.patterns;
+using yoksdotnet.data.entities;
 
 namespace yoksdotnet.drawing.painters;
 
@@ -46,7 +44,7 @@ public static class DebugPainter
 
     private static void DebugBoid(SKCanvas canvas, Entity entity)
     {
-        if (entity.Get<Boid>() is not { } boid)
+        if (entity.boid is not { } boid)
         {
             return;
         }
@@ -63,8 +61,8 @@ public static class DebugPainter
     private static List<string> InfoToReport(Entity entity)
     {
         return [
-            $"Gcx: {entity.Get<Gaze>()?.currentGazePoint.X}",
-            $"Gcy: {entity.Get<Gaze>()?.currentGazePoint.Y}",
+            $"Gcx: {entity.gaze?.currentGazePoint.X}",
+            $"Gcy: {entity.gaze?.currentGazePoint.Y}",
         ];
     }
 }

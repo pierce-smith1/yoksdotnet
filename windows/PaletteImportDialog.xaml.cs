@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using yoksdotnet.data;
 using yoksdotnet.logic;
 
 namespace yoksdotnet.windows;

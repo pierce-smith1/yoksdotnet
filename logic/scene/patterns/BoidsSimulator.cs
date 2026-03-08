@@ -1,64 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using yoksdotnet.common;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public class Boid : EntityComponent
+public class BoidsSimulator : PatternSimulator<(Physics, Boid)>
 {
-    public required double avoidRadius;
-    public required double visionRadius;
-    public required double visionTheta;
-}
-
-public class BoidsPattern
-{
-    public static void Start(AnimationContext ctx, Entity entity, Brand brand)
+    public override (Physics, Boid) Init(AnimationContext ctx, Entity entity)
     {
-        var boid = entity.EnsureHas<Boid>(() => new()
+        var boid = entity.boid ??= new()
         {
             avoidRadius = 60.0,
             visionRadius = 120.0,
             visionTheta = Math.PI / 5.0,
-        });
+        };
 
-        var physics = entity.EnsureHas<Physics>(() => new()
+        var physics = entity.physics ??= new()
         {
             velocity = Vector.RandomScaled(ctx.rng, 2.0, 2.0),
-            mass = Interp.Linear(brand.value, 0.0, 1.0, 0.5, 1.5),
-        });
+            mass = Interp.Linear(entity.brand, 0.0, 1.0, 0.5, 1.5),
+        };
+
+        return (physics, boid);
     }
 
-    public static void Move(AnimationContext ctx, Entity entity, Brand brand)
+    public override void Move(AnimationContext ctx, Entity entity, (Physics, Boid) components)
     {
-        var boid = entity.Get<Boid>()!;
-        var physics = entity.Get<Physics>()!;
+        var (physics, boid) = components;
 
-        var peersToAvoid = ctx.scene.entities.Where(e => ShouldAvoid(entity.basis, boid, e.basis));
-        PushAwayFrom(entity.basis, physics, peersToAvoid.Select(e => e.basis));
+        var peersToAvoid = ctx.scene.entities.Where(e => ShouldAvoid((entity.basis, boid), e.basis));
+        PushAwayFrom((entity.basis, physics), peersToAvoid.Select(e => e.basis));
 
-        var visiblePeers = ctx.scene.entities.Where(e => IsVisibleTo(entity.basis, physics, boid, e.basis));
-        AlignWith(entity.basis, physics, visiblePeers.Select(e => e.Get<Physics>()!));
-        SteerTowardsCenter(entity.basis, physics, visiblePeers.Select(e => e.basis));
+        var visiblePeers = ctx.scene.entities.Where(e => IsVisibleTo((entity.basis, physics, boid), e.basis));
+        AlignWith((entity.basis, physics), visiblePeers.Select(e => e.physics!));
+        SteerTowardsCenter((entity.basis, physics), visiblePeers.Select(e => e.basis));
 
         ClampSpeed(physics);
-        TurnFromEdges(ctx, entity.basis, physics);
+        TurnFromEdges(ctx, (entity.basis, physics));
 
-        SpriteMovement.SimulatePhysics(ctx, entity.basis, physics);
+        SpriteMovement.SimulatePhysics(ctx, (entity.basis, physics));
         SpriteMovement.WrapScreen(ctx, entity.basis);
     }
 
-    private static bool ShouldAvoid(Basis basis, Boid boid, Basis other)
+    private static bool ShouldAvoid((Basis, Boid) entity, Basis other)
     {
+        var (basis, boid) = entity;
+
         var dist = basis.Final.DistanceTo(other.Final);
         return dist < boid.avoidRadius;
     }
 
-    private static bool IsVisibleTo(Basis basis, Physics physics, Boid boid, Basis other)
+    private static bool IsVisibleTo((Basis, Physics, Boid) entity, Basis other)
     {
+        var (basis, physics, boid) = entity;
+
         var dist = basis.Final.DistanceTo(other.Final);
 
         var isInRadius = dist > boid.avoidRadius && dist < boid.visionRadius;
@@ -70,8 +68,10 @@ public class BoidsPattern
         return isInRadius && isInFov;
     }
     
-    private static void PushAwayFrom(Basis basis, Physics physics, IEnumerable<Basis> others)
+    private static void PushAwayFrom((Basis, Physics) entity, IEnumerable<Basis> others)
     {
+        var (basis, physics) = entity;
+
         const double avoidanceStrength = 1.0 / 3.0;
 
         var pushForce = new Vector(0.0, 0.0);
@@ -91,8 +91,10 @@ public class BoidsPattern
         physics.velocity.Y += pushForce.Y;
     }
 
-    private static void AlignWith(Basis basis, Physics physics, IEnumerable<Physics> others)
+    private static void AlignWith((Basis, Physics) entity, IEnumerable<Physics> others)
     {
+        var (basis, physics) = entity;
+
         if (!others.Any())
         {
             return;
@@ -114,8 +116,10 @@ public class BoidsPattern
         physics.velocity.Y += (desiredVelocity.Y - physics.velocity.Y) * alignmentStrength;
     }
 
-    private static void SteerTowardsCenter(Basis basis, Physics physics, IEnumerable<Basis> others)
+    private static void SteerTowardsCenter((Basis, Physics) entity, IEnumerable<Basis> others)
     {
+        var (basis, physics) = entity;
+    
         if (!others.Any())
         {
             return;
@@ -136,8 +140,10 @@ public class BoidsPattern
         physics.velocity.Y += (centerOfMass.Y - basis.Final.Y) * centeringStrength;
     }
 
-    private static void TurnFromEdges(AnimationContext ctx, Basis basis, Physics physics)
+    private static void TurnFromEdges(AnimationContext ctx, (Basis, Physics) entity)
     {
+        var (basis, physics) = entity;
+
         const double margin = 100.0;
         const double turnStrength = 1.0 / 20.0;
 

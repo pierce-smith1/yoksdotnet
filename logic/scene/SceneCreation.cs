@@ -1,6 +1,6 @@
 ﻿using System;
 using yoksdotnet.common;
-using yoksdotnet.logic.scene.patterns;
+using yoksdotnet.data;
 
 namespace yoksdotnet.logic.scene;
 

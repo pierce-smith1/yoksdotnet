@@ -1,5 +1,6 @@
 ﻿using System;
 using yoksdotnet.common;
+using yoksdotnet.data;
 
 namespace yoksdotnet.logic.scene;
 
@@ -19,13 +20,13 @@ public static class SceneSimulation
             ctx.scene.seconds += dt.TotalSeconds * speedScale;
         }
 
-        if (ctx.scene.frame == 0)
+        ctx.scene.lastTick = now;
+        ctx.scene.frame++;
+
+        if (ctx.scene.frame == 1)
         {
             SpriteChoreography.HandleSceneStart(ctx);
         }
-
-        ctx.scene.lastTick = now;
-        ctx.scene.frame++;
 
         SpriteChoreography.HandleFrame(ctx);
     }

@@ -1,33 +1,34 @@
 ﻿using yoksdotnet.common;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public static class BouncyPattern
+public class BouncySimulator : PatternSimulator<Physics>
 {
-    public static void Start(AnimationContext ctx, Entity entity, Brand _brand)
+    public override Physics Init(AnimationContext ctx, Entity entity)
     {
-        var lastVelocity = entity.Get<PhysicsMeasurements>()?.lastVelocity;
+        var lastVelocity = entity.physicsMeasurements?.lastVelocity;
 
-        entity.EnsureHas<Physics>(() => new()
+        entity.physics ??= new()
         {
             velocity = lastVelocity ?? Vector.RandomScaled(ctx.rng, 5.0, 5.0),
             mass = Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, 0.5, 1.5),
-        });
+        };
+
+        return entity.physics;
     }
 
-    public static void Move(AnimationContext ctx, Entity entity, Brand _brand)
+    public override void Move(AnimationContext ctx, Entity entity, Physics physics)
     {
-        if (entity.Get<Physics>() is not { } physics)
-        {
-            return;
-        }
-
-        SpriteMovement.SimulatePhysics(ctx, entity.basis, physics);
-        BounceOffScreen(ctx, entity.basis, physics);
+        SpriteMovement.SimulatePhysics(ctx, (entity.basis, physics));
+        BounceOffScreen(ctx, (entity.basis, physics));
     }
 
-    public static void BounceOffScreen(AnimationContext ctx, Basis basis, Physics physics)
+    public static void BounceOffScreen(AnimationContext ctx, (Basis, Physics) entity)
     {
+        var (basis, physics) = entity;
+
         var bounds = basis.Bounds;
 
         if (bounds.topLeft.X < 0)

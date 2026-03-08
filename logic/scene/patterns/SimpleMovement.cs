@@ -1,48 +1,64 @@
 ﻿using System;
 using yoksdotnet.common;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public class SimpleMovement
+public static class SimpleMovement
 {
-    public static void Noop(AnimationContext _ctx, Entity _entity, Brand _brand) {}
-
-    public static void MoveRoamers(AnimationContext ctx, Entity entity, Brand brand)
+    public class LatticeSimulator : SimplePatternSimulator
     {
-        entity.basis.home.X += brand.value * ctx.scene.lastDtMs;
-        entity.basis.home.Y += Math.Sin(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
-
-        SpriteMovement.WrapScreen(ctx, entity.basis);
+        public override void Move(AnimationContext _ctx, Entity _entity) {}
     }
-    public static void MoveWaves(AnimationContext ctx, Entity entity, Brand brand)
-    {
-        entity.basis.home.X += Math.Sin(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
-        entity.basis.home.Y += Math.Cos(ctx.scene.seconds * brand.value) * ctx.scene.lastDtMs;
 
-        SpriteMovement.WrapScreen(ctx, entity.basis);
+    public class RoamerSimulator : SimplePatternSimulator
+    {
+        public override void Move(AnimationContext ctx, Entity entity)
+        {
+            entity.basis.home.X += entity.brand * ctx.scene.lastDtMs;
+            entity.basis.home.Y += Math.Sin(ctx.scene.seconds * entity.brand) * ctx.scene.lastDtMs;
+
+            SpriteMovement.WrapScreen(ctx, entity.basis);
+        }
     }
-    public static void MoveLissajous(AnimationContext ctx, Entity entity, Brand brand)
+
+    public class WavesSimulator : SimplePatternSimulator
     {
-        var minX = Math.Max((ctx.scene.width - ctx.scene.height) / 2.0, 0.0);
-        var maxX = ctx.scene.width - minX;
+        public override void Move(AnimationContext ctx, Entity entity)
+        {
+            entity.basis.home.X += Math.Sin(ctx.scene.seconds * entity.brand) * ctx.scene.lastDtMs;
+            entity.basis.home.Y += Math.Cos(ctx.scene.seconds * entity.brand) * ctx.scene.lastDtMs;
 
-        var minY = Math.Max((ctx.scene.height - ctx.scene.width) / 2.0, 0.0);
-        var maxY = ctx.scene.height - minY;
+            SpriteMovement.WrapScreen(ctx, entity.basis);
+        }
+    }
 
-        var targetX = Interp.Linear(
-            Math.Sin(ctx.scene.seconds * 4.0 - brand.value * 17.0),
-            -1.0, 1.0,
-            minX, maxX - ClassicBitmap.Size
-        );
+    public class LissajousSimulator : SimplePatternSimulator
+    {
+        public override void Move(AnimationContext ctx, Entity entity)
+        {
+            var minX = Math.Max((ctx.scene.width - ctx.scene.height) / 2.0, 0.0);
+            var maxX = ctx.scene.width - minX;
 
-        var targetY = Interp.Linear(
-            Math.Cos(ctx.scene.seconds * 4.0 - brand.value * 11.0),
-            -1.0, 1.0,
-            minY, maxY - ClassicBitmap.Size
-        );
+            var minY = Math.Max((ctx.scene.height - ctx.scene.width) / 2.0, 0.0);
+            var maxY = ctx.scene.height - minY;
 
-        entity.basis.home.X = targetX + (entity.basis.home.X - targetX) * 0.9;
-        entity.basis.home.Y = targetY + (entity.basis.home.Y - targetY) * 0.9;
+            var targetX = Interp.Linear(
+                Math.Sin(ctx.scene.seconds * 4.0 - entity.brand * 17.0),
+                -1.0, 1.0,
+                minX, maxX - ClassicBitmap.Size
+            );
+
+            var targetY = Interp.Linear(
+                Math.Cos(ctx.scene.seconds * 4.0 - entity.brand * 11.0),
+                -1.0, 1.0,
+                minY, maxY - ClassicBitmap.Size
+            );
+
+            entity.basis.home.X = targetX + (entity.basis.home.X - targetX) * 0.9;
+            entity.basis.home.Y = targetY + (entity.basis.home.Y - targetY) * 0.9;
+        }
     }
 }

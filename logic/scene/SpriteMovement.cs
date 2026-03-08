@@ -1,22 +1,26 @@
 ﻿using System;
 using yoksdotnet.common;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene;
 
 public static class SpriteMovement
 {
-    public static void ApplyEmotionShake(AnimationContext ctx, Emotion emotion, Basis point)
+    public static void ApplyEmotionShake(AnimationContext ctx, (Basis, Emotion) entity)
     {
-        point.offset.X += Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, -0.5, 0.5) * emotion.Magnitude * emotion.Magnitude;
-        point.offset.Y += Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, -0.5, 0.5) * emotion.Magnitude * emotion.Magnitude;
+        var (basis, emotion) = entity;
 
-        point.offset.X = Math.Clamp(point.offset.X, -20.0, 20.0);
-        point.offset.Y = Math.Clamp(point.offset.Y, -20.0, 20.0);
+        basis.offset.X += Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, -0.5, 0.5) * emotion.Magnitude * emotion.Magnitude;
+        basis.offset.Y += Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, -0.5, 0.5) * emotion.Magnitude * emotion.Magnitude;
+
+        basis.offset.X = Math.Clamp(basis.offset.X, -20.0, 20.0);
+        basis.offset.Y = Math.Clamp(basis.offset.Y, -20.0, 20.0);
     }
 
-    public static void WrapScreen(AnimationContext ctx, Basis point)
+    public static void WrapScreen(AnimationContext ctx, Basis basis)
     {
-        var bounds = point.Bounds;
+        var bounds = basis.Bounds;
 
         var xInBounds = bounds.bottomRight.X >= 0 && bounds.topLeft.X <= ctx.scene.width;
         var yInBounds = bounds.bottomRight.Y >= 0 && bounds.topLeft.Y <= ctx.scene.height;
@@ -31,12 +35,12 @@ public static class SpriteMovement
 
         if (!xInBounds)
         {
-            point.home.X += (ctx.scene.width + boundsWidth) * (point.home.X < 0 ? 1 : -1);
+            basis.home.X += (ctx.scene.width + boundsWidth) * (basis.home.X < 0 ? 1 : -1);
         } 
 
         if (!yInBounds)
         {
-            point.home.Y += (ctx.scene.height + boundsHeight) * (point.home.Y < 0 ? 1 : -1);
+            basis.home.Y += (ctx.scene.height + boundsHeight) * (basis.home.Y < 0 ? 1 : -1);
         }
     }
 
@@ -46,8 +50,10 @@ public static class SpriteMovement
         basis.home.Y = Math.Clamp(basis.home.Y, basis.offset.Y, ctx.scene.height + basis.offset.Y);
     }
 
-    public static void SimulatePhysics(AnimationContext ctx, Basis basis, Physics physics)
+    public static void SimulatePhysics(AnimationContext ctx, (Basis, Physics) entity)
     {
+        var (basis, physics) = entity;
+
         basis.home.X += physics.velocity.X * ctx.scene.lastDtMs;
         basis.home.Y += physics.velocity.Y * ctx.scene.lastDtMs;
     }

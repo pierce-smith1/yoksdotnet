@@ -1,6 +1,6 @@
-﻿using SkiaSharp;
-using System.Collections.Generic;
-using yoksdotnet.common;
+﻿using yoksdotnet.common;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
@@ -33,7 +33,9 @@ public static class CreatureCreation
                 width = CreatureSize,
                 height = CreatureSize,
                 angleRadians = 0.0,
-            }
+            },
+
+            brand = 0.0,
         };
 
         return entity;
@@ -52,38 +54,35 @@ public static class CreatureCreation
                 height = CreatureSize,
                 angleRadians = 0.0,
             },
+
+            brand = parameters.brand,
+
+            skin = new()
+            {
+                palette = parameters.palette,
+                style = parameters.style,
+
+                bodyPaintHandle = parameters.paintCache.GetBodyPaintHandle(parameters.palette),
+                whitePaintHandle = parameters.paintCache.GetSolidColorPaintHandle(parameters.palette.whites),
+                eyePaintHandle = parameters.paintCache.GetSolidColorPaintHandle(parameters.palette.eyes),
+
+                paintCache = parameters.paintCache.Cache,
+            },
+
+            emotion = new()
+            {
+                ambition = 0.0,
+                empathy = 0.0,
+                optimism = 0.0,
+            },
         };
-
-        yokin.Attach(new Brand
-        {
-            value = parameters.brand,
-        });
-
-        yokin.Attach(new Skin
-        {
-            palette = parameters.palette,
-            style = parameters.style,
-
-            bodyPaintHandle = parameters.paintCache.GetBodyPaintHandle(parameters.palette),
-            whitePaintHandle = parameters.paintCache.GetSolidColorPaintHandle(parameters.palette.whites),
-            eyePaintHandle = parameters.paintCache.GetSolidColorPaintHandle(parameters.palette.eyes),
-
-            paintCache = parameters.paintCache.Cache,
-        });
-
-        yokin.Attach(new Emotion
-        {
-            ambition = 0.0,
-            empathy = 0.0,
-            optimism = 0.0,
-        });
 
         if (parameters.trailLength is not null)
         {
-            yokin.Attach(new Trail()
+            yokin.trail = new Trail()
             {
                 snapshots = new CircularBuffer<Entity?>(parameters.trailLength.Value * 10),
-            });
+            };
         }
 
         return yokin;
@@ -102,21 +101,23 @@ public static class CreatureCreation
                 height = CreatureSize,
                 angleRadians = 0.0,
             },
+
+            brand = 0.0,
+
+            skin = new()
+            {
+                palette = Palette.DefaultPalette,
+                style = bitmap.ClassicBitmap is not null ? SpriteStyleChoice.Classic() : SpriteStyleChoice.Refined(),
+                fixedBitmap = bitmap,
+            },
+
+            gaze = new() 
+            {
+                currentGazePoint = new(0.0, 0.0),
+                targetGazePoint = new(0.0, 0.0),
+                targetChangeCooldownSeconds = 0.0,
+            },
         };
-
-        yokinnequin.Attach(new Skin
-        {
-            palette = Palette.DefaultPalette,
-            style = bitmap.ClassicBitmap is not null ? SpriteStyleChoice.Classic() : SpriteStyleChoice.Refined(),
-            fixedBitmap = bitmap,
-        });
-
-        yokinnequin.Attach(new Gaze
-        {
-            currentGazePoint = new(0.0, 0.0),
-            targetGazePoint = new(0.0, 0.0),
-            targetChangeCooldownSeconds = 0.0,
-        });
 
         return yokinnequin;
     }

@@ -1,6 +1,7 @@
 ﻿using SkiaSharp;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 using yoksdotnet.logic;
-using yoksdotnet.logic.scene;
 using yoksdotnet.windows;
 
 namespace yoksdotnet.drawing.painters;

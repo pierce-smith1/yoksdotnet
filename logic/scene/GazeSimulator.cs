@@ -1,31 +1,24 @@
 ﻿using System;
 using System.Linq;
 using yoksdotnet.common;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene;
-
-public class Gaze : EntityComponent
-{
-    public required Vector currentGazePoint;
-    public required Vector targetGazePoint;
-    public required double targetChangeCooldownSeconds;
-    public Entity? targetEntity;
-    public DateTimeOffset? lastTargetChange;
-}
 
 public static class GazeSimulator
 {
     public static void UpdateGaze(AnimationContext ctx, Entity entity)
     {
-        var gaze = entity.EnsureHas<Gaze>(() => new()
+        entity.gaze ??= new()
         {
             currentGazePoint = new(0.0, 0.0),
             targetGazePoint = new(0.0, 0.0),
-            targetChangeCooldownSeconds = Interp.Linear(entity.Get<Brand>()?.value ?? 0.5, 0.0, 1.0, 1.5, 3.0),
-        });
+            targetChangeCooldownSeconds = Interp.Linear(entity.brand, 0.0, 1.0, 1.5, 3.0),
+        };
 
-        UpdateTarget(ctx, entity, gaze);
-        UpdateCurrentGazePoint(ctx, entity, gaze);
+        UpdateTarget(ctx, entity, entity.gaze);
+        UpdateCurrentGazePoint(ctx, entity, entity.gaze);
     }
 
     private static void UpdateTarget(AnimationContext ctx, Entity entity, Gaze gaze)

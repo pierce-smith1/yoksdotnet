@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using yoksdotnet.common;
+using yoksdotnet.data;
+using yoksdotnet.data.entities;
 using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;

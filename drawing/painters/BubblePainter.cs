@@ -1,6 +1,5 @@
 ﻿using SkiaSharp;
-using yoksdotnet.logic;
-using yoksdotnet.logic.scene.patterns;
+using yoksdotnet.data.entities;
 
 namespace yoksdotnet.drawing.painters;
 
@@ -46,8 +45,10 @@ public static class BubblePainter
         _uniforms = new(_shader);
     }
 
-    public static void Draw(SKCanvas canvas, Basis basis, Skin skin, Bubble bubble)
+    public static void Draw(SKCanvas canvas, (Basis, Skin, Bubble) entity)
     {
+        var (basis, skin, bubble) = entity;
+
         var radius = (float)bubble.radius;
         var originX = (float)basis.Final.X - radius;
         var originY = (float)basis.Final.Y - radius;

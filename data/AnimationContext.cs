@@ -1,7 +1,8 @@
 ﻿using System;
 using yoksdotnet.drawing;
+using yoksdotnet.logic;
 
-namespace yoksdotnet.logic.scene;
+namespace yoksdotnet.data;
 
 public class AnimationContext(Scene scene, ScrOptions options, Random rng)
 {

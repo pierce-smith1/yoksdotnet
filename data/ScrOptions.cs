@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using yoksdotnet.common;
 using yoksdotnet.drawing;
-using yoksdotnet.logic.scene.patterns;
 
-namespace yoksdotnet.logic;
+namespace yoksdotnet.data;
 
 public class ScrOptions
 {
@@ -29,7 +28,7 @@ public class ScrOptions
     public bool patternDoesChange = true;
     public double patternChangeFrequency = 0.5;
 
-    // Custom palettes are serialized and de-serialized separately. See OptionsStore.
+    // Custom palettes are serialized explicitly. See OptionsStorage.
     [JsonIgnore]
     public List<CustomPaletteSet> customPalettes = [];
 }

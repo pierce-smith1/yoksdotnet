@@ -13,9 +13,9 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using yoksdotnet.common;
+using yoksdotnet.data;
 using yoksdotnet.drawing;
 using yoksdotnet.drawing.painters;
-using yoksdotnet.logic;
 
 using Button = System.Windows.Controls.Button;
 using TextBox = System.Windows.Controls.TextBox;

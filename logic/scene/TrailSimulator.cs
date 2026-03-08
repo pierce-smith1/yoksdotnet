@@ -1,18 +1,13 @@
-﻿using yoksdotnet.common;
-using yoksdotnet.drawing;
+﻿using yoksdotnet.data;
+using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene;
 
-public class Trail : EntityComponent
-{
-    public required CircularBuffer<Entity?> snapshots;
-}
-
-public static class SpriteTrails
+public static class TrailSimulator
 {
     public static void UpdateTrails(AnimationContext ctx, Entity entity)
     {
-        if (entity.Get<Trail>() is not { } trail)
+        if (entity.trail is not { } trail)
         {
             return;
         }
@@ -33,13 +28,13 @@ public static class SpriteTrails
         ghost.basis.height = entity.basis.height;
         ghost.basis.angleRadians = entity.basis.angleRadians;
 
-        if (entity.Get<Skin>() is { } skin)
+        if (entity.skin is { } skin)
         {
-            var ghostSkin = ghost.EnsureHas<Skin>(() => new()
+            var ghostSkin = ghost.skin ??= new()
             {
                 style = skin.style,
                 palette = skin.palette,
-            });
+            };
 
             ghostSkin.style = skin.style;
             ghostSkin.palette = skin.palette;
@@ -50,9 +45,25 @@ public static class SpriteTrails
             ghostSkin.whitePaintHandle = skin.whitePaintHandle;
         }
 
-        if (entity.Get<Emotion>() is { } emotion)
+        if (entity.gaze is { } gaze)
         {
-            ghost.Attach(emotion);
+            var ghostGaze = ghost.gaze ??= new()
+            {
+                currentGazePoint = gaze.currentGazePoint,
+                targetGazePoint = gaze.targetGazePoint,
+                targetChangeCooldownSeconds = gaze.targetChangeCooldownSeconds,
+            };
+
+            ghostGaze.currentGazePoint = gaze.currentGazePoint;
+            ghostGaze.targetGazePoint = gaze.targetGazePoint;
+            ghostGaze.lastTargetChange = gaze.lastTargetChange;
+            ghostGaze.targetEntity = gaze.targetEntity;
+            ghostGaze.targetChangeCooldownSeconds = gaze.targetChangeCooldownSeconds;
+        }
+
+        if (entity.emotion is { } emotion)
+        {
+            ghost.emotion = emotion;
         }
     }
 }

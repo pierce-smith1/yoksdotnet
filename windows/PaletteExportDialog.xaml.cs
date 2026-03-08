@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using yoksdotnet.data;
 using yoksdotnet.logic;
 
 namespace yoksdotnet.windows;

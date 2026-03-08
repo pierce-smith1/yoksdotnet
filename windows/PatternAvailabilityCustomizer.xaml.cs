@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows;
 using yoksdotnet.common;
-using yoksdotnet.logic.scene.patterns;
+using yoksdotnet.data;
 using yoksdotnet.windows.common;
 
 namespace yoksdotnet.windows;

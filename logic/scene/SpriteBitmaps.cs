@@ -1,4 +1,5 @@
-﻿using yoksdotnet.drawing;
+﻿using yoksdotnet.data.entities;
+using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene;
 

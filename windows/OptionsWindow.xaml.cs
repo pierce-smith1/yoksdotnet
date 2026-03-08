@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 
 using yoksdotnet.common;
+using yoksdotnet.data;
 using yoksdotnet.drawing;
 using yoksdotnet.logic;
 using yoksdotnet.logic.scene.patterns;

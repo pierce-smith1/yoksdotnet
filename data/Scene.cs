@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using yoksdotnet.logic.scene.patterns;
+using yoksdotnet.data.entities;
 
-namespace yoksdotnet.logic.scene;
+namespace yoksdotnet.data;
 
 public class Scene
 {
     public int frame = 0;
     public double seconds = 0.0;
     public double lastDtMs = 0.0;
-    public DateTimeOffset? lastTick = null;
-    public Pattern? currentPattern = null;
-    public DateTimeOffset? patternLastChangedAt = null;
+    public DateTimeOffset? lastTick;
+
+    public required Pattern currentPattern;
+    public DateTimeOffset? patternLastChangedAt;
 
     public List<Entity> entities = [];
 

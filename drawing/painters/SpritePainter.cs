@@ -1,9 +1,8 @@
 ﻿using SkiaSharp;
 using System;
 using yoksdotnet.common;
-using yoksdotnet.logic;
+using yoksdotnet.data.entities;
 using yoksdotnet.logic.scene;
-using yoksdotnet.logic.scene.patterns;
 
 namespace yoksdotnet.drawing.painters;
 
@@ -11,12 +10,12 @@ public static class SpritePainter
 {
     public static void Draw(SKCanvas canvas, Entity entity)
     {
-        if (entity.Get<Skin>() is not { } skin)
+        if (entity.skin is not { } skin)
         {
             return;
         }
 
-        if (entity.Get<Trail>() is { } trail)
+        if (entity.trail is { } trail)
         {
             DrawTrail(canvas, trail);
         }
@@ -30,21 +29,21 @@ public static class SpritePainter
             DrawRefined(canvas, entity, skin);
         }
 
-        if (entity.Get<Bubble>() is { } bubble)
+        if (entity.bubble is { } bubble)
         {
-            BubblePainter.Draw(canvas, entity.basis, skin, bubble);
+            BubblePainter.Draw(canvas, (entity.basis, skin, bubble));
         }
     }
 
     private static void DrawClassic(SKCanvas canvas, Entity entity, Skin skin)
     {
-        var skBitmap = SpriteBitmaps.GetClassicBitmap(skin, entity.Get<Emotion>()).Resource;
+        var skBitmap = SpriteBitmaps.GetClassicBitmap(skin, entity.emotion).Resource;
         canvas.DrawBitmap(skBitmap, GetRect(entity), skin.BodyPaint);
     }
 
     private static void DrawRefined(SKCanvas canvas, Entity entity, Skin skin)
     {
-        var refinedBitmap = SpriteBitmaps.GetRefinedBitmap(skin, entity.Get<Emotion>());
+        var refinedBitmap = SpriteBitmaps.GetRefinedBitmap(skin, entity.emotion);
 
         var bounds = entity.basis.Bounds;
 
@@ -57,7 +56,7 @@ public static class SpritePainter
 
         var isBlind = skin.palette == PredefinedPalette.Loxxe;
 
-        if (entity.Get<Gaze>() is { } gaze && !isBlind)
+        if (entity.gaze is { } gaze && !isBlind)
         {
             var eyeOrigin = new Vector(eyeX, eyeY);
             var eyeline = gaze.currentGazePoint.Sub(eyeOrigin);

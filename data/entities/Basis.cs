@@ -1,8 +1,6 @@
 ﻿using yoksdotnet.common;
 
-namespace yoksdotnet.logic;
-
-public abstract class EntityComponent;
+namespace yoksdotnet.data.entities;
 
 public class Basis : EntityComponent
 {
@@ -30,18 +28,3 @@ public class Basis : EntityComponent
     }
 }
 
-public class Physics : EntityComponent
-{
-    public required Vector velocity;
-    public required double mass;
-}
-
-public class Brand : EntityComponent
-{
-    public required double value;
-}
-
-public class PhysicsMeasurements : EntityComponent
-{
-    public required Vector lastVelocity;
-}

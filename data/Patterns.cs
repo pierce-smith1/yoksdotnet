@@ -1,63 +1,55 @@
-﻿using System;
-using yoksdotnet.common;
+﻿using yoksdotnet.common;
+using yoksdotnet.logic.scene.patterns;
 
-namespace yoksdotnet.logic.scene.patterns;
+namespace yoksdotnet.data;
 
 public record Pattern(
-    string Name, 
-    string Description, 
-    Action<AnimationContext, Entity, Brand> MoveAction,
-    Action<AnimationContext, Entity, Brand> StartAction
+    string Name,
+    string Description,
+    IPatternSimulator Simulator
 ) 
     : ISfEnum
 {
     public readonly static Pattern Lattice = new(
         "Lattice", 
         "No motion",
-        MoveAction: SimpleMovement.Noop,
-        StartAction: SimpleMovement.Noop
+        new SimpleMovement.LatticeSimulator()
     );
 
     public readonly static Pattern Roamers = new(
         "Roamers", 
         "Drift from left to right, softly bobbing up and down",
-        MoveAction: SimpleMovement.MoveRoamers,
-        StartAction: SimpleMovement.Noop
+        new SimpleMovement.RoamerSimulator()
     );
 
     public readonly static Pattern Bouncy = new(
         "Bouncy",
         "DVD screensaver style",
-        MoveAction: BouncyPattern.Move,
-        StartAction: BouncyPattern.Start
+        new BouncySimulator()
     );
 
     public readonly static Pattern Waves = new(
         "Waves", 
         "Move in large, random circles",
-        MoveAction: SimpleMovement.MoveWaves,
-        StartAction: SimpleMovement.Noop
+        new SimpleMovement.WavesSimulator()
     );
 
     public readonly static Pattern Lissajous = new(
         "Lissajous",
         "Line up and march in a snaking curve",
-        MoveAction: SimpleMovement.MoveLissajous,
-        StartAction: SimpleMovement.Noop
+        new SimpleMovement.LissajousSimulator()
     );
 
     public readonly static Pattern Bubbles = new(
         "Bubbles",
         "Become bubbles and bounce off one another",
-        MoveAction: BubblesPattern.Move,
-        StartAction: BubblesPattern.Start
+        new BubblesSimulator()
     );
 
     public readonly static Pattern Boids = new(
         "Boids",
         "Coalesce and flock",
-        MoveAction: BoidsPattern.Move,
-        StartAction: BoidsPattern.Start
+        new BoidsSimulator()
     );
 
     public override string ToString() => Name;
