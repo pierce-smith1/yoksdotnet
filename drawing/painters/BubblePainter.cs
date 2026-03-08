@@ -18,6 +18,8 @@ public static class BubblePainter
         StrokeCap = SKStrokeCap.Round,
     };
 
+    private static readonly SKPaint _shaderPaint = new();
+
     private static readonly TimeSpan _fadeTime = TimeSpan.FromMilliseconds(500.0);
 
     static BubblePainter()
@@ -84,12 +86,11 @@ public static class BubblePainter
         _uniforms["shadow_color"] = ColorConversion.ToFloatArray(skin.palette.scalesShadow);
         _uniforms["final_opacity"] = (float)opacity;
 
-        var paint = new SKPaint()
-        {
-            Shader = _shader.ToShader(isOpaque: false, uniforms: _uniforms),
-        };
+        _shaderPaint.Shader = _shader.ToShader(isOpaque: false, _uniforms);
 
-        canvas.DrawRect(originX, originY, radius * 2.0f, radius * 2.0f, paint);
+        canvas.DrawRect(originX, originY, radius * 2.0f, radius * 2.0f, _shaderPaint);
+
+        _shinePaint.Color = new SKColor(255, 255, 255, (byte)(opacity * 255.0));
         canvas.DrawArc(new SKRect(originX + 8.0f, originY + 8.0f, originX + radius * 2.0f - 8.0f, originY + radius * 2.0f - 8.0f), 360 * 3 / 5, 20, false, _shinePaint);
     }
 }

@@ -13,7 +13,7 @@ public static class SpriteChoreography
     {
         foreach (var entity in ctx.scene.entities)
         {
-            entity.patternToken ??= ctx.scene.currentPattern.Simulator.InitSimulation(ctx, entity);
+            entity.patternToken = ctx.scene.currentPattern.Simulator.InitSimulation(ctx, entity);
         }
     }
 
@@ -34,7 +34,7 @@ public static class SpriteChoreography
         {
             foreach (var entity in ctx.scene.entities)
             {
-                entity.patternToken ??= startingPattern.Simulator.InitSimulation(ctx, entity);
+                entity.patternToken = startingPattern.Simulator.InitSimulation(ctx, entity);
             }
         }
 
