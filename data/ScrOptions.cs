@@ -28,12 +28,14 @@ public class ScrOptions
     public bool patternDoesChange = true;
     public double patternChangeFrequency = 0.5;
 
+    public MultiMonitorModeChoice multiMonitorMode = MultiMonitorModeChoice.Stretch();
+
     // Custom palettes are serialized explicitly. See OptionsStorage.
     [JsonIgnore]
     public List<CustomPaletteSet> customPalettes = [];
 }
 
-public class SpriteStyleChoice
+public record SpriteStyleChoice
 {
     public bool IsClassic { get; init; } = default;
     public bool IsRefined { get; init; } = default;
@@ -76,7 +78,7 @@ public record PatternChoice
 public record PaletteChoice
 {
     public bool IsAllGroups { get; init; } = default;
-    public bool IsRandomlyGenerated { get; init; } = default;
+    public bool IsRandomlyGenerated { get;  init; } = default;
     public PaletteGroup? Group { get; init; } = default;
     public CustomPaletteSetEntry? CustomSet { get; init; } = default;
 
@@ -112,6 +114,30 @@ public record PaletteChoice
         if (IsRandomlyGenerated) return whenGenerated();
 
         throw new NotImplementedException();
+    }
+}
+
+public record MultiMonitorModeChoice
+{
+    public bool IsStretch { get; init; }
+    public bool IsPerScreen { get; init; }
+
+    public static MultiMonitorModeChoice Stretch() => new()
+    {
+        IsStretch = true,
+    };
+
+    public static MultiMonitorModeChoice PerScreen() => new()
+    {
+        IsPerScreen = true,
+    };
+
+    public T Match<T>(Func<T> whenStretch, Func<T> whenPerScreen)
+    {
+        if (IsStretch) return whenStretch();
+        if (IsPerScreen) return whenPerScreen();
+
+        throw new InvalidOperationException();
     }
 }
 

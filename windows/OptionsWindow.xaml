@@ -182,6 +182,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 
                 <!-- Patterns -->
@@ -212,6 +213,14 @@
                 <Label Grid.Row="3" Grid.Column="1" FontWeight="Normal" IsEnabled="{Binding AnimationPatternDoesChange}">Rarely</Label>
                 <Slider Grid.Row="3" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding AnimationPatternChangeFrequency}" IsEnabled="{Binding AnimationPatternDoesChange}" />
                 <Label Grid.Row="3" Grid.Column="3" FontWeight="Normal" IsEnabled="{Binding AnimationPatternDoesChange}">Often</Label>
+                
+                <!-- Multi screen -->
+                <Label Grid.Row="4" Grid.Column="0" FontWeight="SemiBold">Multiple Displays:</Label>
+                <ComboBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" 
+                    ItemsSource="{Binding MultiMonitorModeEntries}"
+                    SelectedValue="{Binding MultiMonitorChoice}"
+                    Height="25"
+                />
             </Grid>
         </GroupBox>
 

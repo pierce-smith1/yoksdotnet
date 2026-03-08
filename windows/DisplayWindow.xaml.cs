@@ -20,7 +20,10 @@ public record DisplayMode
 {
     public bool IsDebug { get; init; } = default;
     public OptionsWindow? DebugOptionsWindow { get; init; } = default;
-    public bool IsScreensaver { get; init; } = default;
+
+    public bool IsStretchedScreensaver { get; init; } = default;
+    public Screen? SingleScreen { get; init; } = default;
+
     public nint? PreviewHwnd { get; init; } = default;
 
     public static DisplayMode Debug(OptionsWindow? optionsWindow) => new()
@@ -29,9 +32,14 @@ public record DisplayMode
         DebugOptionsWindow = optionsWindow,
     };
 
-    public static DisplayMode Screensaver() => new()
+    public static DisplayMode StretchedScreensaver() => new()
     {
-        IsScreensaver = true,
+        IsStretchedScreensaver = true,
+    };
+
+    public static DisplayMode SingleScreensaver(Screen screen) => new()
+    {
+        SingleScreen = screen,
     };
 
     public static DisplayMode Preview(nint hwnd) => new()
@@ -39,10 +47,11 @@ public record DisplayMode
         PreviewHwnd = hwnd,
     };
 
-    public void Match(Action<OptionsWindow?> whenDebug, Action whenScreensaver, Action<nint> whenPreview)
+    public void Switch(Action<OptionsWindow?> whenDebug, Action whenStretchedScreensaver, Action<Screen> whenSingleScreensaver, Action<nint> whenPreview)
     {
         if (IsDebug) whenDebug(DebugOptionsWindow);
-        if (IsScreensaver) whenScreensaver();
+        if (IsStretchedScreensaver) whenStretchedScreensaver();
+        if (SingleScreen is not null) whenSingleScreensaver(SingleScreen);
         if (PreviewHwnd is not null) whenPreview(PreviewHwnd.Value);
     }
 }
@@ -61,9 +70,10 @@ public partial class DisplayWindow : Window
     [DllImport("user32.dll")]
     static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
 
+    private static readonly int _fixedRngSeed = new Random().Next();
+
     private readonly int _animationFps = 60;
     private readonly AnimationContext _ctx;
-    private readonly int _debugRngSeed = new Random().Next();
 
     private readonly DisplayMode _displayMode;
     private readonly ScenePainter _scenePainter;
@@ -74,14 +84,15 @@ public partial class DisplayWindow : Window
 
         _displayMode = mode;
 
-        mode.Match(
-            whenScreensaver: InitForScreensaver,
+        mode.Switch(
+            whenStretchedScreensaver: InitForStetchedScreensaver,
+            whenSingleScreensaver: InitForSingleScreensaver,
             whenDebug: InitForDebug,
             whenPreview: hwnd => { /* TODO */ }
         );
 
-        var rng = GetRng();
         var options = GetOptions();
+        var rng = GetRng(options);
 
         var scene = SceneCreation.NewScene(options, rng, (int)Width, (int)Height);
         _ctx = new AnimationContext(scene, options, rng);
@@ -102,18 +113,6 @@ public partial class DisplayWindow : Window
         WindowStyle = WindowStyle.None;
         ResizeMode = ResizeMode.NoResize;
 
-        var globalMinX = Screen.AllScreens.Select(screen => screen.Bounds.Left).Min();
-        var globalMaxX = Screen.AllScreens.Select(screen => screen.Bounds.Right).Max();
-
-        var globalMinY = Screen.AllScreens.Select(screen => screen.Bounds.Top).Min();
-        var globalMaxY = Screen.AllScreens.Select(screen => screen.Bounds.Bottom).Max();
-
-        Width = globalMaxX - globalMinX;
-        Height = globalMaxY - globalMinY;
-
-        Left = 0;
-        Top = 0;
-
         System.Windows.Forms.Cursor.Hide();
 
         // Windows forms repeatedly fires MouseMove events even if you aren't doing shit.
@@ -130,6 +129,34 @@ public partial class DisplayWindow : Window
         };
 
         KeyDown += (s, e) => Shutdown();
+    }
+
+    private void InitForStetchedScreensaver()
+    {
+        InitForScreensaver();
+
+        var globalMinX = Screen.AllScreens.Min(screen => screen.Bounds.Left);
+        var globalMaxX = Screen.AllScreens.Max(screen => screen.Bounds.Right);
+
+        var globalMinY = Screen.AllScreens.Min(screen => screen.Bounds.Top);
+        var globalMaxY = Screen.AllScreens.Max(screen => screen.Bounds.Bottom);
+
+        Width = globalMaxX - globalMinX;
+        Height = globalMaxY - globalMinY;
+
+        Left = 0;
+        Top = 0;
+    }
+
+    private void InitForSingleScreensaver(Screen screen)
+    {
+        InitForScreensaver();
+
+        Width = screen.Bounds.Width;
+        Height = screen.Bounds.Height;
+
+        Left = screen.Bounds.Left;
+        Top = screen.Bounds.Top;
     }
 
     private void InitForDebug(OptionsWindow? debugOptionsWindow)
@@ -166,7 +193,10 @@ public partial class DisplayWindow : Window
 
     private void RefreshScene()
     {
-        var newScene = SceneCreation.NewScene(GetOptions(), GetRng(), (int)Width, (int)Height);
+        var options = GetOptions();
+        var rng = GetRng(options);
+
+        var newScene = SceneCreation.NewScene(options, rng, (int)Width, (int)Height);
 
         _ctx.scene = newScene;
     }
@@ -209,11 +239,12 @@ public partial class DisplayWindow : Window
         return savedOptions;
     }
 
-    private Random GetRng()
+    private Random GetRng(ScrOptions options)
     {
-        if (_displayMode.IsDebug && _displayMode.DebugOptionsWindow is not null)
+        var debuggingWithOptionsWindow = _displayMode.IsDebug && _displayMode.DebugOptionsWindow is not null;
+        if (debuggingWithOptionsWindow)
         {
-            return new Random(_debugRngSeed);
+            return new Random(_fixedRngSeed);
         }
 
         return new Random();

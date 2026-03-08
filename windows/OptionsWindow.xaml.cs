@@ -7,7 +7,6 @@ using yoksdotnet.common;
 using yoksdotnet.data;
 using yoksdotnet.drawing;
 using yoksdotnet.logic;
-using yoksdotnet.logic.scene.patterns;
 using yoksdotnet.windows.common;
 
 namespace yoksdotnet.windows;
@@ -56,6 +55,7 @@ public partial class OptionsWindow : Window
         ViewModel.AnimationStartingPattern = new(options.startingPattern);
         ViewModel.AnimationPatternChangeFrequency = options.patternChangeFrequency;
         ViewModel.AnimationPatternDoesChange = options.patternDoesChange;
+        ViewModel.MultiMonitorChoice = new(options.multiMonitorMode);
 
         ViewModel.CustomPalettes = options.customPalettes;
         ViewModel.FamilyPaletteChoice = PaletteSelection.PaletteSet(options.paletteChoice);
@@ -412,6 +412,16 @@ public class OptionsViewModel : NotifiesPropertyChanged
         }
     }
 
+    public MultiMonitorModeEntry MultiMonitorChoice
+    {
+        get => new(BackingOptions.multiMonitorMode);
+        set
+        {
+            BackingOptions.multiMonitorMode = value.Choice;
+            OnPropertyChanged(nameof(MultiMonitorChoice));
+        }
+    }
+
     public List<CustomPaletteSet> CustomPalettes
     {
         get => BackingOptions.customPalettes;
@@ -439,6 +449,11 @@ public class OptionsViewModel : NotifiesPropertyChanged
             return choices;
         }
     }
+
+    public List<MultiMonitorModeEntry> MultiMonitorModeEntries => [
+        new(MultiMonitorModeChoice.Stretch()),
+        new(MultiMonitorModeChoice.PerScreen()),
+    ];
 
     public Visibility PaletteCustomizeVisibility => FamilyPaletteChoice.Match(
         whenPaletteSet: choice => choice.CustomSet is not null
@@ -526,6 +541,16 @@ public record PatternChoiceEntry(PatternChoice Choice)
     public string Name => Choice.Match(
         whenRandom: () => "Random",
         whenSingle: pattern => pattern.Name
+    );
+
+    public override string ToString() => Name;
+}
+
+public record MultiMonitorModeEntry(MultiMonitorModeChoice Choice)
+{
+    public string Name => Choice.Match(
+        whenStretch: () => "Stretch animation across displays",
+        whenPerScreen: () => "Unique animation per display"
     );
 
     public override string ToString() => Name;

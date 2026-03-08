@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-
+using System.Windows.Forms;
+using yoksdotnet.data;
 using yoksdotnet.logic;
 using yoksdotnet.windows;
 
@@ -45,7 +47,7 @@ public record RunType
     }
 }
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     public App() {}
 
@@ -61,23 +63,35 @@ public partial class App : Application
             return;
         }
 
-        MainWindow = runType.Match<Window>(
-            whenConfigure: () => new OptionsWindow(),
-            whenScreensaver: () => new DisplayWindow(DisplayMode.Screensaver()),
-            whenPreview: hwnd => new DisplayWindow(DisplayMode.Preview(hwnd)),
+        var options = OptionsStorage.Load() ?? new ScrOptions();
+
+        var windows = runType.Match<IEnumerable<Window>>(
+            whenConfigure: () => [new OptionsWindow()],
+            whenScreensaver: () => options.multiMonitorMode.Match(
+                whenPerScreen: () => Screen.AllScreens.Select(s => new DisplayWindow(DisplayMode.SingleScreensaver(s))),
+                whenStretch: () => [new DisplayWindow(DisplayMode.StretchedScreensaver())]
+            ),
+            whenPreview: hwnd => [new DisplayWindow(DisplayMode.Preview(hwnd))],
             whenDebug: withOptions =>
             {
+                var displayWindow = new DisplayWindow(DisplayMode.Debug(_debugOptionsWindow));
+
                 if (withOptions)
                 {
-                    _debugOptionsWindow = new OptionsWindow(OptionsStorage.Load());
-                    _debugOptionsWindow.Show();
+                    _debugOptionsWindow = new OptionsWindow(options);
+                    return [displayWindow, _debugOptionsWindow];
                 }
 
-                return new DisplayWindow(DisplayMode.Debug(_debugOptionsWindow));
+                return [displayWindow];
             }
         );
 
-        MainWindow.Show();
+        MainWindow = windows.FirstOrDefault();
+
+        foreach (var window in windows)
+        {
+            window.Show();
+        }
     }
 
     private static RunType? DetermineRunType(StartupEventArgs e)
