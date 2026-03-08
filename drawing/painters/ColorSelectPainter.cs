@@ -5,12 +5,11 @@ namespace yoksdotnet.drawing.painters;
 
 public static class ColorSelectPainter
 {
-    private static readonly SKRuntimeEffect _shader;
-    private static readonly SKRuntimeEffectUniforms _shaderUniforms;
+    private static readonly SKRuntimeShaderBuilder _shader;
 
     static ColorSelectPainter()
     {
-        _shader = SKRuntimeEffect.Create(@"
+        _shader = SKRuntimeEffect.BuildShader(@"
             uniform half2 resolution;
             uniform half hue;
 
@@ -46,21 +45,19 @@ public static class ColorSelectPainter
                 half4 rgb = coord_to_rgb(coord / resolution);
                 return half4(rgb.r, rgb.g, rgb.b, 1.0);
             }
-        ", out var _errorText);
-
-        _shaderUniforms = new(_shader);
+        ");
     }
 
     public static void Draw(SKCanvas canvas, HslColor selectedColor)
     {
         canvas.GetLocalClipBounds(out var canvasBounds);
         
-        _shaderUniforms["resolution"] = new float[] {canvasBounds.Width, canvasBounds.Height};
-        _shaderUniforms["hue"] = (float)selectedColor.H;
+        _shader.Uniforms["resolution"] = new float[] {canvasBounds.Width, canvasBounds.Height};
+        _shader.Uniforms["hue"] = (float)selectedColor.H;
 
         var selectPaint = new SKPaint()
         {
-            Shader = _shader.ToShader(isOpaque: true, uniforms: _shaderUniforms),
+            Shader = _shader.Build(),
         };
 
         canvas.DrawRect(0, 0, canvasBounds.Width, canvasBounds.Height, selectPaint);

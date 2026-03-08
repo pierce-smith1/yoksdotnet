@@ -7,8 +7,7 @@ namespace yoksdotnet.drawing.painters;
 
 public static class BubblePainter
 {
-    private static readonly SKRuntimeEffect _shader;
-    private static readonly SKRuntimeEffectUniforms _uniforms;
+    private static readonly SKRuntimeShaderBuilder _shader;
 
     private static readonly SKPaint _shinePaint = new()
     {
@@ -24,7 +23,7 @@ public static class BubblePainter
 
     static BubblePainter()
     {
-        _shader = SKRuntimeEffect.Create(@"
+        _shader = SKRuntimeEffect.BuildShader(@"
             uniform half size;
             uniform half2 origin;
             uniform half3 highlight_color;
@@ -47,9 +46,7 @@ public static class BubblePainter
 
                 return half4(color.r, color.g, color.b, opacity);
             }
-        ", out var _errorText);
-
-        _uniforms = new(_shader);
+        ");
     }
 
     public static void Draw(SKCanvas canvas, (Basis, Skin, Bubble) entity)
@@ -80,14 +77,13 @@ public static class BubblePainter
         var originX = (float)basis.Final.X - radius;
         var originY = (float)basis.Final.Y - radius;
 
-        _uniforms["size"] = radius * 2.0f;
-        _uniforms["origin"] = new float[] { originX, originY };
-        _uniforms["highlight_color"] = ColorConversion.ToFloatArray(skin.palette.scales);
-        _uniforms["shadow_color"] = ColorConversion.ToFloatArray(skin.palette.scalesShadow);
-        _uniforms["final_opacity"] = (float)opacity;
+        _shader.Uniforms["size"] = radius * 2.0f;
+        _shader.Uniforms["origin"] = new float[] { originX, originY };
+        _shader.Uniforms["highlight_color"] = ColorConversion.ToFloatArray(skin.palette.scales);
+        _shader.Uniforms["shadow_color"] = ColorConversion.ToFloatArray(skin.palette.scalesShadow);
+        _shader.Uniforms["final_opacity"] = (float)opacity;
 
-        _shaderPaint.Shader = _shader.ToShader(isOpaque: false, _uniforms);
-
+        _shaderPaint.Shader = _shader.Build();
         canvas.DrawRect(originX, originY, radius * 2.0f, radius * 2.0f, _shaderPaint);
 
         _shinePaint.Color = new SKColor(255, 255, 255, (byte)(opacity * 255.0));
