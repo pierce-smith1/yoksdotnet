@@ -2,17 +2,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
+using System.Windows.Interop;
 using yoksdotnet.data;
 using yoksdotnet.drawing.painters;
 using yoksdotnet.logic;
 using yoksdotnet.logic.scene;
+
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace yoksdotnet.windows;
 
@@ -58,18 +61,6 @@ public record DisplayMode
 
 public partial class DisplayWindow : Window
 {
-    [DllImport("user32.dll")]
-    static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-
-    [DllImport("user32.dll")]
-    static extern int SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-    [DllImport("user32.dll")]
-    static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
-
     private static readonly int _fixedRngSeed = new Random().Next();
 
     private readonly int _animationFps = 60;
@@ -88,7 +79,7 @@ public partial class DisplayWindow : Window
             whenStretchedScreensaver: InitForStetchedScreensaver,
             whenSingleScreensaver: InitForSingleScreensaver,
             whenDebug: InitForDebug,
-            whenPreview: hwnd => { /* TODO */ }
+            whenPreview: InitForPreview
         );
 
         var options = GetOptions();
@@ -189,6 +180,37 @@ public partial class DisplayWindow : Window
                 }
             };
         }
+    }
+
+    private void InitForPreview(nint parentHandle)
+    {
+        WindowStyle = WindowStyle.None;
+        ResizeMode = ResizeMode.NoResize;
+
+        Left = 0;
+        Top = 0;
+
+        Loaded += (_s, _e) =>
+        {
+            var interopHelper = new WindowInteropHelper(this);
+            var thisHwnd = (HWND)interopHelper.Handle;
+
+            var parentHwnd = (HWND)parentHandle;
+
+            var setParentResult = PInvoke.SetParent(thisHwnd, parentHwnd);
+
+            var currentWindowStyle = PInvoke.GetWindowLong(thisHwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+            var setWindowLongResult = PInvoke.SetWindowLong(thisHwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE, currentWindowStyle | (int)WINDOW_STYLE.WS_CHILD);
+
+            unsafe
+            {
+                RECT parentRect = new();
+                PInvoke.GetClientRect(parentHwnd, &parentRect);
+
+                Width = parentRect.Width;
+                Height = parentRect.Height;
+            }
+        };
     }
 
     private void RefreshScene()

@@ -1,0 +1,6 @@
+SetParent
+SetWindowLong
+GetWindowLong
+GetClientRect
+WINDOW_LONG_PTR_INDEX
+WINDOW_STYLE

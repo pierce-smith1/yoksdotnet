@@ -117,6 +117,9 @@ public partial class App : System.Windows.Application
             [var flag] when flag.StartsWith("/p") && flag.Contains(':')
                 => RunType.RunAsPreview(nint.Parse(flag.Split(':')[1])),
 
+            [var flag] when flag.StartsWith("/c")
+                => RunType.RunAsConfigure(),
+
             _ => null,
         }; 
 
