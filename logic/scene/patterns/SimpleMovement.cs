@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using yoksdotnet.common;
 using yoksdotnet.data;
 using yoksdotnet.data.entities;
@@ -39,22 +40,35 @@ public static class SimpleMovement
     {
         public override void Move(AnimationContext ctx, Entity entity)
         {
-            var minX = Math.Max((ctx.scene.width - ctx.scene.height) / 2.0, 0.0);
-            var maxX = ctx.scene.width - minX;
+            var bounds = entity.basis.Bounds;
+            var bufferX = (bounds.bottomRight.X - bounds.topLeft.X);
+            var bufferY = (bounds.bottomRight.Y - bounds.topLeft.Y);
 
-            var minY = Math.Max((ctx.scene.height - ctx.scene.width) / 2.0, 0.0);
-            var maxY = ctx.scene.height - minY;
+            var brandX = ctx.scene.entities.FirstOrDefault()?.brand ?? 0.5;
+            var brandY = ctx.scene.entities.LastOrDefault()?.brand ?? 0.5;
+
+            var minX = Math.Max((ctx.scene.width - ctx.scene.height) / 2.0, 0.0) + bufferX;
+            var maxX = ctx.scene.width - minX - bufferX;
+
+            var minY = Math.Max((ctx.scene.height - ctx.scene.width) / 2.0, 0.0) + bufferY;
+            var maxY = ctx.scene.height - minY - bufferY;
+
+            var coeffX = Interp.Linear(brandX, 0.0, 1.0, 10.0, 20.0);
+            var coeffY = Interp.Linear(brandY, 0.0, 1.0, 10.0, 20.0);
+
+            var speedX = Interp.Linear(brandX, 0.0, 1.0, 2.0, 7.0);
+            var speedY = Interp.Linear(brandY, 0.0, 1.0, 2.0, 7.0);
 
             var targetX = Interp.Linear(
-                Math.Sin(ctx.scene.seconds * 4.0 - entity.brand * 17.0),
+                Math.Sin(ctx.scene.seconds * 5.0 - entity.brand * coeffX),
                 -1.0, 1.0,
-                minX, maxX - ClassicBitmap.Size
+                minX, maxX
             );
 
             var targetY = Interp.Linear(
-                Math.Cos(ctx.scene.seconds * 4.0 - entity.brand * 11.0),
+                Math.Cos(ctx.scene.seconds * 5.0 - entity.brand * coeffY),
                 -1.0, 1.0,
-                minY, maxY - ClassicBitmap.Size
+                minY, maxY
             );
 
             entity.basis.home.X = targetX + (entity.basis.home.X - targetX) * 0.9;

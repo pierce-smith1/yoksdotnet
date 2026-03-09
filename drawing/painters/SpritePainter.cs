@@ -66,7 +66,7 @@ public static class SpritePainter
                 -Math.PI / 2.0, 
                 Math.PI / 2.0, 
                 0.0, 
-                refinedBitmap.PupilRange * entity.basis.scale
+                refinedBitmap.PupilRange * entity.basis.scale * 1.2
             );
             var pupilOffset = eyeline.AsNormalized().Mult(offsetCoefficient);
 

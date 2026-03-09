@@ -28,7 +28,7 @@ public class SpriteGenerator(Random rng, ScrOptions options)
             var palette = rng.SampleExponential(selectedPalettes, 1.0 - (double)selectedPalettes.Count / totalPossibleCount);
 
             int? trailLength = options.trailsEnabled
-                ? (int)Interp.Linear(options.trailLength, 0.0, 1.0, 5.0, 15.0)
+                ? (int)Interp.Linear(options.trailLength, 0.0, 1.0, 2.0, 8.0)
                 : null;
 
             var isImpostor = rng.NextDouble() < impostorChance;

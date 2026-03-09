@@ -91,8 +91,8 @@ public partial class DisplayWindow : Window
             options.spriteScale /= 5.0;
             options.animationSpeed /= 5.0;
 
-            Width /= 2;
-            Height /= 2;
+            Width /= 2.0;
+            Height /= 2.0;
         }
 
         var scene = SceneCreation.NewScene(options, rng, (int)Width, (int)Height);

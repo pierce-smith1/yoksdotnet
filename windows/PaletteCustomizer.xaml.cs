@@ -12,20 +12,26 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
+using System.Windows.Input;
 using yoksdotnet.common;
 using yoksdotnet.data;
 using yoksdotnet.drawing;
 using yoksdotnet.drawing.painters;
 
 using Button = System.Windows.Controls.Button;
+using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace yoksdotnet.windows;
 
+public record UndoStep(PaletteIndex Index, RgbColor PreviousColor);
+
 public partial class PaletteCustomizer : Window
 {
     private readonly RandomPaletteGenerator _randomPaletteGenerator = new(new());
-    private readonly SpriteEditPreviewPainter _previewPainter = new(RefinedBitmap.Neutral); 
+    private readonly SpriteEditPreviewPainter _previewPainter = new(RefinedBitmap.Neutral);
+
+    private readonly List<UndoStep> _undoStack = [];
 
     public PaletteCustomizer(CustomPaletteSet set)
     {
@@ -42,6 +48,14 @@ public partial class PaletteCustomizer : Window
             {
                 ViewModel.UpdatePalette();
                 RefreshSurfaces();
+            }
+        };
+
+        KeyUp += (s, e) =>
+        {
+            if ((Keyboard.Modifiers == ModifierKeys.Control) && (e.Key == Key.Z))
+            {
+                OnUndo();
             }
         };
 
@@ -83,11 +97,6 @@ public partial class PaletteCustomizer : Window
         DialogResult = true;
     }
 
-    protected void OnCancel(object _sender, RoutedEventArgs _e)
-    {
-        DialogResult = false;
-    }
-
     protected void OnAddPalette(object _sender, RoutedEventArgs _e)
     {
         var name = WithDuplicateSuffix(ViewModel.PaletteToAdd.Key);
@@ -120,9 +129,7 @@ public partial class PaletteCustomizer : Window
 
         var paletteName = ViewModel.GetEntryWithId(paletteId).Name;
 
-        var shouldSkipPrompt = System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift)
-            || System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.RightShift);
-
+        var shouldSkipPrompt = Keyboard.Modifiers == ModifierKeys.Shift;
         var shouldDoDelete = shouldSkipPrompt;
 
         if (!shouldSkipPrompt)
@@ -169,6 +176,8 @@ public partial class PaletteCustomizer : Window
     {
         ViewModel.UpdateHsl();
         RefreshSurfaces();
+
+        _undoStack.Clear();
     }
 
     private void RefreshSurfaces()
@@ -227,7 +236,7 @@ public partial class PaletteCustomizer : Window
         RefreshSurfaces();
     }
 
-    private void OnEntryKeyboardFocused(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
+    private void OnEntryKeyboardFocused(object sender, KeyboardFocusChangedEventArgs e)
     {
         if (sender is not TextBox textBox)
         {
@@ -253,6 +262,24 @@ public partial class PaletteCustomizer : Window
         }
 
         ColorSelectPainter.Draw(ctx, new(ViewModel.Hue, ViewModel.Saturation, ViewModel.Lightness));
+    }
+
+    private void OnColorSelectMouseDown(object? sender, MouseEventArgs e)
+    {
+        if (ViewModel.SelectedEntry is not { } entry)
+        {
+            return;
+        }
+
+        if (sender is not SKGLControl glControl)
+        {
+            return;
+        }
+
+        var index = ViewModel.SelectedIndex;
+        UpdateUndoable(index, entry.Palette[index]);
+
+        OnColorSelectMouseMove(sender, e);
     }
 
     private void OnColorSelectMouseMove(object? sender, MouseEventArgs e)
@@ -310,6 +337,7 @@ public partial class PaletteCustomizer : Window
 
         var glControl = InitCanvas(host, OnPaintColorSelect);
         glControl.MouseMove += OnColorSelectMouseMove;
+        glControl.MouseDown += OnColorSelectMouseDown;
     }
 
     private void OnExport(object _sender, RoutedEventArgs _e)
@@ -387,8 +415,108 @@ public partial class PaletteCustomizer : Window
             return;
         }
 
-        entry.Palette[ViewModel.SelectedIndex] = inputColor.Value;
+        UpdateUndoable(ViewModel.SelectedIndex, inputColor.Value);
+    }
+
+    private void OnSmartFill(object _sender, RoutedEventArgs _e)
+    {
+        if (ViewModel.SelectedEntry is not { } entry) 
+        {
+            return;
+        }
+
+        var selectedIndex = ViewModel.SelectedIndex;
+
+        if (selectedIndex == PaletteIndex.Scales)
+        {
+            var fromShadow = ColorManipulation.LightenColor(entry.Palette.hornsShadow);
+            var fromHighlight = ColorManipulation.DarkenColor(entry.Palette.scalesHighlight);
+            var average = ColorManipulation.ColorBetween(entry.Palette.scalesShadow, entry.Palette.scalesHighlight);
+
+            var fromShadowDelta = ColorManipulation.Distance(fromShadow, entry.Palette.scalesShadow);
+            var fromHighlightDelta = ColorManipulation.Distance(fromHighlight, entry.Palette.scalesHighlight);
+            var averageDelta = ColorManipulation.Distance(average, entry.Palette.scalesShadow);
+
+            var deltaMax = new[] { fromShadowDelta, fromHighlightDelta, averageDelta }.Max();
+
+            var newColor = deltaMax == fromShadowDelta ? fromShadow
+                : deltaMax == fromHighlightDelta ? fromHighlight
+                : average;
+
+            UpdateUndoable(PaletteIndex.Scales, newColor);
+        }
+
+        if (selectedIndex == PaletteIndex.ScalesHighlight)
+        {
+            var newColor = ColorManipulation.LightenColor(entry.Palette.scales);
+            UpdateUndoable(PaletteIndex.ScalesHighlight, newColor);
+        }
+
+        if (selectedIndex == PaletteIndex.ScalesShadow)
+        {
+            var newColor = ColorManipulation.DarkenColor(entry.Palette.scales);
+            UpdateUndoable(PaletteIndex.ScalesShadow, newColor);
+        }
+
+        if (selectedIndex == PaletteIndex.HornsShadow)
+        {
+            var newColor = ColorManipulation.DarkenColor(entry.Palette.horns);
+            UpdateUndoable(PaletteIndex.HornsShadow, newColor);
+        }
+
+        if (selectedIndex == PaletteIndex.Horns)
+        {
+            var newColor = ColorManipulation.LightenColor(entry.Palette.hornsShadow);
+            UpdateUndoable(PaletteIndex.HornsShadow, newColor);
+        }
+
+        if (selectedIndex == PaletteIndex.Whites)
+        {
+            var newColor = ColorManipulation.WhitenColor(entry.Palette.scales);
+            UpdateUndoable(PaletteIndex.Whites, newColor);
+        }
+
+        if (selectedIndex == PaletteIndex.Eyes)
+        {
+            var newColor = ColorManipulation.DarkenColor(entry.Palette.scales);
+            UpdateUndoable(PaletteIndex.Eyes, newColor);
+        }
+    }
+
+    private void UpdateUndoable(PaletteIndex index, RgbColor color)
+    {
+        if (ViewModel.SelectedEntry is not { } entry) 
+        {
+            return;
+        }
+
+        var newStep = new UndoStep(index, entry.Palette[index]);
+        _undoStack.Insert(0, newStep);
+
+        entry.Palette[index] = color;
+
+        ViewModel.UpdateHex();
         ViewModel.UpdateHsl();
+    }
+
+    private void OnUndo()
+    {
+        if (ViewModel.SelectedEntry is not { } entry) 
+        {
+            return;
+        }
+
+        var undoStep = _undoStack.FirstOrDefault();
+        if (undoStep is null)
+        {
+            return;
+        }
+
+        entry.Palette[undoStep.Index] = undoStep.PreviousColor;
+        ViewModel.UpdateHsl();
+        ViewModel.UpdateHex();
+
+        _undoStack.RemoveAt(0);
     }
 
     private string WithDuplicateSuffix(string name)
@@ -438,7 +566,7 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
 
     public Dictionary<string, PaletteView> PredefinedPalettes { get; init; } = SfEnums.GetAll<PredefinedPalette>()
         .Select(p => (p.Name, new PaletteView(p)))
-        .Prepend(("Template", new PaletteView(PaletteConversion.Copy(Palette.ExamplePalette))))
+        .Prepend(("(template)", new PaletteView(PaletteConversion.Copy(Palette.ExamplePalette))))
         .ToDictionary();
 
     private KeyValuePair<string, PaletteView> _paletteToAdd;

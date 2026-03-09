@@ -28,11 +28,6 @@ public partial class OptionsWindow : Window
         InitializeModel(options);
     }
 
-    protected void OnSave(object? _sender, RoutedEventArgs _e)
-    {
-        OptionsStorage.Save(ViewModel.BackingOptions);
-    }
-
     protected void OnDefaults(object? _sender, RoutedEventArgs _e)
     {
         InitializeModel(new());
@@ -61,8 +56,9 @@ public partial class OptionsWindow : Window
         ViewModel.FamilyPaletteChoice = PaletteSelection.PaletteSet(options.paletteChoice);
     }
 
-    private void OnCancel(object? _sender, RoutedEventArgs _e)
+    private void OnClose(object? _sender, RoutedEventArgs _e)
     {
+        OptionsStorage.Save(ViewModel.BackingOptions);
         Close();
     }
 

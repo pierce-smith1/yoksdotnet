@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using yoksdotnet.common;
 using yoksdotnet.data;
+using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic;
 
@@ -29,6 +30,7 @@ public static class OptionsStorage
         {
             new JsonStringEnumConverter(),
             new JsonSfeConverterFactory(),
+            new JsonRgbColorConverter(),
         },
     };
 

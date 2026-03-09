@@ -107,12 +107,12 @@ public class RandomPaletteGenerator(Random rng)
         var palette = new Palette 
         { 
             scales = scalesBase,
-            scalesHighlight = LightenColor(scalesBase),
-            scalesShadow = DarkenColor(scalesBase),
+            scalesHighlight = ColorManipulation.LightenColor(scalesBase),
+            scalesShadow = ColorManipulation.DarkenColor(scalesBase),
             horns = hornsBase,
-            hornsShadow = DarkenColor(hornsBase),
-            eyes = DarkenColor(GenerateBaseColor(parameters)),
-            whites = WhitenColor(scalesBase)
+            hornsShadow = ColorManipulation.DarkenColor(hornsBase),
+            eyes = ColorManipulation.DarkenColor(GenerateBaseColor(parameters)),
+            whites = ColorManipulation.WhitenColor(scalesBase)
         };
 
         var anomalies = Enum.GetValues<PaletteAnomaly>()
@@ -137,7 +137,7 @@ public class RandomPaletteGenerator(Random rng)
         if (anomalies.Contains(PaletteAnomaly.DarkEyes))
         {
             palette.whites = new RgbColor(0, 0, 0);
-            palette.eyes = LightenColor(GenerateBaseColor(parameters));
+            palette.eyes = ColorManipulation.LightenColor(GenerateBaseColor(parameters));
         }
 
         return palette;
@@ -178,47 +178,6 @@ public class RandomPaletteGenerator(Random rng)
         var newValue = Interp.Linear(rng.NextDouble(), 0.0, 1.0, min, max);
 
         return (byte)Math.Clamp(Math.Round(newValue), 0, 255);
-    }
-
-    private RgbColor DarkenColor(RgbColor color)
-    {
-        var (h, s, l) = ColorConversion.ToHsl(color);
-
-        h = ShiftHueTowards(hue: h, target: 240.0, factor: 1.2);
-        l /= 2;
-
-        var newColor = ColorConversion.FromHsl(new(h, s, l));
-        return newColor;
-    }
-
-    private RgbColor LightenColor(RgbColor color)
-    {
-        var (h, s, l) = ColorConversion.ToHsl(color);
-
-        h = ShiftHueTowards(hue: h, target: 50.0, factor: 1.2);
-        l = Interp.Linear(l, 0.0, 100.0, 50.0, 100.0);
-
-        var newColor = ColorConversion.FromHsl(new(h, s, l));
-        return newColor;
-    }
-
-    private RgbColor WhitenColor(RgbColor color)
-    {
-        var (h, s, l) = ColorConversion.ToHsl(color);
-
-        l = Interp.Linear(l, 0.0, 100.0, 90.0, 100.0);
-
-        var newColor = ColorConversion.FromHsl(new(h, s, l));
-        return newColor;
-    }
-
-    private double ShiftHueTowards(double hue, double target, double factor)
-    {
-        hue -= target;
-        hue = Interp.Linear(hue, -target, 360 - target, -target / factor, (360 - target) / factor);
-        hue += target;
-
-        return hue;
     }
 }
 

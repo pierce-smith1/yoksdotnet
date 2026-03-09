@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using yoksdotnet.common;
 
@@ -110,104 +111,33 @@ public class Palette : IEquatable<Palette>
     public override bool Equals(object? other) => Equals(other as Palette);
 }
 
-public class PredefinedPalette(string name, PaletteGroup group) : Palette, ISfEnum
-{
-    public static readonly PredefinedPalette Ascent = PaletteConversion.FromHexStrings(
-        "Ascent",
-        PaletteGroup.XpInspired,
-        "#1963c4",
-        "#1963c4",
-        "#0b407d",
-        "#8c96dd",
-        "#8c96dd",
-        "#ffffff",
-        "#506bbc"
-    );
-
-    public static readonly PredefinedPalette Autumn = PaletteConversion.FromHexStrings(
-        "Autumn",
-        PaletteGroup.XpInspired,
-        "#db8313",
-        "#be9275",
-        "#904a08",
-        "#574d3c",
-        "#904a08",
-        "#f3e6e9",
-        "#000000"
-    );
-
-    public static readonly PredefinedPalette Azul = PaletteConversion.FromHexStrings(
-        "Azul",
-        PaletteGroup.XpInspired,
-        "#1aadd9",
-        "#a1d0e5",
-        "#296d9e",
-        "#4d8db9",
-        "#296d9e",
-        "#ffffff",
-        "#103050"
-    );
-
-    public static readonly PredefinedPalette Bliss = PaletteConversion.FromHexStrings(
-        "Bliss",
-        PaletteGroup.XpInspired,
-        "#73981e",
-        "#73981e",
-        "#3d5317",
-        "#6a96f2",
-        "#282438",
-        "#eaf2ff",
-        "#3b73ee"
-    );
-
-    public static readonly PredefinedPalette Crystal = PaletteConversion.FromHexStrings(
-        "Crystal",
-        PaletteGroup.XpInspired,
-        "#38399e",
-        "#51b7cf",
-        "#1c63d8",
-        "#434ad9",
-        "#0a1a4a",
-        "#eaf2ff",
-        "#0a1a4a"
-    );
-
-
-    public static readonly PredefinedPalette Aemil = PaletteConversion.FromHexStrings(
-        "Aemil",
-        PaletteGroup.Fractalthorns,
-        "#56eb8e",
-        "#84f5c3",
-        "#1d9550",
-        "#e29a56",
-        "#e16a72",
-        "#dff9eb",
-        "#966336"
-    );
-
-    public static readonly PredefinedPalette Loxxe = PaletteConversion.FromHexStrings(
-        "Loxxe",
-        PaletteGroup.Fractalthorns,
-        "#243966",
-        "#31487a",
-        "#16274d",
-        "#122240",
-        "#546e78",
-        "#a4b2b6",
-        "#0b162c"
-    );
-
-    public string Name => name;
-    public PaletteGroup Group => group;
-
-    public override string ToString() => name;
-}
-
 public record PaletteGroup(string Name) : ISfEnum
 {
-    public static readonly PaletteGroup XpInspired = new("Classic");
-    public static readonly PaletteGroup Fractalthorns = new("Fractalthorns Characters");
+    public static readonly PaletteGroup XpInspired = new("Neptune");
+    public static readonly PaletteGroup SevenInspired = new("Blackcomb");
+    public static readonly PaletteGroup Fractalthorns = new("Fractalthorns");
 
     public override string ToString() => Name;
 }
 
+public class JsonRgbColorConverter : JsonConverter<RgbColor>
+{
+    public override RgbColor Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions _options)
+    {
+        var input = reader.GetString()!;
+
+        var color = ColorConversion.FromHex(input);
+        if (color is null)
+        {
+            throw new JsonException();
+        }
+
+        return color.Value;
+    }
+
+    public override void Write(Utf8JsonWriter writer, RgbColor color, JsonSerializerOptions _options)
+    {
+        var serialized = ColorConversion.ToHex(color);
+        writer.WriteStringValue(serialized);
+    }
+}
