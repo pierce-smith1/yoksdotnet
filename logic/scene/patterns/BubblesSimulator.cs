@@ -17,7 +17,7 @@ public class BubblesSimulator : PatternSimulator<(Physics, Bubble)>
 
         var bubble = entity.bubble ??= new()
         {
-            radius = Interp.Linear(ctx.options.spriteScale, 0.0, 1.0, 10.0, 50.0) + physics.mass * 10.0,
+            radius = Interp.Linear(ctx.options.spriteScale, 0.0, 1.0, 2.0, 50.0) + physics.mass * 10.0,
         };
 
         bubble.isFree = false;

@@ -14,7 +14,7 @@ public static class SceneSimulation
         {
             var dt = now - lastTick;
 
-            var speedScale = Interp.Square(ctx.options.animationSpeed, 0.0, 1.0, 0.05, 0.5);
+            var speedScale = Interp.Square(ctx.options.animationSpeed, 0.0, 1.0, 0.01, 0.5);
 
             ctx.scene.lastDtMs = dt.TotalMilliseconds * speedScale;
             ctx.scene.seconds += dt.TotalSeconds * speedScale;

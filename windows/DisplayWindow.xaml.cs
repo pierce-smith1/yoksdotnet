@@ -28,6 +28,7 @@ public record DisplayMode
     public Screen? SingleScreen { get; init; } = default;
 
     public nint? PreviewHwnd { get; init; } = default;
+    public bool IsPreview => PreviewHwnd is not null;
 
     public static DisplayMode Debug(OptionsWindow? optionsWindow) => new()
     {
@@ -84,6 +85,15 @@ public partial class DisplayWindow : Window
 
         var options = GetOptions();
         var rng = GetRng(options);
+
+        if (_displayMode.IsPreview)
+        {
+            options.spriteScale /= 5.0;
+            options.animationSpeed /= 5.0;
+
+            Width /= 2;
+            Height /= 2;
+        }
 
         var scene = SceneCreation.NewScene(options, rng, (int)Width, (int)Height);
         _ctx = new AnimationContext(scene, options, rng);
