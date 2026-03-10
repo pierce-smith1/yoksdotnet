@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -16,7 +17,8 @@ public static class OptionsStorage
     public readonly static string OptionsFileName = "ydn-options.json";
     public readonly static string PaletteDataFileName = "ydn-custom-palettes.json";
 
-    private readonly static string _appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private readonly static string _appDataPath = 
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
     private readonly static string _optionsDirPath;
     private readonly static string _optionsPath;
@@ -60,25 +62,18 @@ public static class OptionsStorage
 
     public static ScrOptions? Load()
     {
+        ScrOptions? loadedOptions;
         try
         {
             var optionsJson = File.ReadAllText(_optionsPath);
-            var palettesJson = File.ReadAllText(_paletteDataPath);
 
-            var loadedOptions = JsonSerializer.Deserialize<ScrOptions>(optionsJson, _jsonOptions);
-            var loadedCustomPalettes = JsonSerializer.Deserialize<List<CustomPaletteSet>>(palettesJson, _jsonOptions);
+            loadedOptions = JsonSerializer.Deserialize<ScrOptions>(optionsJson, _jsonOptions);
 
             if (loadedOptions is null)
             {
+                Log.Warning("Options file could not deserialize");
                 return null;
             }
-
-            if (loadedCustomPalettes is not null)
-            {
-                loadedOptions.customPalettes = loadedCustomPalettes;
-            }
-
-            return loadedOptions;
         }
         catch (Exception ex) when
         (
@@ -87,7 +82,36 @@ public static class OptionsStorage
             ex is JsonException
         )
         {
+            Log.Warning(ex, "Options file couldn't be loaded");
             return null;
         }
+
+        try
+        {
+            var palettesJson = File.ReadAllText(_paletteDataPath);
+            var loadedCustomPalettes = JsonSerializer.Deserialize<List<CustomPaletteSet>>(palettesJson, _jsonOptions);
+
+            if (loadedCustomPalettes is null)
+            {
+                Log.Warning("Custom palettes file could not deserialize");
+                return null;
+            }
+
+            if (loadedOptions is not null)
+            {
+                loadedOptions.customPalettes = loadedCustomPalettes;
+            }
+        }
+        catch (Exception ex) when
+        (
+            ex is FileNotFoundException ||
+            ex is DirectoryNotFoundException ||
+            ex is JsonException
+        )
+        {
+            Log.Warning(ex, "Custom palette file couldn't be loaded");
+        }
+
+        return loadedOptions;
     }
 }

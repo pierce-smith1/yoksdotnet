@@ -21,8 +21,9 @@ public class Entity
     public Physics? physics;
     public PhysicsMeasurements? physicsMeasurements;
 
-    public IPatternToken? patternToken;
-
     public Bubble? bubble;
     public Boid? boid;
+
+    public IPatternToken? patternToken;
+    public EntityBlock? block;
 }

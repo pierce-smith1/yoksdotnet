@@ -31,7 +31,7 @@ public class BubblesSimulator : PatternSimulator<(Physics, Bubble)>
         var (physics, bubble) = components;
 
         var isColliding = false;
-        foreach (var peer in ctx.scene.entities)
+        foreach (var peer in entity.block!.AllAround)
         {
             if (peer == entity)
             {

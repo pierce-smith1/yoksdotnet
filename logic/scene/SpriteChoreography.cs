@@ -11,6 +11,8 @@ public static class SpriteChoreography
 {
     public static void HandleSceneStart(AnimationContext ctx)
     {
+        EntityBlockMapper.InitBlocks(ctx.scene);
+
         foreach (var entity in ctx.scene.entities)
         {
             entity.patternToken = ctx.scene.currentPattern.Simulator.InitSimulation(ctx, entity);
@@ -19,6 +21,8 @@ public static class SpriteChoreography
 
     public static void HandleFrame(AnimationContext ctx)
     {
+        EntityBlockMapper.AssignEntities(ctx.scene, ctx.scene.entityBlocks, ctx.scene.entities);
+
         var (endingPattern, startingPattern) = CheckPatternChange(ctx);
 
         if (endingPattern is not null)

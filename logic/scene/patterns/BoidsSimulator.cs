@@ -31,10 +31,10 @@ public class BoidsSimulator : PatternSimulator<(Physics, Boid)>
     {
         var (physics, boid) = components;
 
-        var peersToAvoid = ctx.scene.entities.Where(e => ShouldAvoid((entity.basis, boid), e.basis));
+        var peersToAvoid = entity.block!.AllAround.Where(e => ShouldAvoid((entity.basis, boid), e.basis));
         PushAwayFrom((entity.basis, physics), peersToAvoid.Select(e => e.basis));
 
-        var visiblePeers = ctx.scene.entities.Where(e => IsVisibleTo((entity.basis, physics, boid), e.basis));
+        var visiblePeers = entity.block!.AllAround.Where(e => IsVisibleTo((entity.basis, physics, boid), e.basis));
         AlignWith((entity.basis, physics), visiblePeers.Select(e => e.physics!));
         SteerTowardsCenter((entity.basis, physics), visiblePeers.Select(e => e.basis));
 

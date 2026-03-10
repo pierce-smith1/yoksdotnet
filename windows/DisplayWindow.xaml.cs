@@ -119,6 +119,8 @@ public partial class DisplayWindow : Window
         {
             _ctx.scene.width = (int)e.NewSize.Width;
             _ctx.scene.height = (int)e.NewSize.Height;
+
+            EntityBlockMapper.InitBlocks(_ctx.scene);
         };
 
         StartLoop();

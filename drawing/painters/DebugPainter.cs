@@ -61,8 +61,7 @@ public static class DebugPainter
     private static List<string> InfoToReport(Entity entity)
     {
         return [
-            $"Gcx: {entity.gaze?.currentGazePoint.X}",
-            $"Gcy: {entity.gaze?.currentGazePoint.Y}",
+            $"bi: {entity.block?.index}",
         ];
     }
 }

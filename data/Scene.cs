@@ -15,6 +15,7 @@ public class Scene
     public DateTimeOffset? patternLastChangedAt;
 
     public List<Entity> entities = [];
+    public List<EntityBlock> entityBlocks = [];
 
     public required int width;
     public required int height;

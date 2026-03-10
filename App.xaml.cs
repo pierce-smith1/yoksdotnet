@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -51,9 +52,14 @@ public partial class App : System.Windows.Application
 {
     public App() {}
 
-    public void OnStartup(object? sender, StartupEventArgs e)
+    private void OnStartup(object? sender, StartupEventArgs e)
     {
+        Logging.Setup();
+
+        Log.Information("yoksdotnet started");
+
         var runType = DetermineRunType(e);
+        Log.Information("Run type is {RunType}", runType);
 
         if (runType == null)
         {
@@ -110,5 +116,10 @@ public partial class App : System.Windows.Application
         }; 
 
         return runType;
+    }
+
+    private void OnShutdown(object? _sender, ExitEventArgs _e)
+    {
+        Log.CloseAndFlush();
     }
 }
