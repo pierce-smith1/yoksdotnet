@@ -11,8 +11,6 @@ public static class SpriteChoreography
 {
     public static void HandleSceneStart(AnimationContext ctx)
     {
-        EntityBlockMapper.InitBlocks(ctx.scene);
-
         foreach (var entity in ctx.scene.entities)
         {
             entity.patternToken = ctx.scene.currentPattern.Simulator.InitSimulation(ctx, entity);

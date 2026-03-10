@@ -12,7 +12,10 @@ public static class SceneCreation
         {
             width = width,
             height = height,
+
             entities = [..new SpriteGenerator(rng, options).Make(width, height)],
+            entityBlocks = EntityBlockMapper.InitBlocks(width, height),
+
             currentPattern = options.startingPattern.Match(
                 whenRandom: () => 
                     rng.SampleOrDefault(options.possiblePatterns) ?? Pattern.Lattice,

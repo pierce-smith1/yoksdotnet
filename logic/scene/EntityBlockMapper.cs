@@ -10,18 +10,18 @@ public static class EntityBlockMapper
 {
     public const double BlockSize = 128.0;
 
-    public static List<EntityBlock> InitBlocks(Scene scene)
+    public static List<EntityBlock> InitBlocks(double width, double height)
     {
-        scene.entityBlocks.Clear();
+        var blocks = new List<EntityBlock>();
 
-        var numBlocksX = (int)Math.Ceiling(scene.width / BlockSize);
-        var numBlocksY = (int)Math.Ceiling(scene.height / BlockSize);
+        var numBlocksX = (int)Math.Ceiling(width / BlockSize);
+        var numBlocksY = (int)Math.Ceiling(height / BlockSize);
 
         var numBlocks = numBlocksX * numBlocksY;
 
         for (var i = 0; i < numBlocks; i++)
         {
-            scene.entityBlocks.Add(new EntityBlock
+            blocks.Add(new EntityBlock
             {
                 index = i,
             });
@@ -31,11 +31,11 @@ public static class EntityBlockMapper
         {
             foreach (var iNeighbor in AdjacentBlockIndices(i, numBlocksX, numBlocksY))
             {
-                scene.entityBlocks[i].neighbors.Add(scene.entityBlocks[iNeighbor]);
+                blocks[i].neighbors.Add(blocks[iNeighbor]);
             }
         }
 
-        return scene.entityBlocks;
+        return blocks;
     }
 
     public static void AssignEntities(Scene scene, List<EntityBlock> entityBlocks, IEnumerable<Entity> entities)
