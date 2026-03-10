@@ -90,6 +90,7 @@ public partial class OptionsWindow : Window
         ViewModel.AnimationPatternChangeFrequency = options.patternChangeFrequency;
         ViewModel.AnimationPatternDoesChange = options.patternDoesChange;
         ViewModel.MultiMonitorChoice = new(options.multiMonitorMode);
+        ViewModel.BackgroundStyleChoice = new(options.backgroundStyle);
 
         if (setCustomPalettes)
         {

@@ -51,8 +51,6 @@ public partial class App : System.Windows.Application
 {
     public App() {}
 
-    private OptionsWindow? _debugOptionsWindow;
-
     public void OnStartup(object? sender, StartupEventArgs e)
     {
         var runType = DetermineRunType(e);
