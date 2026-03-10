@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="resources\backgrounds\runed.png" />
     <None Remove="resources\cvjoy.png" />
     <None Remove="resources\fn.png" />
     <None Remove="resources\fnplead.png" />
@@ -41,6 +42,10 @@
     <None Remove="resources\sprites\refined\unamused.png" />
     <None Remove="resources\ui\hue-strip.png" />
     <None Remove="resources\vx.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="resources\backgrounds\runed.png" />
   </ItemGroup>
 
   <ItemGroup>

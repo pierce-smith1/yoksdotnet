@@ -465,6 +465,16 @@ public class OptionsViewModel : NotifiesPropertyChanged
         }
     }
 
+    public BackgroundStyleEntry BackgroundStyleChoice
+    {
+        get => new(BackingOptions.backgroundStyle);
+        set
+        {
+            BackingOptions.backgroundStyle = value.Choice;
+            OnPropertyChanged(nameof(BackgroundStyleChoice));
+        }
+    }
+
     public List<CustomPaletteSet> CustomPalettes
     {
         get => BackingOptions.customPalettes;
@@ -494,8 +504,13 @@ public class OptionsViewModel : NotifiesPropertyChanged
     }
 
     public List<MultiMonitorModeEntry> MultiMonitorModeEntries => [
-        new(MultiMonitorModeChoice.Stretch()),
-        new(MultiMonitorModeChoice.PerScreen()),
+        new(MultiMonitorMode.Stretch()),
+        new(MultiMonitorMode.PerScreen()),
+    ];
+
+    public List<BackgroundStyleEntry> BackgroundStyleEntries => [
+        new(BackgroundStyle.PureBlack()),
+        new(BackgroundStyle.Patterned()),
     ];
 
     public Visibility PaletteCustomizeVisibility => FamilyPaletteChoice.Match(
@@ -602,11 +617,21 @@ public record PatternChoiceEntry(PatternChoice Choice)
     public override string ToString() => Name;
 }
 
-public record MultiMonitorModeEntry(MultiMonitorModeChoice Choice)
+public record MultiMonitorModeEntry(MultiMonitorMode Choice)
 {
     public string Name => Choice.Match(
         whenStretch: () => "Stretch animation across displays",
         whenPerScreen: () => "Unique animation per display"
+    );
+
+    public override string ToString() => Name;
+}
+
+public record BackgroundStyleEntry(BackgroundStyle Choice)
+{
+    public string Name => Choice.Match(
+        whenPureBlack: () => "Pure black",
+        whenPatterned: () => "Patterned"
     );
 
     public override string ToString() => Name;

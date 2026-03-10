@@ -28,7 +28,8 @@ public class ScrOptions
     public bool patternDoesChange = true;
     public double patternChangeFrequency = 0.5;
 
-    public MultiMonitorModeChoice multiMonitorMode = MultiMonitorModeChoice.Stretch();
+    public MultiMonitorMode multiMonitorMode = MultiMonitorMode.Stretch();
+    public BackgroundStyle backgroundStyle = BackgroundStyle.Patterned();
 
     // Custom palettes are serialized explicitly. See OptionsStorage.
     [JsonIgnore]
@@ -117,17 +118,17 @@ public record PaletteChoice
     }
 }
 
-public record MultiMonitorModeChoice
+public record MultiMonitorMode
 {
     public bool IsStretch { get; init; }
     public bool IsPerScreen { get; init; }
 
-    public static MultiMonitorModeChoice Stretch() => new()
+    public static MultiMonitorMode Stretch() => new()
     {
         IsStretch = true,
     };
 
-    public static MultiMonitorModeChoice PerScreen() => new()
+    public static MultiMonitorMode PerScreen() => new()
     {
         IsPerScreen = true,
     };
@@ -136,6 +137,30 @@ public record MultiMonitorModeChoice
     {
         if (IsStretch) return whenStretch();
         if (IsPerScreen) return whenPerScreen();
+
+        throw new InvalidOperationException();
+    }
+}
+
+public record BackgroundStyle
+{
+    public bool IsPureBlack { get; init; }
+    public bool IsPatterned { get; init; }
+
+    public static BackgroundStyle PureBlack() => new()
+    {
+        IsPureBlack = true,
+    };
+
+    public static BackgroundStyle Patterned() => new()
+    {
+        IsPatterned = true,
+    };
+
+    public T Match<T>(Func<T> whenPureBlack, Func<T> whenPatterned)
+    {
+        if (IsPureBlack) return whenPureBlack();
+        if (IsPatterned) return whenPatterned();
 
         throw new InvalidOperationException();
     }

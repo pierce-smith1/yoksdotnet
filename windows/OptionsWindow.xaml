@@ -7,7 +7,7 @@
     xmlns:ydnwindows="clr-namespace:yoksdotnet.windows"
     mc:Ignorable="d"
     Title="Yoksdotnet Settings" 
-    Height="700"
+    Height="800"
     Width="500"
     ResizeMode="NoResize"
 >
@@ -185,6 +185,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 
                 <!-- Patterns -->
@@ -210,15 +211,22 @@
                     Pattern changes
                 </CheckBox>
                 
-                <!-- Change Frequency -->
                 <Label Grid.Row="3" Grid.Column="0" FontWeight="SemiBold" IsEnabled="{Binding AnimationPatternDoesChange}">Change Pattern:</Label>
                 <Label Grid.Row="3" Grid.Column="1" FontWeight="Normal" IsEnabled="{Binding AnimationPatternDoesChange}">Rarely</Label>
                 <Slider Grid.Row="3" Grid.Column="2" Minimum="0.0" Maximum="1.0" Value="{Binding AnimationPatternChangeFrequency}" IsEnabled="{Binding AnimationPatternDoesChange}" />
                 <Label Grid.Row="3" Grid.Column="3" FontWeight="Normal" IsEnabled="{Binding AnimationPatternDoesChange}">Often</Label>
+
+                <!-- Background -->
+                <Label Grid.Row="4" Grid.Column="0" FontWeight="SemiBold">Background:</Label>
+                <ComboBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" 
+                    ItemsSource="{Binding BackgroundStyleEntries}"
+                    SelectedValue="{Binding BackgroundStyleChoice}"
+                    Height="25"
+                />
                 
                 <!-- Multi screen -->
-                <Label Grid.Row="4" Grid.Column="0" FontWeight="SemiBold">Multiple Displays:</Label>
-                <ComboBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" 
+                <Label Grid.Row="5" Grid.Column="0" FontWeight="SemiBold">Multiple Displays:</Label>
+                <ComboBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" 
                     ItemsSource="{Binding MultiMonitorModeEntries}"
                     SelectedValue="{Binding MultiMonitorChoice}"
                     Height="25"

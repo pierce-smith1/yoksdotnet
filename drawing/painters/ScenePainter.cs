@@ -1,7 +1,6 @@
 ﻿using SkiaSharp;
 using yoksdotnet.data;
 using yoksdotnet.data.entities;
-using yoksdotnet.logic;
 using yoksdotnet.windows;
 
 namespace yoksdotnet.drawing.painters;
@@ -12,7 +11,7 @@ public class ScenePainter(AnimationContext ctx, DisplayMode displayMode)
 
     public void Draw(SKCanvas canvas)
     {
-        canvas.Clear(new SKColor(0x11, 0x11, 0x11));
+        DrawBackground(canvas);
 
         foreach (var entity in ctx.scene.entities)
         {
@@ -22,6 +21,19 @@ public class ScenePainter(AnimationContext ctx, DisplayMode displayMode)
         if (displayMode.IsDebug && DebuggedEntity is not null)
         {
             DebugPainter.DrawDebugInfo(canvas, DebuggedEntity);
+        }
+    }
+
+    public void DrawBackground(SKCanvas canvas)
+    {
+        if (ctx.options.backgroundStyle.IsPureBlack)
+        {
+            canvas.Clear(SKColors.Black);
+        }
+
+        if (ctx.options.backgroundStyle.IsPatterned)
+        {
+            PatternedBackgroundPainter.Draw(canvas, ctx);
         }
     }
 }
