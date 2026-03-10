@@ -13,27 +13,66 @@ namespace yoksdotnet.windows;
 
 public partial class OptionsWindow : Window
 {
-    public OptionsWindow(ScrOptions? debugOptions = null)
+    private DisplayWindow? _realtimeWindow;
+
+    public OptionsWindow(bool startRealtimeDebug = false)
     {
         InitializeComponent();
 
-        if (debugOptions is not null)
-        {
-            ViewModel.IsDebugWindow = true;
-        }
-
-        var options = debugOptions ?? OptionsStorage.Load() ?? new();
+        var options = OptionsStorage.Load() ?? new();
 
         ViewModel.BackingOptions = options;
         InitializeModel(options);
+
+        Closing += (s, e) =>
+        {
+            OptionsStorage.Save(ViewModel.BackingOptions);
+            _realtimeWindow?.Close();
+        };
+
+        if (startRealtimeDebug)
+        {
+            LaunchRealtime(debug: true);
+        }
     }
 
     protected void OnDefaults(object? _sender, RoutedEventArgs _e)
     {
-        InitializeModel(new());
+        var confirmResult = MessageBox.Show(
+            "Are you sure you want to replace all settings with the defaults?\n\n(Note: your custom palettes will not be deleted.)",
+            "Set to defaults?",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning
+        );
+
+        if (confirmResult == MessageBoxResult.Yes)
+        {
+            InitializeModel(new(), setCustomPalettes: false);
+        }
     }
 
-    protected void InitializeModel(ScrOptions options)
+    private void OnRealtimePreview(object? _sender, RoutedEventArgs _e)
+    {
+        LaunchRealtime(debug: false);
+    }
+
+    private void LaunchRealtime(bool debug)
+    {
+        var displayMode = debug ? DisplayMode.Debug(this) : DisplayMode.Realtime(this);
+
+        _realtimeWindow = new DisplayWindow(displayMode);
+        _realtimeWindow.Show();
+
+        ViewModel.CanStartPreview = false;
+
+        _realtimeWindow.Closing += (_s, _e) =>
+        {
+            _realtimeWindow = null;
+            ViewModel.CanStartPreview = true;
+        };
+    }
+
+    protected void InitializeModel(ScrOptions options, bool setCustomPalettes = true)
     {
         ViewModel.FamilyDiversity = options.diversity;
         ViewModel.FamilySize = options.familySize;
@@ -52,14 +91,22 @@ public partial class OptionsWindow : Window
         ViewModel.AnimationPatternDoesChange = options.patternDoesChange;
         ViewModel.MultiMonitorChoice = new(options.multiMonitorMode);
 
-        ViewModel.CustomPalettes = options.customPalettes;
+        if (setCustomPalettes)
+        {
+            ViewModel.CustomPalettes = options.customPalettes;
+        }
+
         ViewModel.FamilyPaletteChoice = PaletteSelection.PaletteSet(options.paletteChoice);
     }
 
     private void OnClose(object? _sender, RoutedEventArgs _e)
     {
         OptionsStorage.Save(ViewModel.BackingOptions);
-        Close();
+
+        if (!ViewModel.IsDebugWindow)
+        {
+            Close();
+        }
     }
 
     private void OnEditPaletteSet(object? _sender, RoutedEventArgs _e)
@@ -471,6 +518,19 @@ public class OptionsViewModel : NotifiesPropertyChanged
         PaletteSelection.CreateAction(PaletteCreateAction.NewSet),
         PaletteSelection.CreateAction(PaletteCreateAction.ImportPalette),
     ];
+
+    public string VersionString => $"yoksdotnet {Yoksdotnet.Version}\nhttps://fractalthorns.com";
+
+    private bool _canStartPreview = true;
+    public bool CanStartPreview
+    {
+        get => _canStartPreview;
+        set 
+        {
+            _canStartPreview = value;
+            OnPropertyChanged(nameof(CanStartPreview));
+        }
+    }
 
     public ScrOptions BackingOptions { get; set; } = new();
 }

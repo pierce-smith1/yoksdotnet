@@ -24,6 +24,7 @@
         <Style TargetType="Button">
             <Setter Property="Padding" Value="5,2" />
             <Setter Property="Margin" Value="5,2" />
+            <Setter Property="MaxHeight" Value="25" />
         </Style>
 
         <Style TargetType="Label">
@@ -44,6 +45,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
@@ -163,7 +165,7 @@
                     Margin="0,10,0,0"
                     IsChecked="{Binding IndividualUseRefinedStyle}"
                 >
-                    Use new sprites
+                    Use redrawn sprites
                 </CheckBox>
             </Grid>
         </GroupBox>
@@ -225,9 +227,10 @@
         </GroupBox>
 
         <DockPanel Grid.Row="3" LastChildFill="False">
+            <Label Foreground="Gray" DockPanel.Dock="Left" FontStyle="Italic" FontSize="12" Content="{Binding VersionString}" />
             <Button DockPanel.Dock="Right" Click="OnClose" IsEnabled="{Binding IsNotDebugWindow}">OK</Button>
             <Button DockPanel.Dock="Right" Click="OnDefaults">Defaults</Button>
+            <Button DockPanel.Dock="Right" Click="OnRealtimePreview" IsEnabled="{Binding CanStartPreview}">Preview</Button>
         </DockPanel>
     </Grid>
-    
 </Window>

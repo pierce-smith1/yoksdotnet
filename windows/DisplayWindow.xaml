@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:yoksdotnet.windows"
     xmlns:views="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
     mc:Ignorable="d"
-    Title="DisplayWindow" 
+    Title="yoksdnotnet" 
     Height="800" 
     Width="1200"
 >

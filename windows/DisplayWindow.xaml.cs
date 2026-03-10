@@ -22,7 +22,8 @@ namespace yoksdotnet.windows;
 public record DisplayMode
 {
     public bool IsDebug { get; init; } = default;
-    public OptionsWindow? DebugOptionsWindow { get; init; } = default;
+    public bool IsRealtime { get; init; } = default;
+    public OptionsWindow? RealtimeOptionsWindow { get; init; } = default;
 
     public bool IsStretchedScreensaver { get; init; } = default;
     public Screen? SingleScreen { get; init; } = default;
@@ -33,7 +34,14 @@ public record DisplayMode
     public static DisplayMode Debug(OptionsWindow? optionsWindow) => new()
     {
         IsDebug = true,
-        DebugOptionsWindow = optionsWindow,
+        IsRealtime = optionsWindow is not null,
+        RealtimeOptionsWindow = optionsWindow,
+    };
+
+    public static DisplayMode Realtime(OptionsWindow optionsWindow) => new()
+    {
+        IsRealtime = true,
+        RealtimeOptionsWindow = optionsWindow,
     };
 
     public static DisplayMode StretchedScreensaver() => new()
@@ -51,9 +59,15 @@ public record DisplayMode
         PreviewHwnd = hwnd,
     };
 
-    public void Switch(Action<OptionsWindow?> whenDebug, Action whenStretchedScreensaver, Action<Screen> whenSingleScreensaver, Action<nint> whenPreview)
+    public void Switch(
+        Action<OptionsWindow?> whenDebug, 
+        Action<OptionsWindow> whenUserRealtime,
+        Action whenStretchedScreensaver, 
+        Action<Screen> whenSingleScreensaver, 
+        Action<nint> whenPreview)
     {
-        if (IsDebug) whenDebug(DebugOptionsWindow);
+        if (IsDebug) whenDebug(RealtimeOptionsWindow);
+        if (!IsDebug && IsRealtime) whenUserRealtime(RealtimeOptionsWindow!);
         if (IsStretchedScreensaver) whenStretchedScreensaver();
         if (SingleScreen is not null) whenSingleScreensaver(SingleScreen);
         if (PreviewHwnd is not null) whenPreview(PreviewHwnd.Value);
@@ -80,6 +94,7 @@ public partial class DisplayWindow : Window
             whenStretchedScreensaver: InitForStetchedScreensaver,
             whenSingleScreensaver: InitForSingleScreensaver,
             whenDebug: InitForDebug,
+            whenUserRealtime: InitForUserRealtime,
             whenPreview: InitForPreview
         );
 
@@ -179,17 +194,22 @@ public partial class DisplayWindow : Window
 
         if (debugOptionsWindow is not null)
         {
-            var viewModel = debugOptionsWindow.ViewModel;
-            var debugOptions = viewModel.BackingOptions;
-
-            viewModel.PropertyChanged += (s, e) =>
-            {
-                if (PropertyRequiresSceneRefresh(e.PropertyName ?? ""))
-                {
-                    RefreshScene();
-                }
-            };
+            InitForUserRealtime(debugOptionsWindow);
         }
+    }
+
+    private void InitForUserRealtime(OptionsWindow optionsWindow)
+    {
+        var viewModel = optionsWindow.ViewModel;
+        var realtimeOptions = viewModel.BackingOptions;
+
+        viewModel.PropertyChanged += (s, e) =>
+        {
+            if (PropertyRequiresSceneRefresh(e.PropertyName ?? ""))
+            {
+                RefreshScene();
+            }
+        };
     }
 
     private void InitForPreview(nint parentHandle)
@@ -253,9 +273,9 @@ public partial class DisplayWindow : Window
 
     private ScrOptions GetOptions()
     { 
-        if (_displayMode.IsDebug && _displayMode.DebugOptionsWindow is not null)
+        if (_displayMode.RealtimeOptionsWindow is not null)
         {
-            return _displayMode.DebugOptionsWindow.ViewModel.BackingOptions;
+            return _displayMode.RealtimeOptionsWindow.ViewModel.BackingOptions;
         }
 
         var savedOptions = OptionsStorage.Load();
@@ -273,7 +293,7 @@ public partial class DisplayWindow : Window
 
     private Random GetRng(ScrOptions options)
     {
-        var debuggingWithOptionsWindow = _displayMode.IsDebug && _displayMode.DebugOptionsWindow is not null;
+        var debuggingWithOptionsWindow = _displayMode.IsDebug && _displayMode.RealtimeOptionsWindow is not null;
         if (debuggingWithOptionsWindow)
         {
             return new Random(_fixedRngSeed);

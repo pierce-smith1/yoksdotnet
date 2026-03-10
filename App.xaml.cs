@@ -14,7 +14,7 @@ public record RunType
     public bool Configure { get; init; } = default;
     public bool Screensaver { get; init; } = default;
     public nint? PreviewHwnd { get; init; } = default;
-    public bool? DebugWithOptions { get; init; } = default;
+    public bool Debug { get; init; } = default;
 
     public static RunType RunAsConfigure() => new()
     {
@@ -31,17 +31,17 @@ public record RunType
         PreviewHwnd = hwnd,
     };
 
-    public static RunType RunAsDebug(bool withOptions) => new()
+    public static RunType RunAsDebug() => new()
     {
-        DebugWithOptions = withOptions,
+        Debug = true,
     };
 
-    public T Match<T>(Func<T> whenConfigure, Func<T> whenScreensaver, Func<nint, T> whenPreview, Func<bool, T> whenDebug)
+    public T Match<T>(Func<T> whenConfigure, Func<T> whenScreensaver, Func<nint, T> whenPreview, Func<T> whenDebug)
     {
         if (Configure) return whenConfigure();
         if (Screensaver) return whenScreensaver();
         if (PreviewHwnd is not null) return whenPreview(PreviewHwnd.Value);
-        if (DebugWithOptions is not null) return whenDebug(DebugWithOptions.Value);
+        if (Debug) return whenDebug();
 
         throw new NotImplementedException();
     }
@@ -72,18 +72,7 @@ public partial class App : System.Windows.Application
                 whenStretch: () => [new DisplayWindow(DisplayMode.StretchedScreensaver())]
             ),
             whenPreview: hwnd => [new DisplayWindow(DisplayMode.Preview(hwnd))],
-            whenDebug: withOptions =>
-            {
-                _debugOptionsWindow = new OptionsWindow(options);
-                var displayWindow = new DisplayWindow(DisplayMode.Debug(_debugOptionsWindow));
-
-                if (withOptions)
-                {
-                    return [displayWindow, _debugOptionsWindow];
-                }
-
-                return [displayWindow];
-            }
+            whenDebug: () => [new OptionsWindow(startRealtimeDebug: true)]
         );
 
         MainWindow = windows.FirstOrDefault();
@@ -105,8 +94,7 @@ public partial class App : System.Windows.Application
         {
             [] => RunType.RunAsConfigure(),
             ["/c"] => RunType.RunAsConfigure(),
-            ["/d"] => RunType.RunAsDebug(withOptions: false),
-            ["/dd"] => RunType.RunAsDebug(withOptions: true),
+            ["/d"] => RunType.RunAsDebug(),
             ["/s"] => RunType.RunAsScreensaver(),
             ["/s", var handle] => RunType.RunAsScreensaver(),
             ["/p", var handle] => RunType.RunAsPreview(nint.Parse(handle)),
