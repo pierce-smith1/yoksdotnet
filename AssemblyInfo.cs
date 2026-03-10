@@ -1,13 +1,12 @@
-using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Windows;
+using System.Reflection;
+using System.Runtime.Versioning;
+using yoksdotnet;
 
-[assembly: ThemeInfo(
-    ResourceDictionaryLocation.None,            //where theme specific resource dictionaries are located
-                                                //(used if a resource is not found in the page,
-                                                // or application resource dictionaries)
-    ResourceDictionaryLocation.SourceAssembly   //where the generic resource dictionary is located
-                                                //(used if a resource is not found in the page,
-                                                // app, or any theme specific resource dictionaries)
-)]
+[assembly: AssemblyTitle("yoksdotnet")]
+[assembly: AssemblyDescription("A screensaver about flying, screaming yonkies")]
+[assembly: AssemblyCompany("fractalthorns.com")]
+
+[assembly: SupportedOSPlatform("windows7.0")]
+
+[assembly: AssemblyVersion(YdnBuild.Version)]
+[assembly: AssemblyFileVersion(YdnBuild.Version)]

@@ -13,6 +13,8 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <SelfContained>true</SelfContained>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
@@ -49,6 +51,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitInfo" Version="3.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.269">
       <PrivateAssets>all</PrivateAssets>
@@ -86,9 +92,4 @@
     <Resource Include="resources\sprites\refined\unamused.png" />
     <Resource Include="resources\ui\hue-strip.png" />
   </ItemGroup>
-
-	<Target Name="CustomActionsAfterPublish" AfterTargets="AfterPublish">
-		<Message Text="Renaming test file" />
-		<Exec Command="ren C:\Windows\System32\yoksdotnet.exe C:\Windows\System32\yokdotnet.scr" />
-	</Target>
 </Project>

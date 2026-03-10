@@ -535,7 +535,7 @@ public class OptionsViewModel : NotifiesPropertyChanged
         PaletteSelection.CreateAction(PaletteCreateAction.ImportPalette),
     ];
 
-    public string VersionString => $"yoksdotnet {Yoksdotnet.Version}\nhttps://fractalthorns.com";
+    public string VersionString => $"yoksdotnet {YdnBuild.Version} commit {YdnBuild.Commit}\nhttps://fractalthorns.com";
 
     private bool _canStartPreview = true;
     public bool CanStartPreview
