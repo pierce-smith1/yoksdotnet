@@ -8,6 +8,8 @@ public static class SceneSimulation
 {
     public static void HandleFrame(AnimationContext ctx)
     {
+        ctx.computeStopwatch.Restart();
+
         var now = DateTimeOffset.Now;
         
         if (ctx.scene.lastTick is { } lastTick)
@@ -29,5 +31,7 @@ public static class SceneSimulation
         }
 
         SpriteChoreography.HandleFrame(ctx);
+
+        ctx.computeStopwatch.Stop();
     }
 }

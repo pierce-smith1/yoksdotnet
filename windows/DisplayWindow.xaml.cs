@@ -16,6 +16,7 @@ using yoksdotnet.logic.scene;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
+using System.Windows.Threading;
 
 namespace yoksdotnet.windows;
 
@@ -120,7 +121,7 @@ public partial class DisplayWindow : Window
             _ctx.scene.width = (int)e.NewSize.Width;
             _ctx.scene.height = (int)e.NewSize.Height;
 
-            EntityBlockMapper.InitBlocks(_ctx.scene);
+            _ctx.scene.entityBlocks = EntityBlockMapper.InitBlocks(_ctx.scene.width, _ctx.scene.height);
         };
 
         StartLoop();
@@ -306,12 +307,16 @@ public partial class DisplayWindow : Window
 
     private void StartLoop()
     {
-        var loopTimer = new System.Timers.Timer(1000 / _animationFps);
-        loopTimer.Elapsed += OnTick;
+        var loopTimer = new DispatcherTimer(DispatcherPriority.Send)
+        {
+            Interval = TimeSpan.FromMilliseconds(1000.0 / _animationFps),
+        };
+
+        loopTimer.Tick += OnTick;
         loopTimer.Start();
     }
     
-    private void OnTick(object? _sender, ElapsedEventArgs _e)
+    private void OnTick(object? _sender, EventArgs _e)
     {
         RefreshSurface();
     }

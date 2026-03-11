@@ -159,3 +159,13 @@ public class RefinedBitmap : ISfEnum
 
     public override string ToString() => Name;
 }
+
+public static class Atlases
+{
+    public static SKImage classic;
+    public static SKImage refined;
+
+    static Atlases() {
+        
+    }
+}

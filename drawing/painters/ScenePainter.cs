@@ -11,11 +11,20 @@ public class ScenePainter(AnimationContext ctx, DisplayMode displayMode)
 
     public void Draw(SKCanvas canvas)
     {
+        ctx.renderStopwatch.Restart();
+
         DrawBackground(canvas);
 
         foreach (var entity in ctx.scene.entities)
         {
             SpritePainter.Draw(canvas, entity);
+        }
+
+        ctx.renderStopwatch.Stop();
+
+        if (displayMode.IsDebug)
+        {
+            DebugPainter.DrawDiagnostics(canvas, ctx);
         }
 
         if (displayMode.IsDebug && DebuggedEntity is not null)

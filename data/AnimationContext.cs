@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using yoksdotnet.drawing;
 using yoksdotnet.logic;
 
@@ -12,4 +13,7 @@ public class AnimationContext(Scene scene, ScrOptions options, Random rng)
 
     public PerlinNoiseGenerator noiseGenerator = new(rng);
     public RandomPaletteGenerator paletteGenerator = new(rng);
+
+    public Stopwatch computeStopwatch = new();
+    public Stopwatch renderStopwatch = new();
 }
