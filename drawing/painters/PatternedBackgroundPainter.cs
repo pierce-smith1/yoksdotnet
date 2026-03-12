@@ -6,7 +6,7 @@ namespace yoksdotnet.drawing.painters;
 public static class PatternedBackgroundPainter
 {
     private static readonly SKShader _backgroundShader =
-        SKImage.FromBitmap(Bitmaps.LoadResource("/resources/backgrounds/runed.png"))
+        Bitmaps.LoadResource("/resources/backgrounds/runed.png")
             .ToShader(SKShaderTileMode.Repeat, SKShaderTileMode.Repeat);
 
     public static void Draw(SKCanvas canvas, AnimationContext ctx)

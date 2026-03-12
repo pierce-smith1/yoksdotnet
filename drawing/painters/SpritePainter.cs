@@ -38,7 +38,7 @@ public static class SpritePainter
     private static void DrawClassic(SKCanvas canvas, Entity entity, Skin skin)
     {
         var skBitmap = SpriteBitmaps.GetClassicBitmap(skin, entity.emotion).Resource;
-        canvas.DrawBitmap(skBitmap, GetRect(entity), skin.BodyPaint);
+        canvas.DrawImage(skBitmap, GetRect(entity), skin.BodyPaint);
     }
 
     private static void DrawRefined(SKCanvas canvas, Entity entity, Skin skin)
@@ -81,7 +81,7 @@ public static class SpritePainter
 
         canvas.DrawCircle(eyeX, eyeY, eyeSize, skin.WhitesPaint);
         canvas.DrawOval(pupilX, pupilY, eyeSize * pupilScaleX, eyeSize * pupilScaleY, skin.EyePaint);
-        canvas.DrawBitmap(skBitmap, GetRect(entity), skin.BodyPaint);
+        canvas.DrawImage(skBitmap, GetRect(entity), skin.BodyPaint);
     }
 
     private static void DrawTrail(SKCanvas canvas, Trail trail)

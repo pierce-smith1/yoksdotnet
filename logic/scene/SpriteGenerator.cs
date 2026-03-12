@@ -85,9 +85,12 @@ public class SpriteGenerator(Random rng, ScrOptions options)
 
     private int GetSpriteCount(double width, double height)
     {
-        var scalingFactor = Interp.Linear(options.familySize, 0.0, 1.0, 0.2, 1.0);
+        const int baseCount = 10;
 
-        var count = (width / 64) * (height / 64) * scalingFactor;
+        var scalingFactor = Interp.Linear(options.familySize, 0.0, 1.0, 0.1, 1.5);
+        var sceneSizeBoost = Math.Sqrt(width * height / (64 * 64));
+
+        var count = baseCount * sceneSizeBoost * scalingFactor;
         return (int)count;
     }
 

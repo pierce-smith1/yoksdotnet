@@ -10,11 +10,11 @@ namespace yoksdotnet.drawing;
 
 public static class Bitmaps
 {
-    public static SKBitmap LoadResource(string path)
+    public static SKImage LoadResource(string path)
     {
         var uri = new Uri(path, UriKind.Relative);
         var resourceStream = Application.GetResourceStream(uri).Stream;
-        var resource = SKBitmap.Decode(new SKManagedStream(resourceStream));
+        var resource = SKImage.FromEncodedData(new SKManagedStream(resourceStream));
         return resource;
     }
 }
@@ -67,7 +67,7 @@ public class ClassicBitmap : ISfEnum
     public readonly static ClassicBitmap Vx = new("vx", isImpostor: true);
 
     public string Name { get; init; }
-    public SKBitmap Resource { get; init; }
+    public SKImage Resource { get; init; }
     public bool IsImpostor { get; init; }
 
     private ClassicBitmap(string name, bool isImpostor = false)
@@ -132,7 +132,7 @@ public class RefinedBitmap : ISfEnum
     );
 
     public string Name { get; init; }
-    public SKBitmap Resource { get; init; }
+    public SKImage Resource { get; init; }
     public Vector PupilCenter { get; init; }
     public double PupilRange { get; init; }
     public double EyeScale { get; init; } = 1.0;
@@ -160,12 +160,3 @@ public class RefinedBitmap : ISfEnum
     public override string ToString() => Name;
 }
 
-public static class Atlases
-{
-    public static SKImage classic;
-    public static SKImage refined;
-
-    static Atlases() {
-        
-    }
-}
