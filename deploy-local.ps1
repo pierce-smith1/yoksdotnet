@@ -5,4 +5,4 @@
 # do with an elevated command prompt or the 'sudo' command.
 
 dotnet publish -p:PublishProfile=Deploy.pubxml
-copy-item .\bin\Release\net8.0-windows\win-x64\publish\yoksdotnet.exe C:\Windows\System32\yoksdotnet.scr
+copy-item .\bin\Release\net10.0-windows\win-x64\publish\yoksdotnet.exe C:\Windows\System32\yoksdotnet.scr

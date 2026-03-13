@@ -24,6 +24,5 @@ public class Entity
     public Bubble? bubble;
     public Boid? boid;
 
-    public IPatternToken? patternToken;
     public EntityBlock? block;
 }

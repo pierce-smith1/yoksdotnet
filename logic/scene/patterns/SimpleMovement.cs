@@ -3,20 +3,19 @@ using System.Linq;
 using yoksdotnet.common;
 using yoksdotnet.data;
 using yoksdotnet.data.entities;
-using yoksdotnet.drawing;
 
 namespace yoksdotnet.logic.scene.patterns;
 
 public static class SimpleMovement
 {
-    public class LatticeSimulator : SimplePatternSimulator
+    public class LatticeSimulator : PatternSimulator
     {
-        public override void Move(AnimationContext _ctx, Entity _entity) {}
+        public override void MoveEntity(AnimationContext _ctx, Entity entity) {}
     }
 
-    public class RoamerSimulator : SimplePatternSimulator
+    public class RoamersSimulator : PatternSimulator
     {
-        public override void Move(AnimationContext ctx, Entity entity)
+        public override void MoveEntity(AnimationContext ctx, Entity entity)
         {
             entity.basis.home.X += entity.brand * ctx.scene.lastDtMs;
             entity.basis.home.Y += Math.Sin(ctx.scene.seconds * entity.brand) * ctx.scene.lastDtMs;
@@ -25,9 +24,9 @@ public static class SimpleMovement
         }
     }
 
-    public class WavesSimulator : SimplePatternSimulator
+    public class WavesSimulator : PatternSimulator
     {
-        public override void Move(AnimationContext ctx, Entity entity)
+        public override void MoveEntity(AnimationContext ctx, Entity entity)
         {
             entity.basis.home.X += Math.Sin(ctx.scene.seconds * entity.brand) * ctx.scene.lastDtMs;
             entity.basis.home.Y += Math.Cos(ctx.scene.seconds * entity.brand) * ctx.scene.lastDtMs;
@@ -36,9 +35,9 @@ public static class SimpleMovement
         }
     }
 
-    public class LissajousSimulator : SimplePatternSimulator
+    public class LissajousSimulator : PatternSimulator
     {
-        public override void Move(AnimationContext ctx, Entity entity)
+        public override void MoveEntity(AnimationContext ctx, Entity entity)
         {
             var bounds = entity.basis.Bounds;
             var bufferX = (bounds.bottomRight.X - bounds.topLeft.X);
@@ -55,9 +54,6 @@ public static class SimpleMovement
 
             var coeffX = Interp.Linear(brandX, 0.0, 1.0, 10.0, 20.0);
             var coeffY = Interp.Linear(brandY, 0.0, 1.0, 10.0, 20.0);
-
-            var speedX = Interp.Linear(brandX, 0.0, 1.0, 2.0, 7.0);
-            var speedY = Interp.Linear(brandY, 0.0, 1.0, 2.0, 7.0);
 
             var targetX = Interp.Linear(
                 Math.Sin(ctx.scene.seconds * 5.0 - entity.brand * coeffX),

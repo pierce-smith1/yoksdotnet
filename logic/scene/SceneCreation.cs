@@ -14,7 +14,6 @@ public static class SceneCreation
             height = height,
 
             entities = [..new SpriteGenerator(rng, options).Make(width, height)],
-            entityBlocks = EntityBlockMapper.InitBlocks(width, height),
 
             currentPattern = options.startingPattern.Match(
                 whenRandom: () => 

@@ -1,56 +1,52 @@
-﻿using yoksdotnet.data;
+﻿using yoksdotnet.common;
+using yoksdotnet.data;
 using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public interface IPatternToken;
-
-public interface IPatternSimulator
+public abstract class PatternSimulator
 {
-    public IPatternToken InitSimulation(AnimationContext ctx, Entity entity);
-    public void Simulate(AnimationContext ctx, Entity entity, IPatternToken token);
-    public void EndSimulation(AnimationContext ctx, Entity entity, IPatternToken token);
+    public virtual void Init(AnimationContext _ctx) {}
+    public virtual void Run(AnimationContext ctx)
+    {
+        BeforeMove(ctx);
+
+        foreach (var entity in ctx.scene.entities)
+        {
+            var oldHome = entity.basis.home;
+
+            MoveEntity(ctx, entity);
+
+            if (entity.emotion is { } emotion)
+            {
+                SpriteMovement.ApplyEmotionShake(ctx, (entity.basis, emotion));
+                EmotionSimulator.UpdateEmotions(ctx, (entity.basis, emotion));
+            }
+
+            var newHome = entity.basis.home;
+            var measuredVelocity = new Vector(
+                (newHome.X - oldHome.X) / ctx.scene.lastDtMs, 
+                (newHome.Y - oldHome.Y) / ctx.scene.lastDtMs
+            );
+
+            var physicsMeasurements = entity.physicsMeasurements ??= new()
+            {
+                lastVelocity = new(0.0, 0.0),
+            };
+
+            physicsMeasurements.lastVelocity = measuredVelocity;
+
+            TrailSimulator.UpdateTrails(ctx, entity);
+
+            if (entity.skin?.style.IsRefined is true)
+            {
+                GazeSimulator.UpdateGaze(ctx, entity);
+            }
+        }
+    }
+    public virtual void End(AnimationContext _ctx) {}
+    public virtual void BeforeMove(AnimationContext _ctx) {}
+
+    public abstract void MoveEntity(AnimationContext ctx, Entity entity);
 }
 
-public abstract class PatternSimulator<T> : IPatternSimulator
-{
-    private record PatternDataToken(T Data) : IPatternToken;
-
-    public IPatternToken InitSimulation(AnimationContext ctx, Entity entity)
-    {
-        var token = new PatternDataToken(Init(ctx, entity));
-        return token;
-    }
-
-    public void Simulate(AnimationContext ctx, Entity entity, IPatternToken token)
-    {
-        var data = (token as PatternDataToken)!.Data;
-        Move(ctx, entity, data);
-    }
-
-    public void EndSimulation(AnimationContext ctx, Entity entity, IPatternToken token)
-    {
-        var data = (token as PatternDataToken)!.Data;
-        End(ctx, entity, data);
-    }
-
-    public abstract T Init(AnimationContext ctx, Entity entity);
-    public abstract void Move(AnimationContext ctx, Entity entity, T data);
-    public virtual void End(AnimationContext _ctx, Entity _entity, T _data) {}
-}
-
-public abstract class SimplePatternSimulator : IPatternSimulator
-{
-    private record PatternToken : IPatternToken;
-
-    public IPatternToken InitSimulation(AnimationContext _ctx, Entity _entity) => new PatternToken();
-
-    public void Simulate(AnimationContext ctx, Entity entity, IPatternToken _token)
-    {
-        Move(ctx, entity);
-    }
-
-    public void EndSimulation(AnimationContext _ctx, Entity _entity, IPatternToken _token) {}
-
-    public abstract void Move(AnimationContext ctx, Entity entity);
-}

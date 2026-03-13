@@ -4,25 +4,25 @@ using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public class BouncySimulator : PatternSimulator<Physics>
+public class BouncySimulator : PatternSimulator
 {
-    public override Physics Init(AnimationContext ctx, Entity entity)
+    public override void Init(AnimationContext ctx)
     {
-        var lastVelocity = entity.physicsMeasurements?.lastVelocity;
-
-        entity.physics ??= new()
+        foreach (var entity in ctx.scene.entities)
         {
-            velocity = lastVelocity ?? Vector.RandomScaled(ctx.rng, 5.0, 5.0),
-            mass = Interp.Linear(ctx.rng.NextDouble(), 0.0, 1.0, 0.5, 1.5),
-        };
+            var lastVelocity = entity.physicsMeasurements?.lastVelocity;
 
-        return entity.physics;
+            var physics = entity.physics ??= new()
+            {
+                velocity = lastVelocity ?? Vector.RandomScaled(ctx.rng, 5.0, 5.0),
+            };
+        }
     }
 
-    public override void Move(AnimationContext ctx, Entity entity, Physics physics)
+    public override void MoveEntity(AnimationContext ctx, Entity entity)
     {
-        SpriteMovement.SimulatePhysics(ctx, (entity.basis, physics));
-        BounceOffScreen(ctx, (entity.basis, physics));
+        SpriteMovement.SimulatePhysics(ctx, (entity.basis, entity.physics!));
+        BounceOffScreen(ctx, (entity.basis, entity.physics!));
     }
 
     public static void BounceOffScreen(AnimationContext ctx, (Basis, Physics) entity)

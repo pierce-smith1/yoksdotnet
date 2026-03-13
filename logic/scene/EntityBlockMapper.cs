@@ -8,14 +8,12 @@ namespace yoksdotnet.logic.scene;
 
 public static class EntityBlockMapper
 {
-    public const double BlockSize = 128.0;
-
-    public static List<EntityBlock> InitBlocks(double width, double height)
+    public static List<EntityBlock> InitBlocks(Scene scene, double blockSize)   
     {
         var blocks = new List<EntityBlock>();
 
-        var numBlocksX = (int)Math.Ceiling(width / BlockSize);
-        var numBlocksY = (int)Math.Ceiling(height / BlockSize);
+        var numBlocksX = (int)Math.Ceiling(scene.width / blockSize);
+        var numBlocksY = (int)Math.Ceiling(scene.height / blockSize);
 
         var numBlocks = numBlocksX * numBlocksY;
 
@@ -38,30 +36,37 @@ public static class EntityBlockMapper
         return blocks;
     }
 
-    public static void AssignEntities(Scene scene, List<EntityBlock> entityBlocks, IEnumerable<Entity> entities)
+    public static void AssignEntities(Scene scene, List<EntityBlock> entityBlocks, IEnumerable<Entity> entities, double blockSize)
     {
         foreach (var block in entityBlocks)
         {
             block.entities.Clear();
+            block.interactibleEntities.Clear();
         }
 
         foreach (var entity in entities)
         {
-            var iBlock = CoordToBlockIndex(scene, entity.basis.home);
+            var iBlock = CoordToBlockIndex(scene, entity.basis.home, blockSize);
             var block = entityBlocks[iBlock];
 
             entity.block = block;
             block.entities.Add(entity);
+            block.interactibleEntities.Add(entity);
+
+            foreach (var neighbor in block.neighbors)
+            {
+                neighbor.interactibleEntities.Add(entity);
+            }
         }
     }
 
-    public static int CoordToBlockIndex(Scene scene, Vector coord)
+    public static int CoordToBlockIndex(Scene scene, Vector coord, double blockSize)
     {
-        var ix = (int)Math.Floor(coord.X / BlockSize);
-        var iy = (int)Math.Floor(coord.Y / BlockSize);
+        var ix = (int)Math.Floor(coord.X / blockSize);
+        var iy = (int)Math.Floor(coord.Y / blockSize);
 
-        var numBlocksX = (int)Math.Ceiling(scene.width / BlockSize);
-        var numBlocksY = (int)Math.Ceiling(scene.height / BlockSize);
+        var numBlocksX = (int)Math.Ceiling(scene.width / blockSize);
+        var numBlocksY = (int)Math.Ceiling(scene.height / blockSize);
 
         ix = Math.Clamp(ix, 0, numBlocksX - 1);
         iy = Math.Clamp(iy, 0, numBlocksY - 1);

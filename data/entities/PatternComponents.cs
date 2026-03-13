@@ -5,6 +5,7 @@ namespace yoksdotnet.data.entities;
 public class Bubble : EntityComponent
 {
     public required double radius;
+    public required double mass;
     public bool isFree = false;
 
     public bool IsVisible { get; private set; } = false;

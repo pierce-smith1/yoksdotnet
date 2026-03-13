@@ -118,13 +118,18 @@ public partial class DisplayWindow : Window
 
         SizeChanged += (s, e) =>
         {
-            _ctx.scene.width = (int)e.NewSize.Width;
-            _ctx.scene.height = (int)e.NewSize.Height;
-
-            _ctx.scene.entityBlocks = EntityBlockMapper.InitBlocks(_ctx.scene.width, _ctx.scene.height);
+            ResetScene((int)e.NewSize.Width, (int)e.NewSize.Height);
         };
 
         StartLoop();
+    }
+
+    private void ResetScene(int newWidth, int newHeight)
+    {
+        _ctx.scene.width = newWidth;
+        _ctx.scene.height = newHeight;
+
+        _ctx.scene.currentPattern.Simulator.Init(_ctx);
     }
 
     private void InitForScreensaver()

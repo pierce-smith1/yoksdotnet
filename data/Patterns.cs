@@ -6,20 +6,20 @@ namespace yoksdotnet.data;
 public record Pattern(
     string Name,
     string Description,
-    IPatternSimulator Simulator
+    PatternSimulator Simulator
 ) 
     : ISfEnum
 {
     public readonly static Pattern Lattice = new(
-        "Lattice", 
+        "Lattice",
         "No motion",
         new SimpleMovement.LatticeSimulator()
-    );
+    ); 
 
     public readonly static Pattern Roamers = new(
         "Roamers", 
         "Drift from left to right, softly bobbing up and down",
-        new SimpleMovement.RoamerSimulator()
+        new SimpleMovement.RoamersSimulator()
     );
 
     public readonly static Pattern Bouncy = new(

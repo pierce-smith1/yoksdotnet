@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using yoksdotnet.common;
@@ -7,34 +8,53 @@ using yoksdotnet.data.entities;
 
 namespace yoksdotnet.logic.scene.patterns;
 
-public class BoidsSimulator : PatternSimulator<(Physics, Boid)>
+public class BoidsSimulator : PatternSimulator
 {
-    public override (Physics, Boid) Init(AnimationContext ctx, Entity entity)
+    private readonly static double _baseAvoidRadius = 60.0;
+    private readonly static double _baseVisionRadius = 120.0;
+    private readonly static double _baseVisionTheta = Math.PI / 5.0;
+    private readonly static double _maxInteractionDistance = _baseVisionRadius;
+
+    public override void Init(AnimationContext ctx)
     {
-        var boid = entity.boid ??= new()
+        foreach (var entity in ctx.scene.entities)
         {
-            avoidRadius = 60.0,
-            visionRadius = 120.0,
-            visionTheta = Math.PI / 5.0,
-        };
+            var boid = entity.boid ??= new()
+            {
+                avoidRadius = _baseAvoidRadius,
+                visionRadius = _baseVisionRadius,
+                visionTheta = _baseVisionTheta,
+            };
 
-        var physics = entity.physics ??= new()
-        {
-            velocity = Vector.RandomScaled(ctx.rng, 2.0, 2.0),
-            mass = Interp.Linear(entity.brand, 0.0, 1.0, 0.5, 1.5),
-        };
+            var physics = entity.physics ??= new()
+            {
+                velocity = Vector.RandomScaled(ctx.rng, 2.0, 2.0),
+            };
+        }
 
-        return (physics, boid);
+        ctx.scene.entityBlocks = EntityBlockMapper.InitBlocks(ctx.scene, _maxInteractionDistance);
     }
 
-    public override void Move(AnimationContext ctx, Entity entity, (Physics, Boid) components)
+    public override void BeforeMove(AnimationContext ctx)
     {
-        var (physics, boid) = components;
+        EntityBlockMapper.AssignEntities(ctx.scene, ctx.scene.entityBlocks, ctx.scene.entities, _maxInteractionDistance);
+    }
 
-        var peersToAvoid = entity.block!.AllAround.Where(e => ShouldAvoid((entity.basis, boid), e.basis));
+    public override void MoveEntity(AnimationContext ctx, Entity entity)
+    {
+        var physics = entity.physics!;
+        var boid = entity.boid!;
+
+        var block = entity.block!;
+
+        var peersToAvoid = entity.block!.interactibleEntities
+            .Where(e => ShouldAvoid((entity.basis, boid), e.basis));
+
         PushAwayFrom((entity.basis, physics), peersToAvoid.Select(e => e.basis));
 
-        var visiblePeers = entity.block!.AllAround.Where(e => IsVisibleTo((entity.basis, physics, boid), e.basis));
+        var visiblePeers = entity.block!.interactibleEntities
+            .Where(e => IsVisibleTo((entity.basis, physics, boid), e.basis));
+
         AlignWith((entity.basis, physics), visiblePeers.Select(e => e.physics!));
         SteerTowardsCenter((entity.basis, physics), visiblePeers.Select(e => e.basis));
 

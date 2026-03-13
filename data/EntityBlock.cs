@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using yoksdotnet.common;
 using yoksdotnet.data.entities;
 
 namespace yoksdotnet.data;
 
 public class EntityBlock
 {
+    public static int MaxEntitiesPerBlock = 16;
+
     public required int index;
 
-    public List<Entity> entities = [];
-    public List<EntityBlock> neighbors = [];
+    public FixedCircularArray<Entity> entities = new(MaxEntitiesPerBlock);
+    public FixedCircularArray<Entity> interactibleEntities = new(MaxEntitiesPerBlock * 9);
 
-    public IEnumerable<Entity> AllAround => 
-        entities.Concat(neighbors.SelectMany(n => n.entities));
+    public List<EntityBlock> neighbors = [];
 }
