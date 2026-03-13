@@ -234,6 +234,9 @@ public partial class OptionsWindow : Window
         if (paletteImportDialog.ShowDialog() is not true)
         {
             OptionsStorage.Save(ViewModel.BackingOptions);
+            ViewModel.FamilyPaletteChoice = PaletteSelection.PaletteSet(
+                ViewModel.BackingOptions.paletteChoice
+            );
             return;
         }
 

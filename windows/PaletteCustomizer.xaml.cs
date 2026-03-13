@@ -683,7 +683,13 @@ public class PaletteCustomizerViewModel : INotifyPropertyChanged
 
         var (h, s, l) = ColorConversion.ToHsl(SelectedEntry.PaletteView[SelectedIndex]);
 
-        Hue = (float)h;
+        if (s != 0 && l != 0)
+        {
+            // Hue is meaningless when saturation/lightness are 0.
+            // Not updating the hue in those cases fixes weird behavior involving gray/black colors.
+            Hue = (float)h;
+        }
+
         Saturation = (float)s;
         Lightness = (float)l;
     }
